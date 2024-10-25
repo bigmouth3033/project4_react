@@ -1,9 +1,9 @@
 import styled from "styled-components";
 import Avatar from "react-avatar";
 import { useState } from "react";
+import { useRef } from "react";
 import { CiLogout } from "react-icons/ci";
 import { useEffect } from "react";
-import { useRef } from "react";
 import { FaBars } from "react-icons/fa6";
 import { FaArrowRight } from "react-icons/fa6";
 import sidebar_content from "../sidebar/data/sidebar_content";
@@ -16,15 +16,18 @@ const Container = styled.div`
   position: sticky;
   top: 0;
   z-index: 1;
-  background-color: white;
-  display: flex;
-  justify-content: space-between;
-  height: 4.8rem;
-  align-items: center;
-  padding: 0 1rem;
+  background-color: #ffffff;
+  padding: 0 2rem;
 
-  & p {
-    margin: 0;
+  > div {
+    display: flex;
+    justify-content: space-between;
+    height: 5rem;
+    align-items: center;
+
+    & p {
+      margin: 0;
+    }
   }
 `;
 
@@ -33,6 +36,9 @@ const Left = styled.div`
   align-items: center;
   gap: 1rem;
   width: max-content;
+  font-size: 20px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
 `;
 
 const Right = styled.div``;
@@ -48,8 +54,12 @@ const Profile = styled.div`
   cursor: pointer;
 
   & p {
-    font-size: 12px;
+    font-size: 14px;
     text-align: end;
+  }
+
+  & h5 {
+    font-size: 15px;
   }
 `;
 
@@ -97,6 +107,8 @@ export default function Header({ isSideBarSmall, setIsSideBarSmall }) {
   const dropDownRef = useRef();
   const dropDownButton = useRef();
   const [currentPage, setCurrentPage] = useState();
+  const headerRef = useRef();
+  const containerRef = useRef();
 
   const edited_sidebar = [];
 
@@ -146,6 +158,25 @@ export default function Header({ isSideBarSmall, setIsSideBarSmall }) {
     }
   }, [location.pathname]);
 
+  useEffect(() => {
+    const event = function () {
+      if (window.scrollY > 100) {
+        if (headerRef.current && containerRef.current) {
+          headerRef.current.style.boxShadow = "rgba(0, 0, 0, 0.05) 0px 0px 0px 1px";
+        }
+      } else {
+        if (headerRef.current && containerRef.current) {
+          headerRef.current.style.boxShadow = "none";
+        }
+      }
+    };
+    window.addEventListener("scroll", event);
+
+    return () => {
+      window.removeEventListener("scroll", event);
+    };
+  }, []);
+
   const onLogout = () => {
     // Cookies.remove("ADMIN_ACCESS_TOKEN");
     // admin.refetch();
@@ -153,30 +184,35 @@ export default function Header({ isSideBarSmall, setIsSideBarSmall }) {
 
   return (
     <>
-      <Container>
-        <Left>
-          <HideShowButton onClick={() => setIsSideBarSmall((prev) => !prev)}>
-            {!isSideBarSmall ? <FaBars /> : <FaArrowRight />}
-          </HideShowButton>
-          <p>{currentPage}</p>
-        </Left>
-        <Right>
-          <ProfileGroup ref={dropDownButton}>
-            <Profile onClick={() => setDropDown((prev) => !prev)}>
-              <div></div>
-              <Avatar name={"admin"} size="40" round />
-            </Profile>
-            {/* {dropDown && (
-              <DropDown ref={dropDownRef}>
-                <DropDownButton onClick={() => setIsPopUp(true)}>Reset password</DropDownButton>
-                <DropDownButton onClick={onLogout}>
-                  <CiLogout />
-                  Log out
-                </DropDownButton>
-              </DropDown>
-            )} */}
-          </ProfileGroup>
-        </Right>
+      <Container ref={headerRef}>
+        <div ref={containerRef}>
+          <Left>
+            <HideShowButton onClick={() => setIsSideBarSmall((prev) => !prev)}>
+              {!isSideBarSmall ? <FaBars /> : <FaArrowRight />}
+            </HideShowButton>
+            <p>{currentPage}</p>
+          </Left>
+          <Right>
+            <ProfileGroup ref={dropDownButton}>
+              <Profile onClick={() => setDropDown((prev) => !prev)}>
+                <div>
+                  <h5>Tân Ngô</h5>
+                  <p>Admin</p>
+                </div>
+                <Avatar name={"admin"} size="45" round />
+              </Profile>
+              {dropDown && (
+                <DropDown ref={dropDownRef}>
+                  <DropDownButton onClick={() => setIsPopUp(true)}>Reset password</DropDownButton>
+                  <DropDownButton onClick={onLogout}>
+                    <CiLogout />
+                    Log out
+                  </DropDownButton>
+                </DropDown>
+              )}
+            </ProfileGroup>
+          </Right>
+        </div>
       </Container>
       {isPopUp && <ResetPopUp action={() => setIsPopUp(false)} />}
     </>

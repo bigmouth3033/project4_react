@@ -3,6 +3,7 @@ import CustomerLayout from "./layout/CustomerLayout";
 import HomePage from "@/feature/customer/homepage/HomePage";
 import DashBoard from "@/feature/admin/dashboard/DashBoard";
 import AdminLayout from "./layout/AdminLayout";
+import AdminLogin from "@/feature/admin/admin_login/AdminLogin";
 
 const router = createBrowserRouter(
   [
@@ -20,6 +21,10 @@ const router = createBrowserRouter(
           element: <DashBoard />,
         },
       ],
+    },
+    {
+      path: "/admin_login",
+      element: <AdminLogin />,
     },
   ],
   { basename: "/UrbanNest" }

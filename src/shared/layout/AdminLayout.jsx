@@ -8,7 +8,7 @@ import Header from "@/feature/admin/header/Header";
 
 const Container = styled.div`
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 280px 1fr;
   min-height: 100vh;
 
   transition: all 0.1s;
@@ -28,7 +28,7 @@ const AdminBody = styled.div`
 `;
 
 const OutletContainer = styled.div`
-  background-color: #f7f6f6;
+  background-color: #f3f3f3;
 `;
 
 export default function AdminLayout() {

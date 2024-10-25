@@ -5,8 +5,8 @@ import { IoIosArrowForward } from "react-icons/io";
 import { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
-import logo from "./assets/images/logo-11.png";
 import ReactDOM from "react-dom";
+import logo from "@/shared/assets/images/URBANNEST.png";
 
 const TooltipContainer = ({ children }) => {
   return ReactDOM.createPortal(children, document.body);
@@ -17,12 +17,16 @@ const Container = styled.div`
   top: 0;
   display: flex;
   flex-direction: column;
-  background-color: #563e7c;
+  background-color: #dd2f6e;
   gap: 15px;
   padding: 1rem;
+  padding-top: 2rem;
   padding-right: 0;
   height: 100vh;
   overflow-y: scroll;
+
+  /* border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px; */
 
   &::-webkit-scrollbar-track {
     background-color: none;
@@ -54,14 +58,20 @@ const SingleButton = styled(Link)`
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: #f0bad4;
+  color: #f5c1d4;
   gap: 1rem;
+  font-size: 17px;
+  font-weight: 600;
 
   &:hover {
     color: white;
   }
   padding: 0.4rem 5px;
   padding-left: 10px;
+
+  > span {
+    font-size: 24px;
+  }
 `;
 
 const SingleButtonSmall = styled(Link)`
@@ -87,13 +97,15 @@ const GroupButton = styled.button`
   align-items: center;
   background-color: inherit;
   border: none;
-  color: #f0bad4;
+  color: #f5c1d4;
   cursor: pointer;
   width: 100%;
   padding: 0.4rem 5px;
   padding-left: 10px;
   border-top-left-radius: 15px;
   border-bottom-left-radius: 15px;
+  font-size: 17px;
+  font-weight: 600;
 
   > div {
     display: flex;
@@ -110,16 +122,20 @@ const GroupButton = styled.button`
     if (props.$active == true) {
       return css`
         background-color: white;
-        color: #4066d5;
+        color: #dd367c;
         border-top-left-radius: 15px;
         border-bottom-left-radius: 15px;
 
         &:hover {
-          color: #4066d5;
+          color: #dd367c;
         }
       `;
     }
   }}
+
+  & span {
+    font-size: 24px;
+  }
 `;
 
 const GroupButtonSmall = styled.button`
@@ -163,7 +179,9 @@ const ChildrenButton = styled(Link)`
   text-decoration: none;
   color: #f0bad4;
   gap: 1rem;
-  font-size: 15px;
+  font-size: 17px;
+  font-weight: 600;
+
   &:hover {
     color: white;
   }
@@ -185,15 +203,19 @@ export default function SideBar({ isSideBarSmall }) {
   return (
     <Container>
       {!isSideBarSmall && (
-        <LogoContainer>
-          <img src={logo} />
-        </LogoContainer>
+        <>
+          <LogoContainer>
+            <img src={logo} />
+          </LogoContainer>
+          <hr />
+        </>
       )}
+
       {sidebar_content.map((item, index) => {
         if (item.type == "button" && !isSideBarSmall) {
           return (
             <SingleButton key={index} to={item.link}>
-              {item.icon} {item.name}
+              <span>{item.icon}</span> {item.name}
             </SingleButton>
           );
         }
@@ -216,7 +238,7 @@ export default function SideBar({ isSideBarSmall }) {
                 }
               >
                 <div>
-                  {item.icon} {item.name}
+                  <span>{item.icon}</span> {item.name}
                 </div>
                 {!buttonGroupState[item.name] ? <IoIosArrowForward /> : <IoIosArrowDown />}
               </GroupButton>
@@ -241,7 +263,7 @@ export default function SideBar({ isSideBarSmall }) {
                   {item.children.map((child, index) => {
                     return (
                       <ChildrenButton key={index} to={child.link}>
-                        {child.icon} {child.name}
+                        <span>{child.icon}</span> {child.name}
                       </ChildrenButton>
                     );
                   })}
