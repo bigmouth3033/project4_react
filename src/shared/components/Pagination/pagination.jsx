@@ -17,7 +17,7 @@ const Container = styled.div`
   }
 
   & .active {
-    background-color: #4da1fa;
+    background-color: black;
     color: white;
   }
 

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import ErrorIcon from "../AnimationIcon/ErrorIcon";
+import RedButton from "../Button/RedButton1";
 
 const initBox = keyframes`
   from {
@@ -64,16 +65,6 @@ const BodyContainer = styled.div`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
-
-  > button {
-    cursor: pointer;
-    background-color: #67bae9;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 15px;
-    color: white;
-    font-weight: 500;
-  }
 `;
 
 const PopUp = ({ header, message, action }) => {
@@ -100,7 +91,7 @@ const PopUp = ({ header, message, action }) => {
         <p>{message}</p>
       </BodyContainer>
       <ButtonContainer>
-        <button onClick={(ev) => onCLickOk(ev)}>Ok</button>
+        <RedButton onClick={(ev) => onCLickOk(ev)}>Ok</RedButton>
       </ButtonContainer>
     </Container>
   );

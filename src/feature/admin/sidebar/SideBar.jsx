@@ -17,7 +17,7 @@ const Container = styled.div`
   top: 0;
   display: flex;
   flex-direction: column;
-  background-color: #dd2f6e;
+  background-color: #ea5e66;
   gap: 15px;
   padding: 1rem;
   padding-top: 2rem;
@@ -58,7 +58,7 @@ const SingleButton = styled(Link)`
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: #f5c1d4;
+  color: #f5f5dc;
   gap: 1rem;
   font-size: 17px;
   font-weight: 600;
@@ -97,13 +97,13 @@ const GroupButton = styled.button`
   align-items: center;
   background-color: inherit;
   border: none;
-  color: #f5c1d4;
+  color: #f5f5dc;
   cursor: pointer;
   width: 100%;
-  padding: 0.4rem 5px;
+  padding: 0.6rem 5px;
   padding-left: 10px;
-  border-top-left-radius: 15px;
-  border-bottom-left-radius: 15px;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
   font-size: 17px;
   font-weight: 600;
 
@@ -136,6 +136,10 @@ const GroupButton = styled.button`
   & span {
     font-size: 24px;
   }
+
+  > svg {
+    font-size: 20px;
+  }
 `;
 
 const GroupButtonSmall = styled.button`
@@ -162,7 +166,7 @@ const GroupChildrens = styled.div`
   padding-left: 1rem;
   height: 0;
   overflow: hidden;
-  transition: all 0.1s ease;
+  transition: all 0.1s ease-in-out;
 
   ${(props) => {
     if (props.$active == true) {
@@ -177,7 +181,7 @@ const ChildrenButton = styled(Link)`
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: #f0bad4;
+  color: #f4f3dc;
   gap: 1rem;
   font-size: 17px;
   font-weight: 600;
@@ -186,7 +190,7 @@ const ChildrenButton = styled(Link)`
     color: white;
   }
 
-  padding: 0.4rem 5px;
+  padding: 0.6rem 20px;
 `;
 
 export default function SideBar({ isSideBarSmall }) {

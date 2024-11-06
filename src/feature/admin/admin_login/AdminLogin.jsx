@@ -6,6 +6,11 @@ import Button1 from "@/shared/components/Button/Button1";
 import { useEffect } from "react";
 import WebFont from "webfontloader";
 import background from "@/feature/admin/admin_login/assets/stacked-steps-haikei.svg";
+import { AdminLoginRequest } from "./api/adminLoginApi";
+import { useState } from "react";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import AlertPopUp from "@/shared/components/PopUp/AlertPopUp";
 
 const Container = styled.div`
   background-color: rgb(248, 249, 251);
@@ -83,7 +88,81 @@ const Intro = styled.div`
   margin-bottom: 10px;
 `;
 
+const EmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const AdminLogin = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const adminLogin = AdminLoginRequest();
+  const navigate = useNavigate();
+  const [isAlert, setIsAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errors, setErrors] = useState("");
+
+  const onLogin = (ev) => {
+    ev.preventDefault();
+
+    let isOk = true;
+
+    if (!email) {
+      setErrors((prev) => {
+        return { ...prev, email: "Email cannot be empty" };
+      });
+      isOk = false;
+    } else {
+      setErrors((prev) => {
+        return { ...prev, email: null };
+      });
+    }
+
+    if (email && !EmailRegex.test(email)) {
+      setErrors((prev) => {
+        return { ...prev, email_pattern: "Wrong pattern of email" };
+      });
+      isOk = false;
+    } else {
+      setErrors((prev) => {
+        return { ...prev, email_pattern: null };
+      });
+    }
+
+    if (!password) {
+      setErrors((prev) => {
+        return { ...prev, password: "Password cannot be empty" };
+      });
+      isOk = false;
+    } else {
+      setErrors((prev) => {
+        return { ...prev, password: null };
+      });
+    }
+
+    if (isOk) {
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("password", password);
+
+      adminLogin.mutate(formData, {
+        onSuccess: (response) => {
+          if (response.status == 200) {
+            Cookies.set("ADMIN_ACCESS_TOKEN", response.data);
+            navigate("/admin");
+          }
+
+          if (response.status == 403) {
+            setErrorMessage(response.message);
+            setIsAlert(true);
+          }
+
+          if (response.status == 404) {
+            setErrorMessage("Wrong username or password");
+            setIsAlert(true);
+          }
+        },
+      });
+    }
+  };
+
   useEffect(() => {
     WebFont.load({
       google: {
@@ -93,35 +172,41 @@ const AdminLogin = () => {
   }, []);
 
   return (
-    <Container>
-      <LoginContainer>
-        <div>
-          <img src={logo} />
-        </div>
-        <LoginForm>
-          <Intro>
-            <p>Sign in to account</p> <p>Enter your email & password to login</p>
-          </Intro>
+    <>
+      <Container>
+        <LoginContainer>
           <div>
-            <label>Email address</label>
-            <CustomTextInput placeholder={"text@gmail.com"} />
+            <img src={logo} />
           </div>
-          <div>
-            <label>Password</label>
-            <CustomTextInput type={"password"} />
-          </div>
-          <RememberForgot>
+          <LoginForm>
+            <Intro>
+              <p>Sign in to account</p> <p>Enter your email & password to login</p>
+            </Intro>
             <div>
-              <InputCheckBox /> Remember me
+              <label>Email address</label>
+              <CustomTextInput state={email} setState={setEmail} placeholder={"text@gmail.com"} />
             </div>
-            <span>Forgot password</span>
-          </RememberForgot>
-          <ButtonContaner>
-            <Button1>Login</Button1>
-          </ButtonContaner>
-        </LoginForm>
-      </LoginContainer>
-    </Container>
+            {errors.email && <h5>{errors.email}</h5>}
+            {errors.email_pattern && <h5>{errors.email_pattern}</h5>}
+            <div>
+              <label>Password</label>
+              <CustomTextInput state={password} setState={setPassword} type={"password"} />
+            </div>
+            {errors.password && <h5>{errors.password}</h5>}
+            <RememberForgot>
+              <div>
+                <InputCheckBox /> Remember me
+              </div>
+              <span>Forgot password</span>
+            </RememberForgot>
+            <ButtonContaner>
+              <Button1 onClick={onLogin}>Login</Button1>
+            </ButtonContaner>
+          </LoginForm>
+        </LoginContainer>
+      </Container>
+      {isAlert && <AlertPopUp action={() => setIsAlert(false)} message={errorMessage} />}
+    </>
   );
 };
 

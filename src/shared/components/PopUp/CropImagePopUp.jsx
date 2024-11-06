@@ -1,4 +1,3 @@
-import React from "react";
 import PopUp from "./PopUp";
 import { useState } from "react";
 import XButton from "../Button/XButton";
@@ -219,6 +218,6 @@ async function getCroppedImg(
   return new Promise((resolve, reject) => {
     croppedCanvas.toBlob((file) => {
       resolve(file);
-    }, "image/jpeg");
+    }, "image/png");
   });
 }

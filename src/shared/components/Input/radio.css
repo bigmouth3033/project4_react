@@ -42,7 +42,7 @@
   left: 50%;
   width: 8px;
   height: 8px;
-  background: #0b74e5;
+  background: black;
   transform: translateX(-50%) translateY(-50%);
 }
 

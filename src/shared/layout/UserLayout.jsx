@@ -3,11 +3,13 @@ import styled from "styled-components";
 import { useEffect } from "react";
 import WebFont from "webfontloader";
 
-const Container = styled.div``;
+const Container = styled.div`
+  background-color: white;
+`;
 
 const OutletContainer = styled.div``;
 
-export default function CustomerLayout() {
+export default function UserLayout() {
   useEffect(() => {
     WebFont.load({
       google: {

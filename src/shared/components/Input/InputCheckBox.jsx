@@ -1,4 +1,3 @@
-import React from "react";
 import "./checkbox.css";
 
 export default function InputCheckBox({ checked, onChange, readOnly }) {

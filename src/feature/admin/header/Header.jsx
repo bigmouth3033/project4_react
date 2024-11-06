@@ -11,6 +11,8 @@ import { useLocation } from "react-router-dom";
 import TextInput from "@/shared/components/Input/TextInput";
 import PopUp from "@/shared/components/PopUp/PopUp";
 import Button1 from "@/shared/components/Button/Button1";
+import { AdminRequest } from "@/shared/api/adminApi";
+import Cookies from "js-cookie";
 
 const Container = styled.div`
   position: sticky;
@@ -101,6 +103,7 @@ const DropDownButton = styled.button`
 `;
 
 export default function Header({ isSideBarSmall, setIsSideBarSmall }) {
+  const admin = AdminRequest();
   const [isPopUp, setIsPopUp] = useState(false);
   const location = useLocation();
   const [dropDown, setDropDown] = useState(false);
@@ -178,8 +181,8 @@ export default function Header({ isSideBarSmall, setIsSideBarSmall }) {
   }, []);
 
   const onLogout = () => {
-    // Cookies.remove("ADMIN_ACCESS_TOKEN");
-    // admin.refetch();
+    Cookies.remove("ADMIN_ACCESS_TOKEN");
+    admin.refetch();
   };
 
   return (
@@ -196,8 +199,14 @@ export default function Header({ isSideBarSmall, setIsSideBarSmall }) {
             <ProfileGroup ref={dropDownButton}>
               <Profile onClick={() => setDropDown((prev) => !prev)}>
                 <div>
-                  <h5>Tân Ngô</h5>
-                  <p>Admin</p>
+                  <h5>
+                    {admin.data.data.firstName} {admin.data.data.lastName}
+                  </h5>
+                  <p>
+                    {admin.data.data.roles.find((role) => role.roleName == "ADMIN")
+                      ? "Admin"
+                      : "Employee"}
+                  </p>
                 </div>
                 <Avatar name={"admin"} size="45" round />
               </Profile>

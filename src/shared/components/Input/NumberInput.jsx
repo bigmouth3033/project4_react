@@ -6,24 +6,26 @@ const Input = styled.input`
   border-radius: 3px;
   width: 100%;
 
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
   outline: none;
   transition: all 0.3s;
 
   &:focus {
-    border: 1px solid rgba(0, 0, 255, 0.4);
+    border: 2px solid black;
   }
 
   &:active {
-    border: 1px solid rgba(0, 0, 255, 0.4);
+    border: 2px solid black;
   }
 `;
 
 const regex = /^-?\d+(\.\d+)?$/;
 
-export default function NumberInput({ state, setState, placeholder, readOnly }) {
+export default function NumberInput({ state, setState, placeholder, readOnly, className }) {
   return (
     <Input
+      className={className}
       readOnly={readOnly}
       placeholder={placeholder}
       value={state}

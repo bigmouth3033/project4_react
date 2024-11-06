@@ -48,3 +48,48 @@ h6 {
   height: 100%;
   overflow-y: hidden;
 }
+
+.character--selected {
+  position: relative;
+}
+
+.character {
+  border-radius: 8px;
+
+  &:active {
+    border: 1px solid #dc0f62;
+  }
+}
+
+/* optionally hide placeholder (in case it overlaps the cursor) */
+.character--selected:not(.character--filled) {
+  color: transparent;
+}
+
+.character--selected:not(.character--filled)::after {
+  content: "";
+  width: 1px;
+  height: 25px;
+  background-color: white;
+
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: blink 1s infinite step-end;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: row !important;
+}

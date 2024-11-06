@@ -1,6 +1,9 @@
 import { CgProfile } from "react-icons/cg";
 import { FaPhoneAlt } from "react-icons/fa";
 import { PiCity } from "react-icons/pi";
+import { FaSwimmingPool } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
+import { TbCategory } from "react-icons/tb";
 
 const sidebar_content = [
   {
@@ -8,30 +11,48 @@ const sidebar_content = [
     type: "button",
     icon: <CgProfile />,
     link: "/admin",
-    role: [],
+    role: ["ADMIN", "EMPLOYEE"],
   },
   {
     name: "Managed City",
     type: "button",
     icon: <PiCity />,
     link: "/admin/managed_city",
-    role: [],
+    role: ["ADMIN", "EMPLOYEE"],
   },
   {
-    name: "Test Group",
+    name: "Amenities",
     type: "group",
-    icon: <PiCity />,
-    role: [],
+    icon: <FaSwimmingPool />,
+    role: ["ADMIN", "EMPLOYEE"],
     children: [
       {
-        name: "test1",
-        icon: <FaPhoneAlt />,
-        link: "/admin/test1",
+        name: "Amenity List",
+        icon: <FaSwimmingPool />,
+        link: "/admin/amenity_list",
       },
       {
-        name: "test2",
-        icon: <FaPhoneAlt />,
-        link: "/admin/test2",
+        name: "Create New Amenity",
+        icon: <FaPlus />,
+        link: "/admin/new_amenity",
+      },
+    ],
+  },
+  {
+    name: "Category",
+    type: "group",
+    icon: <TbCategory />,
+    role: ["ADMIN", "EMPLOYEE"],
+    children: [
+      {
+        name: "Category List",
+        icon: <TbCategory />,
+        link: "/admin/category_list",
+      },
+      {
+        name: "Create New Category",
+        icon: <FaPlus />,
+        link: "/admin/new_category",
       },
     ],
   },
