@@ -107,6 +107,9 @@ export default function ListingSidebar({ listing, state }) {
 
   return (
     <Container>
+      <Item $active={location.pathname == `/become_a_host/${listing.data.data.id}`}>
+        <button>Overview</button>
+      </Item>
       <ItemDropDown $active={isDropDown}>
         <button onClick={() => setIsDropDOwn((prev) => !prev)}>Listing details</button>
         {isDropDown && (
@@ -167,9 +170,6 @@ export default function ListingSidebar({ listing, state }) {
         <button onClick={() => navigate(listing.data.data.id + "/policy")}>
           Policies and rules
         </button>
-      </Item>
-      <Item>
-        <button>Info for guests</button>
       </Item>
     </Container>
   );

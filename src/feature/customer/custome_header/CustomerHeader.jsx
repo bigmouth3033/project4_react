@@ -209,8 +209,8 @@ const DropDownContainer = styled.div`
 
 export default function CustomerHeader() {
   const [scrollEvent, setScrollEvent] = useState("SCROLL"); // BEGIN, SCROLL, SCROLL_CLICK
-  const [isClickDropDown, setIsCLickDropDown] = useState(false);
   const scrollRef = useRef("BEGIN");
+  const [isClickDropDown, setIsCLickDropDown] = useState(false);
   const dropDownRef = useRef();
   const dropDownButtonRef = useRef();
   const containerRef = useRef();

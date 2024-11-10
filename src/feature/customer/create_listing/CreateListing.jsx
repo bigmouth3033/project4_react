@@ -14,6 +14,7 @@ import useListing from "./hooks/useListing";
 import { UpdatePropertyRequest } from "./api/createListingApi";
 import { UserRequest } from "@/shared/api/userApi";
 import { useNavigate } from "react-router-dom";
+import CreateListingHeader from "./components/CreateListingHeader";
 
 const Container = styled.div`
   background-color: white;
@@ -258,7 +259,9 @@ export default function CreateListing() {
 
     updateProperty.mutate(formData, {
       onSuccess: (response) => {
-        console.log(response);
+        if (response.status == 200) {
+          navigate("/hosting/listing");
+        }
       },
     });
   };
@@ -270,7 +273,7 @@ export default function CreateListing() {
   return (
     <Container>
       <Header>
-        <Image>
+        <Image onClick={() => navigate("/hosting")}>
           <img src={logo} />
         </Image>
         {location.pathname == "/become_a_host" ? (
@@ -291,12 +294,15 @@ export default function CreateListing() {
       )}
 
       {isLoadAllDataDone && (
-        <OutletContainerDetail>
-          <SidebarContainer>
-            <ListingSidebar state={state} listing={getHostListingById} />
-          </SidebarContainer>
-          <Outlet context={[state, dispatch, ACTIONS]} />
-        </OutletContainerDetail>
+        <>
+          <CreateListingHeader state={state} listing={getHostListingById} />
+          <OutletContainerDetail>
+            <SidebarContainer>
+              <ListingSidebar state={state} listing={getHostListingById} />
+            </SidebarContainer>
+            <Outlet context={[state, dispatch, ACTIONS]} />
+          </OutletContainerDetail>
+        </>
       )}
     </Container>
   );
