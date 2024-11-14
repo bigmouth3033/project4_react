@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaFilter, FaFilterCircleDollar } from "react-icons/fa6";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled, { css } from "styled-components";
 import { MdArrowBackIosNew, MdArrowForwardIos } from "react-icons/md";
+import { CategoriesRequest } from "../../../shared/api/categoryClientApi";
+import { FaFilter } from "react-icons/fa";
 
 const StyleScrollContainer = styled.div`
   display: flex;
@@ -19,7 +20,7 @@ const StyleCategoryBar = styled.div`
   overflow: hidden;
   scroll-behavior: smooth;
   gap: 1.5rem;
-  /* width: calc(100% - 100px); Adjust width to make room for buttons */
+  width: calc(100% - 100px); //Adjust width to make room for buttons
   padding: 10px 0;
 `;
 
@@ -59,7 +60,7 @@ const StyleButtonLeft = styled.button`
 
   border: 0.5px gray solid;
   border-radius: 50%;
-  padding: 7px 10px;
+  padding: 8px;
   cursor: pointer;
   color: #333;
 
@@ -99,6 +100,7 @@ export const FilterBar = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showLeftButton, setShowLeftButton] = useState(false);
   const [showRightButton, setShowRightButton] = useState(true);
+  const categoriesRequest = CategoriesRequest();
 
   const scrollLeft = () => {
     scrollRef.current.scrollBy({ left: -200, behavior: "smooth" });
@@ -172,7 +174,7 @@ export const FilterBar = () => {
       </StyleButtonRight>
       <StyleFilterButton>
         <div>
-          <MdArrowForwardIos />
+          <FaFilter />
         </div>
         <div>Filter</div>
       </StyleFilterButton>
