@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import CustomerHeader from "../custome_header/CustomerHeader";
+import { FilterBar } from "./FilterBar";
 
 const Container = styled.div`
   background-color: white;
@@ -30,6 +31,9 @@ export default function HomePage() {
     <Container>
       <HeaderContainer>
         <CustomerHeader />
+        <div>
+          <FilterBar />
+        </div>
       </HeaderContainer>
       <Body>
         <BodyItem />
