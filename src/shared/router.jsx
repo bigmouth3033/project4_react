@@ -27,13 +27,14 @@ import PolicyListing from "@/feature/customer/create_listing/components/PolicyLi
 import PropertyDetail from "@/feature/customer/property_detail/PropertyDetail";
 import HostListing from "@/feature/customer/host_listing/HostListing";
 import HostCalendar from "@/feature/customer/host_calendar/HostCalendar";
-
+import AccountSetting from "@/feature/customer/account_settings/AccountSetting";
 const router = createBrowserRouter(
   [
     {
       path: "/",
       element: <UserLayout />,
       children: [
+        { path: "account-settings", element: <AccountSetting /> },
         { path: "", element: <HomePage /> },
         { path: "/property_detail", element: <PropertyDetail /> },
         {
