@@ -4,7 +4,12 @@ import styled, { css } from "styled-components";
 import { MdArrowBackIosNew, MdArrowForwardIos } from "react-icons/md";
 import { CategoriesRequest } from "../../../shared/api/categoryClientApi";
 import { FaFilter } from "react-icons/fa";
+import Skeleton from "react-loading-skeleton";
+import { FilterPopUp } from "./FilterPopUp";
 
+/**
+ * npm install react-loading-skeleton
+ */
 const StyleScrollContainer = styled.div`
   display: flex;
   align-items: center;
@@ -20,7 +25,7 @@ const StyleCategoryBar = styled.div`
   overflow: hidden;
   scroll-behavior: smooth;
   gap: 1.5rem;
-  width: calc(100% - 100px); //Adjust width to make room for buttons
+  /* width: calc(100% - 100px); //Adjust width to make room for buttons */
   padding: 10px 0;
 `;
 
@@ -32,11 +37,20 @@ const StyleCategoryItem = styled.div`
   text-align: center;
   white-space: nowrap;
   cursor: pointer;
-  padding: 5px 10px;
-  height: 3rem;
-  box-sizing: border-box !important; /* BUT NÓ K CHẠYYYYY*/
+  padding: 1rem;
+  width: max-content;
+  height: 5rem;
+  box-sizing: border-box !important; //BUT NÓ K CHẠYYYYY
   /* transition: background-color 0.2s ease, color 0.2s ease; */
+  > div:nth-child(1) {
+    margin: 0 auto;
+    width: 1.5rem;
+  }
+  > div:nth-child(2) {
+    margin: 0 auto;
 
+    padding: 0.5rem;
+  }
   &:hover {
     color: #393838;
     border-bottom: 0.15rem solid #a8a7a7;
@@ -100,6 +114,7 @@ export const FilterBar = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showLeftButton, setShowLeftButton] = useState(false);
   const [showRightButton, setShowRightButton] = useState(true);
+  const [isPopUp, setIsPopUp] = useState(false); //quản lý popup có hiện hay hong
   const categoriesRequest = CategoriesRequest();
 
   const scrollLeft = () => {
@@ -134,50 +149,46 @@ export const FilterBar = () => {
     };
   }, []);
 
-  const categories = [
-    "Nhà nhỏ",
-    "Biểu tượng",
-    "Cabin",
-    "Ven hồ",
-    "Grand piano",
-    "Bếp của bếp trưởng",
-    "Phòng",
-    "Khung cảnh tuyệt vời",
-    "Hồ bơi tuyệt vời",
-    "Nông thôn",
-    "Nhà trên cây",
-    "Biệt thự",
-    "Được ưa chuộng",
-    "Thật ấn tượng!",
-  ];
-
   return (
-    <StyleScrollContainer>
-      <StyleButtonLeft onClick={scrollLeft} hidden={!showLeftButton}>
-        <div>
-          <MdArrowBackIosNew />
-        </div>
-      </StyleButtonLeft>
-      <StyleCategoryBar ref={scrollRef}>
-        {categories.map((category) => (
-          <StyleCategoryItem
-            key={category}
-            selected={selectedItem === category}
-            onClick={() => handleClick(category)}
-          >
-            {category}
-          </StyleCategoryItem>
-        ))}
-      </StyleCategoryBar>
-      <StyleButtonRight onClick={scrollRight} hidden={!showRightButton}>
-        <MdArrowForwardIos />
-      </StyleButtonRight>
-      <StyleFilterButton>
-        <div>
-          <FaFilter />
-        </div>
-        <div>Filter</div>
-      </StyleFilterButton>
-    </StyleScrollContainer>
+    <>
+      <StyleScrollContainer>
+        <StyleButtonLeft onClick={scrollLeft} hidden={!showLeftButton}>
+          <div>
+            <MdArrowBackIosNew />
+          </div>
+        </StyleButtonLeft>
+        <StyleCategoryBar ref={scrollRef}>
+          {categoriesRequest.isSuccess ? (
+            categoriesRequest.data.data.map((category) => (
+              <StyleCategoryItem
+                key={category.id}
+                selected={selectedItem === category}
+                onClick={() => handleClick(category)}
+              >
+                <div>
+                  <img
+                    src={category.categoryImage}
+                    alt={category.categoryName}
+                  />
+                </div>
+                <div>{category.categoryName}</div>
+              </StyleCategoryItem>
+            ))
+          ) : (
+            <Skeleton count={6} />
+          )}
+        </StyleCategoryBar>
+        <StyleButtonRight onClick={scrollRight} hidden={!showRightButton}>
+          <MdArrowForwardIos />
+        </StyleButtonRight>
+        <StyleFilterButton onClick={() => setIsPopUp(true)}>
+          <div>
+            <FaFilter />
+          </div>
+          <div>Filter</div>
+        </StyleFilterButton>
+      </StyleScrollContainer>
+      {isPopUp && <FilterPopUp action={() => setIsPopUp(false)} />}
+    </>
   );
 };
