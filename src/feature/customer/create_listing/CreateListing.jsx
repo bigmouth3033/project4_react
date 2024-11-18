@@ -278,7 +278,7 @@ export default function CreateListing() {
         </Image>
         {location.pathname == "/become_a_host" ? (
           <ButtonContainer>
-            <WhiteButton onClick={onInitializeListing}>Continue</WhiteButton>
+            <WhiteButton onClick={onInitializeListing}>Create new listing</WhiteButton>
           </ButtonContainer>
         ) : (
           <ButtonContainer>

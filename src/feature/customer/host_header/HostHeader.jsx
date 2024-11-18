@@ -11,6 +11,10 @@ import { UserRequest } from "@/shared/api/userApi";
 import { useState } from "react";
 import { FaBars } from "react-icons/fa6";
 import { useEffect } from "react";
+import { GetUserNotificationPopUpRequest } from "./api/hostHeaderApi";
+import Cookies from "js-cookie";
+import { formatDate } from "@/shared/utils/DateTimeHandle";
+import getWords from "@/shared/utils/getWords";
 
 const Container = styled.div`
   display: flex;
@@ -87,6 +91,12 @@ const CircleButton = styled.button`
   border-radius: 50%;
   font-size: 16px;
   cursor: pointer;
+
+  border: 1px solid rgba(0, 0, 0, 0.5);
+
+  &:active {
+    transform: scale(0.9);
+  }
 `;
 
 const DropDownContainer = styled.div`
@@ -153,7 +163,122 @@ const DropDownButton = styled.button`
   }
 `;
 
+const MenuDropDownStyled = styled.div`
+  position: absolute;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  width: 10rem;
+  border-radius: 15px;
+  transform: translate(-3rem, 0.6rem);
+  background-color: white;
+
+  > button {
+    background-color: white;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+  }
+
+  > button:hover {
+    background-color: #f7f7f7;
+  }
+
+  > button:first-child {
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+  }
+
+  > button:last-child {
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+  }
+`;
+
+const MenuDropDownContainer = styled.div`
+  position: relative;
+`;
+
+const NotificationContainerStyled = styled.div`
+  position: relative;
+`;
+
+const NotificationDropDownStyled = styled.div`
+  position: absolute;
+  padding: 1rem;
+  width: 25rem;
+  transform: translate(-22rem, 1rem);
+  border-radius: 15px;
+
+  height: 40rem;
+  background-color: white;
+  z-index: 1;
+
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+
+  display: flex;
+  flex-direction: column;
+
+  > div:nth-of-type(2) {
+    flex: 1;
+    margin: 2rem 0;
+    max-height: 30rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    &::-webkit-scrollbar-track {
+      background-color: none;
+    }
+
+    &::-webkit-scrollbar {
+      width: 4px;
+      background-color: none;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgb(205, 205, 207);
+    }
+  }
+
+  > div:nth-of-type(3) {
+    display: flex;
+    justify-content: flex-end;
+
+    > button {
+      background-color: white;
+      padding: 10px;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+
+    > button:active {
+      transform: scale(0.9);
+    }
+  }
+`;
+
+const NotificationStyled = styled.div`
+  display: grid;
+  padding: 0 1rem;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+
+    > p:nth-of-type(2) {
+      color: rgba(0, 0, 0, 0.5);
+      font-size: 14px;
+    }
+  }
+
+  /* border-bottom: 1px solid rgba(0, 0, 0, 0.1); */
+`;
+
 export default function HostHeader() {
+  const getUserNotificationPopUp = GetUserNotificationPopUpRequest();
+  const [notificationDropDown, setNotificationDropDown] = useState(false);
+  const [isMenuDropDown, setIsMenuDropDown] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -161,6 +286,12 @@ export default function HostHeader() {
   const dropDownRef = useRef();
   const dropDownButtonRef = useRef();
   const user = UserRequest();
+
+  const menuDropDownButtonRef = useRef();
+  const menuDropDownContainerRef = useRef();
+
+  const popUpButtonRef = useRef();
+  const popUpDropDownContainerRef = useRef();
 
   useEffect(() => {
     const event = (ev) => {
@@ -170,6 +301,22 @@ export default function HostHeader() {
         !dropDownButtonRef.current.contains(ev.target)
       ) {
         setIsCLickDropDown(false);
+      }
+
+      if (
+        menuDropDownContainerRef.current &&
+        !menuDropDownContainerRef.current.contains(ev.target) &&
+        !menuDropDownButtonRef.current.contains(ev.target)
+      ) {
+        setIsMenuDropDown(false);
+      }
+
+      if (
+        popUpDropDownContainerRef.current &&
+        !popUpDropDownContainerRef.current.contains(ev.target) &&
+        !popUpButtonRef.current.contains(ev.target)
+      ) {
+        setNotificationDropDown(false);
       }
     };
 
@@ -195,51 +342,94 @@ export default function HostHeader() {
         <CustomLink $active={location.pathname == "/hosting/listing"} to={"/hosting/listing"}>
           Listings
         </CustomLink>
-        <CustomLink $active={location.pathname == "/hosting/messages"} to={"hosting/messages"}>
+        <CustomLink
+          $active={location.pathname == "/hosting/host_messages"}
+          to={"/hosting/host_messages"}
+        >
           Messages
         </CustomLink>
-        <FocusButton>
-          Menu <IoIosArrowDown />
-        </FocusButton>
+        <MenuDropDownContainer>
+          <FocusButton
+            ref={menuDropDownButtonRef}
+            onClick={() => setIsMenuDropDown((prev) => !prev)}
+          >
+            Menu <IoIosArrowDown />
+          </FocusButton>
+
+          {isMenuDropDown && (
+            <MenuDropDownStyled ref={menuDropDownContainerRef}>
+              <button>Earning</button>
+              <button
+                onClick={() => {
+                  navigate("/hosting/host_reservation");
+                  setIsMenuDropDown(false);
+                }}
+              >
+                Reservation
+              </button>
+              <button
+                onClick={() => {
+                  navigate("/become_a_host");
+                  setIsMenuDropDown(false);
+                }}
+              >
+                Create new listing
+              </button>
+              <button
+                onClick={() => {
+                  navigate("/");
+                  setIsMenuDropDown(false);
+                }}
+              >
+                Go back to home page
+              </button>
+            </MenuDropDownStyled>
+          )}
+        </MenuDropDownContainer>
       </Center>
       <Right>
-        <div>
-          <CircleButton>
+        <NotificationContainerStyled>
+          <CircleButton
+            ref={popUpButtonRef}
+            onClick={() => setNotificationDropDown((prev) => !prev)}
+          >
             <FaRegBell />
           </CircleButton>
-        </div>
+          {notificationDropDown && (
+            <NotificationDropDownStyled ref={popUpDropDownContainerRef}>
+              <div>
+                <h3>Notifications</h3>
+              </div>
+              <div>
+                {getUserNotificationPopUp.isSuccess &&
+                  getUserNotificationPopUp.data.data.map((notification, index) => {
+                    return (
+                      <NotificationStyled key={index}>
+                        <div>
+                          <p>{getWords(notification.message, 15)}</p>
+                          <p>{formatDate(notification.createdAt)}</p>
+                        </div>
+                        {notification.url && (
+                          <div onClick={() => navigate(notification.url)}>Detail</div>
+                        )}
+                      </NotificationStyled>
+                    );
+                  })}
+              </div>
+              <div>
+                <button>Notification detail</button>
+              </div>
+            </NotificationDropDownStyled>
+          )}
+        </NotificationContainerStyled>
         <DropDownButton ref={dropDownButtonRef} onClick={() => setIsCLickDropDown((prev) => !prev)}>
           <FaBars />
-          {user.isSuccess && user.data.status == 404 && (
-            <Avatar src={default_avatar} round size="30" />
-          )}
           {user.isSuccess && user.data.status == 200 && (
             <Avatar src={user.data.data.Avatar} name={user.data.data.firstName} round size="30" />
           )}
         </DropDownButton>
         {isClickDropDown && (
           <DropDownContainer ref={dropDownRef}>
-            {user.isSuccess && user.data.status == 404 && (
-              <>
-                <button
-                  onClick={() => {
-                    setIsCLickDropDown(false);
-                    setIsRegisterPopUp(true);
-                  }}
-                >
-                  Sign up
-                </button>
-                <hr />
-                <button
-                  onClick={() => {
-                    setIsCLickDropDown(false);
-                    setIsRegisterPopUp(true);
-                  }}
-                >
-                  Log in
-                </button>
-              </>
-            )}
             {user.isSuccess && user.data.status == 200 && (
               <>
                 <button className="focus">Message</button>

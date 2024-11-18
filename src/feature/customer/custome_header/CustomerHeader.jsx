@@ -10,6 +10,7 @@ import { useRef } from "react";
 import RegisterPopUp from "./components/RegisterPopUp";
 import { UserRequest } from "@/shared/api/userApi";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   padding: 1.4rem 1rem;
@@ -175,7 +176,7 @@ const DropDownContainer = styled.div`
   display: flex;
   flex-direction: column;
   background-color: white;
-  transform: translate(-40px, 50px);
+  transform: translate(-150px, 50px);
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   border-radius: 15px;
 
@@ -216,6 +217,7 @@ export default function CustomerHeader() {
   const containerRef = useRef();
   const [isRegisterPopUp, setIsRegisterPopUp] = useState("");
   const user = UserRequest();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const event = function () {
@@ -328,7 +330,12 @@ export default function CustomerHeader() {
           </FilterBar>
         </Center>
         <Right>
-          <h5>Become a host</h5>
+          {user.isSuccess && user.data.status == 200 && user.data.data.properties.length > 0 && (
+            <h5 onClick={() => navigate("/hosting")}>Switch to hosting</h5>
+          )}
+          {user.isSuccess && user.data.status == 200 && user.data.data.properties.length == 0 && (
+            <h5 onClick={() => navigate("/become_a_host")}>Become a host</h5>
+          )}
           <DropDownButton
             ref={dropDownButtonRef}
             onClick={() => setIsCLickDropDown((prev) => !prev)}

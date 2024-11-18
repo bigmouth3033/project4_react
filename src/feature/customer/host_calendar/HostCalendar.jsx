@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { GetHostCalendarRequest } from "./api/hostCalendarApi";
 import WaitingPopUp from "@/shared/components/PopUp/WaitingPopUp";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
@@ -13,6 +13,14 @@ import Avatar from "react-avatar";
 import RedButton from "@/shared/components/Button/RedButton1";
 import WhiteButton from "@/shared/components/Button/WhiteButton";
 import TextInput from "@/shared/components/Input/TextInput";
+import XButton from "@/shared/components/Button/XButton";
+import formatDateRange from "@/shared/utils/formatDateRange";
+import { UpdateNotAvailableDateRequest } from "./api/hostCalendarApi";
+import { UpdateExceptionDateRequest } from "./api/hostCalendarApi";
+import { OpenNotAvailableDateRequest } from "./api/hostCalendarApi";
+import NumberInput from "@/shared/components/Input/NumberInput";
+import BookingDetail from "../hosting/components/BookingDetail";
+import formatDollar from "@/shared/utils/FormatDollar";
 
 const localizer = momentLocalizer(moment);
 
@@ -276,6 +284,94 @@ const ChangeWeeklyDiscountStyled = styled.div`
   }
 `;
 
+const SelectedDayStyled = styled.div`
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  > div:nth-of-type(1) {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    > span {
+      font-weight: 900;
+      font-size: 30px;
+      text-decoration: underline;
+    }
+  }
+
+  > div:nth-of-type(2) {
+    display: flex;
+    border-radius: 25px;
+    gap: 5px;
+    background-color: #f0f0f0;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    padding: 5px;
+
+    > button {
+      flex: 1;
+      border-radius: 25px;
+      border: none;
+      cursor: pointer;
+      padding: 10px;
+    }
+  }
+`;
+
+const OpenButtonStyled = styled.button`
+  ${(props) => {
+    if (props.$active) {
+      return css`
+        background-color: black;
+        color: white;
+      `;
+    }
+  }}
+`;
+
+const BlockButtonStyled = styled.button`
+  ${(props) => {
+    if (props.$active) {
+      return css`
+        background-color: black;
+        color: white;
+      `;
+    }
+  }}
+`;
+
+const PricesStyled = styled.div`
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  padding: 2rem;
+  border-radius: 25px;
+  font-size: 30px;
+  font-weight: 900;
+  cursor: pointer;
+`;
+
+const CustomPricesStyled = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  > div {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    > span {
+      font-size: 30px;
+      font-weight: 900;
+    }
+    > input {
+      border: none !important;
+      font-size: 30px;
+      text-decoration: underline;
+      font-weight: 900;
+    }
+  }
+`;
+
 const CustomEvent = ({ event }) => {
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
@@ -288,6 +384,12 @@ const CustomEvent = ({ event }) => {
 };
 
 export default function HostCalendar() {
+  const [showBookingDetail, setShowBookingDetail] = useState();
+  const [isChangeCustomPrice, setIsChangeCustomPrice] = useState(false);
+  const [changeCustomPrice, setChangeCustomPrice] = useState();
+  const openNotAvailableDate = OpenNotAvailableDateRequest();
+  const updateNotAvailableDate = UpdateNotAvailableDateRequest();
+  const updateExceptionDate = UpdateExceptionDateRequest();
   const [basePrice, setBasePrice] = useState();
   const [monthlyDiscount, setMonthlyDiscount] = useState();
   const [weeklyDiscount, setWeeklyDiscount] = useState();
@@ -308,22 +410,39 @@ export default function HostCalendar() {
 
   useEffect(() => {
     if (getHostCalendar.isSuccess) {
-      if (getHostCalendar.data.data.length > 0) {
+      if (getHostCalendar.data.data.length > 0 && chosenProperty.id == null) {
         setChosenProperty(getHostCalendar.data.data[0]);
       }
+
+      if (getHostCalendar.data.data.length > 0 && chosenProperty.id != null) {
+        setChosenProperty((prev) => getHostCalendar.data.data.find((item) => item.id == prev.id));
+      }
     }
-  }, [getHostCalendar.isSuccess]);
+  }, [getHostCalendar.fetchStatus]);
 
   useEffect(() => {
     if (chosenProperty && getBookingOfProperty.isSuccess) {
       setBasePrice(chosenProperty.basePrice);
       setWeeklyDiscount(chosenProperty.weeklyDiscount);
       setMonthlyDiscount(chosenProperty.monthlyDiscount);
+      var blockedDates = [];
+
+      for (let blocked of chosenProperty.propertyNotAvailableDates) {
+        blockedDates.push(moment(blocked.date).format("YYYY-MM-DD"));
+      }
+      setDisabledDate(blockedDates);
+
       const today = moment(currentStartDate).toDate();
       const endOfMonth = moment(currentEndDate).toDate();
-      setPriceEvent(generateEventsForRange(today, endOfMonth));
 
-      setEvents([...generateEventsForRange(today, endOfMonth), ...getBookingList()]);
+      setPriceEvent(
+        generateEventsForRange(today, endOfMonth, chosenProperty.propertyExceptionDates)
+      );
+
+      setEvents([
+        ...generateEventsForRange(today, endOfMonth, chosenProperty.propertyExceptionDates),
+        ...getBookingList(),
+      ]);
     }
   }, [chosenProperty, getBookingOfProperty.isSuccess]);
 
@@ -332,7 +451,14 @@ export default function HostCalendar() {
       const today = currentStartDate;
       const endOfMonth = currentEndDate;
 
-      setEvents([...getBookingList(), ...generateEventsForRange(today, endOfMonth)]);
+      const prices = generateEventsForRange(
+        today,
+        endOfMonth,
+        chosenProperty.propertyExceptionDates || []
+      );
+      setPriceEvent(prices);
+
+      setEvents([...getBookingList(), ...prices]);
     }
   }, [getBookingOfProperty.isSuccess]);
 
@@ -346,13 +472,14 @@ export default function HostCalendar() {
           end: moment(booking.checkOutDay).subtract(1, "days").toDate(),
           allDay: true,
           avatar: `${booking.customer.avatar}`,
+          bookingId: booking.id,
         });
       }
       return eventsClone;
     }
   }
 
-  const generateEventsForRange = (startDate, endDate) => {
+  const generateEventsForRange = (startDate, endDate, exceptionList = []) => {
     const generatedEvents = [];
     const bookingList = getBookingList() || [];
 
@@ -368,19 +495,31 @@ export default function HostCalendar() {
       isOK = true;
       for (let event of bookingList) {
         if (
-          currentDate.isAfter(moment(event.start).subtract(1, "days")) &&
-          currentDate.isBefore(moment(event.end))
+          currentDate.isSameOrAfter(moment(event.start), "days") &&
+          currentDate.isSameOrBefore(moment(event.end), "days")
         ) {
           isOK = false;
         }
       }
       if (isOK) {
-        generatedEvents.push({
-          title: `$ ${chosenProperty.basePrice}`,
-          start: currentDate.toDate(),
-          end: currentDate.clone().add(1, "hour").toDate(),
-          type: "price",
-        });
+        let exception = exceptionList.find((item) => moment(item.date).isSame(currentDate, "day"));
+        if (exception) {
+          generatedEvents.push({
+            title: `$ ${formatDollar(exception.basePrice)}`,
+            start: currentDate.toDate(),
+            end: currentDate.clone().add(1, "hour").toDate(),
+            type: "price",
+            number: exception.basePrice,
+          });
+        } else {
+          generatedEvents.push({
+            title: `$ ${formatDollar(chosenProperty.basePrice)}`,
+            start: currentDate.toDate(),
+            end: currentDate.clone().add(1, "hour").toDate(),
+            type: "price",
+            number: chosenProperty.basePrice,
+          });
+        }
       }
 
       currentDate.add(1, "day");
@@ -394,11 +533,18 @@ export default function HostCalendar() {
   }
 
   const handleViewChange = (range) => {
+    setSelectedDates([]);
     const { start, end } = range;
     setCurrentStartDate(start);
     setCurrentEndDate(end);
 
-    const generatedEvents = generateEventsForRange(start, end);
+    const generatedEvents = generateEventsForRange(
+      start,
+      end,
+      chosenProperty?.propertyExceptionDates || []
+    );
+
+    setPriceEvent(generatedEvents);
 
     setEvents([...generatedEvents, ...getBookingList()]);
   };
@@ -468,9 +614,103 @@ export default function HostCalendar() {
   };
 
   const handleEventClick = (event) => {
-    alert(`Event clicked: ${event.title}`);
-    // You can show a modal or perform any other actions with the event data
+    // alert(`Event clicked: ${event.title}`);
+    const bookingId = event.bookingId;
+    const booking = getBookingOfProperty.data.data.find((item) => item.id == bookingId);
+
+    setShowBookingDetail(booking);
+
     console.log(event);
+  };
+
+  const isDisabled = (selectedDates) => {
+    let isOk = false;
+    selectedDates.forEach((selected) => {
+      if (disabledDate.includes(selected)) {
+        isOk = true;
+      }
+    });
+
+    return isOk;
+  };
+
+  const openNights = (range) => {
+    const formData = new FormData();
+    formData.append("propertyId", chosenProperty.id);
+    formData.append("start", range[0]);
+    formData.append("end", range[range.length - 1]);
+
+    openNotAvailableDate.mutate(formData, {
+      onSuccess: (response) => {
+        console.log(response);
+      },
+    });
+
+    setDisabledDate((prev) => prev.filter((item) => !range.includes(item)));
+  };
+
+  const blockNights = (range) => {
+    const formData = new FormData();
+    formData.append("propertyId", chosenProperty.id);
+    formData.append("start", range[0]);
+    formData.append("end", range[range.length - 1]);
+
+    updateNotAvailableDate.mutate(formData, {
+      onSuccess: (response) => {
+        if (response.status == 200) {
+          setDisabledDate((prev) => Array.from(new Set([...range, ...prev])));
+        }
+      },
+    });
+  };
+
+  const getPrices = () => {
+    const prices = [];
+
+    selectedDates.forEach((date) => {
+      var price = priceEvent.find((priceDate) =>
+        moment(priceDate.start).isSame(moment(date), "days")
+      );
+
+      if (price && !prices.includes(price.number)) {
+        prices.push(price.number);
+      }
+    });
+
+    prices.sort();
+    if (prices.length == 1) {
+      return [prices[0]];
+    }
+
+    return [prices[0], prices[prices.length - 1]];
+  };
+
+  const onUpdateNewPrice = (range) => {
+    const formData = new FormData();
+    formData.append("propertyId", chosenProperty.id);
+    formData.append("start", range[0]);
+    formData.append("end", range[range.length - 1]);
+    formData.append("price", changeCustomPrice);
+
+    updateExceptionDate.mutate(formData, {
+      onSuccess: (response) => {
+        if (response.status == 200) {
+          range.forEach((date) => {
+            var price = priceEvent.find((priceDate) =>
+              moment(priceDate.start).isSame(moment(date), "days")
+            );
+
+            if (price) {
+              price.number = changeCustomPrice;
+              price.title = `$ ${changeCustomPrice}`;
+            }
+          });
+          setIsChangeCustomPrice(false);
+          setChangeCustomPrice();
+          getHostCalendar.refetch();
+        }
+      },
+    });
   };
 
   return (
@@ -506,6 +746,57 @@ export default function HostCalendar() {
           />
         </CalendarStyled>
         <RightStyled>
+          {selectedDates.length > 0 && (
+            <SelectedDayStyled>
+              <div>
+                <span>
+                  {formatDateRange(selectedDates[0], selectedDates[selectedDates.length - 1])}
+                </span>
+                <XButton
+                  action={() => {
+                    setSelectedDates([]);
+                    setIsChangeCustomPrice(false);
+                  }}
+                />
+              </div>
+              <div>
+                <OpenButtonStyled
+                  onClick={() => openNights(selectedDates)}
+                  $active={!isDisabled(selectedDates)}
+                >
+                  Open
+                </OpenButtonStyled>
+                <BlockButtonStyled
+                  onClick={() => blockNights(selectedDates)}
+                  $active={isDisabled(selectedDates)}
+                >
+                  Block nights
+                </BlockButtonStyled>
+              </div>
+              {!isChangeCustomPrice && (
+                <PricesStyled
+                  onClick={() => {
+                    setIsChangeCustomPrice(true);
+                    setChangeCustomPrice(getPrices()[0]);
+                  }}
+                >
+                  $ {getPrices().join("-")}
+                </PricesStyled>
+              )}
+
+              {isChangeCustomPrice && (
+                <CustomPricesStyled>
+                  <div>
+                    <span>$ </span>{" "}
+                    <NumberInput state={changeCustomPrice} setState={setChangeCustomPrice} />
+                  </div>
+                  <RedButton onClick={() => onUpdateNewPrice(selectedDates)}>Save</RedButton>
+                  <WhiteButton onClick={() => setIsChangeCustomPrice(false)}>Cancel</WhiteButton>
+                </CustomPricesStyled>
+              )}
+            </SelectedDayStyled>
+          )}
+
           {isChangePrice && (
             <ChangeBasePriceStyled>
               <div>
@@ -640,6 +931,9 @@ export default function HostCalendar() {
           listings={getHostCalendar.data.data}
           action={() => setIsSelectedPopUp(false)}
         />
+      )}
+      {showBookingDetail && (
+        <BookingDetail action={() => setShowBookingDetail()} booking={showBookingDetail} />
       )}
     </>
   );

@@ -1,5 +1,5 @@
 import axiosClient from "@/shared/api/axiosClient";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const GetHostBookingRequest = (status) => {
   const request = async (status) => {
@@ -22,5 +22,16 @@ export const GetHostBookingCountRequest = () => {
   return useQuery({
     queryKey: ["booking_count"],
     queryFn: () => request(),
+  });
+};
+
+export const RateByHostRequest = () => {
+  const request = async (payload) => {
+    const response = await axiosClient.post("reviewCM/review_by_host", payload);
+    return response.data;
+  };
+
+  return useMutation({
+    mutationFn: request,
   });
 };

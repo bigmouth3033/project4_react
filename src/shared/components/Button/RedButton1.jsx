@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 const Button = styled.button`
   align-items: center;
@@ -48,11 +48,24 @@ const Button = styled.button`
     box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px;
     transform: translateY(0);
   }
+
+  ${(props) => {
+    if (props.$active == false) {
+      return css`
+        background-color: #e6e6e6;
+        cursor: not-allowed;
+
+        &:hover {
+          background-color: #e6e6e6;
+        }
+      `;
+    }
+  }}
 `;
 
-export default function RedButton({ className, children, onClick, type }) {
+export default function RedButton({ className, children, onClick, type, active }) {
   return (
-    <Button type={type} onClick={onClick} className={className}>
+    <Button $active={active} type={type} onClick={onClick} className={className}>
       {children}
     </Button>
   );

@@ -28,6 +28,7 @@ const HeaderStyled = styled.div`
 
 const BodyStyled = styled.div`
   margin: 3rem 0;
+  min-height: 20rem;
 
   & h4 {
     font-size: 16px;

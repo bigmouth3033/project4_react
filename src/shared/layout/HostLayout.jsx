@@ -8,7 +8,9 @@ import Cookies from "js-cookie";
 import WaitingPopUp from "../components/PopUp/WaitingPopUp";
 import { useNavigate } from "react-router-dom";
 
-const Container = styled.div``;
+const Container = styled.div`
+  min-height: 100vh;
+`;
 
 const OutletContainer = styled.div``;
 

@@ -8,6 +8,8 @@ import { formatDate } from "@/shared/utils/DateTimeHandle";
 import Avatar from "react-avatar";
 import { CiSquareInfo } from "react-icons/ci";
 import { GetHostBookingCountRequest } from "./api/hostingApi";
+import BookingDetail from "./components/BookingDetail";
+import ReviewPopUp from "./components/ReviewPopUp";
 
 const ContainerStyled = styled.div`
   padding: 3rem 0;
@@ -23,6 +25,11 @@ const ReserveStyled = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  & a {
+    color: black;
+    font-weight: 600;
+  }
 `;
 
 const ButtonListStyled = styled.div`
@@ -53,6 +60,7 @@ const BookingStyled = styled.div`
 
   & h3 {
     color: #fca6af;
+    font-size: 17px;
   }
 
   border-radius: 10px;
@@ -127,6 +135,8 @@ export default function Hosting() {
   const [active, setActive] = useState("checkout");
   const getHostBooking = GetHostBookingRequest(active);
   const getHostBookingCount = GetHostBookingCountRequest();
+  const [showBookingDetail, setShowBookingDetail] = useState();
+  const [review, setReview] = useState();
 
   return (
     <>
@@ -137,36 +147,41 @@ export default function Hosting() {
         <BodyStyled>
           <ReserveStyled>
             <h2>Your reservations</h2>
-            <Link>All reservations (0)</Link>
+            <Link to={"/hosting/host_reservation"}>
+              All reservations{" "}
+              {getHostBookingCount.isSuccess && getHostBookingCount.data.data != null && (
+                <span>({getHostBookingCount.data.data.reservedHosting})</span>
+              )}
+            </Link>
           </ReserveStyled>
           <ButtonListStyled>
             <ButtonStyled $active={active == "checkout"} onClick={() => setActive("checkout")}>
               Checking out{" "}
-              {getHostBookingCount.isSuccess && (
+              {getHostBookingCount.isSuccess && getHostBookingCount.data.data != null && (
                 <span>({getHostBookingCount.data.data.checkoutHosting})</span>
               )}
             </ButtonStyled>
             <ButtonStyled $active={active == "hosting"} onClick={() => setActive("hosting")}>
               Currently hosting{" "}
-              {getHostBookingCount.isSuccess && (
+              {getHostBookingCount.isSuccess && getHostBookingCount.data.data != null && (
                 <span>({getHostBookingCount.data.data.currentlyHosting})</span>
               )}
             </ButtonStyled>
             <ButtonStyled $active={active == "soon"} onClick={() => setActive("soon")}>
               Arriving soon{" "}
-              {getHostBookingCount.isSuccess && (
+              {getHostBookingCount.isSuccess && getHostBookingCount.data.data != null && (
                 <span>({getHostBookingCount.data.data.checkInHosting})</span>
               )}
             </ButtonStyled>
             <ButtonStyled $active={active == "upcoming"} onClick={() => setActive("upcoming")}>
               Upcoming{" "}
-              {getHostBookingCount.isSuccess && (
+              {getHostBookingCount.isSuccess && getHostBookingCount.data.data != null && (
                 <span>({getHostBookingCount.data.data.upcomingHosting})</span>
               )}
             </ButtonStyled>
             <ButtonStyled $active={active == "pending"} onClick={() => setActive("pending")}>
               Pending review{" "}
-              {getHostBookingCount.isSuccess && (
+              {getHostBookingCount.isSuccess && getHostBookingCount.data.data != null && (
                 <span>({getHostBookingCount.data.data.pendingReviewHosting})</span>
               )}
             </ButtonStyled>
@@ -212,9 +227,13 @@ export default function Hosting() {
                       </IntoStyled>
                     </div>
                     <div>
-                      {active == "pending" ? <button>Review</button> : <button>Message</button>}
+                      {active == "pending" ? (
+                        <button onClick={() => setReview(booking)}>Review</button>
+                      ) : (
+                        <button>Message</button>
+                      )}
 
-                      <button>Detail</button>
+                      <button onClick={() => setShowBookingDetail(booking)}>Detail</button>
                     </div>
                   </BookingStyled>
                 );
@@ -224,6 +243,17 @@ export default function Hosting() {
         </BodyStyled>
       </ContainerStyled>
       <Footer />
+      {showBookingDetail && (
+        <BookingDetail booking={showBookingDetail} action={() => setShowBookingDetail()} />
+      )}
+      {review && (
+        <ReviewPopUp
+          getHostBookingCount={getHostBookingCount}
+          getHostBooking={getHostBooking}
+          action={() => setReview()}
+          booking={review}
+        />
+      )}
     </>
   );
 }

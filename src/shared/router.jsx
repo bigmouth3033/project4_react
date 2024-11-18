@@ -27,6 +27,8 @@ import PolicyListing from "@/feature/customer/create_listing/components/PolicyLi
 import PropertyDetail from "@/feature/customer/property_detail/PropertyDetail";
 import HostListing from "@/feature/customer/host_listing/HostListing";
 import HostCalendar from "@/feature/customer/host_calendar/HostCalendar";
+import HostMessages from "@/feature/customer/host_messages/HostMessages";
+import HostReservation from "@/feature/customer/host_reservation/HostReservation";
 
 const router = createBrowserRouter(
   [
@@ -43,6 +45,8 @@ const router = createBrowserRouter(
             { path: "", element: <Hosting /> },
             { path: "listing", element: <HostListing /> },
             { path: "calendar", element: <HostCalendar /> },
+            { path: "host_messages", element: <HostMessages /> },
+            { path: "host_reservation", element: <HostReservation /> },
           ],
         },
         {
