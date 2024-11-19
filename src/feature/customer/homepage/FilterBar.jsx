@@ -43,10 +43,12 @@ const StyleCategoryItem = styled.div`
   box-sizing: border-box !important; //BUT NÓ K CHẠYYYYY
   /* transition: background-color 0.2s ease, color 0.2s ease; */
   > div:nth-child(1) {
+    //style hình
     margin: 0 auto;
     width: 1.5rem;
   }
   > div:nth-child(2) {
+    //style chữ
     margin: 0 auto;
 
     padding: 0.5rem;
@@ -139,7 +141,7 @@ export const FilterBar = () => {
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
-    console.log(scrollRef.current);
+    // console.log(scrollRef.current);
 
     scrollContainer.addEventListener("scroll", handleScroll);
     handleScroll(); // Initial check to set button visibility on mount
