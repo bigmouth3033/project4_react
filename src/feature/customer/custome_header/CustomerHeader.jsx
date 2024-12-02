@@ -16,6 +16,7 @@ const Container = styled.div`
   display: flex;
   justify-content: space-between;
   background-color: white;
+  z-index: 1;
 `;
 
 const LogoContainer = styled.div`
@@ -29,7 +30,8 @@ const Center = styled.div`
   gap: 20px;
 
   transition: all 0.4s ease-in-out;
-  transform: ${(props) => (props.$event === "SCROLL" ? "scale(0.9)" : "scale(1)")};
+  transform: ${(props) =>
+    props.$event === "SCROLL" ? "scale(0.9)" : "scale(1)"};
 `;
 
 const Right = styled.div`
@@ -58,14 +60,17 @@ const DropDownButton = styled.button`
   align-items: center;
   gap: 12px;
   border: 2.5px solid white;
-  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
 
   &:hover {
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+      rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
   }
 
   &:focus {
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+      rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
     border: 2.5px solid black;
     font-weight: 600;
   }
@@ -112,7 +117,8 @@ const FilterBar = styled.div`
     }
 
     > button:focus {
-      box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+      box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+        rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
     }
   }
 `;
@@ -338,7 +344,12 @@ export default function CustomerHeader() {
               <Avatar src={default_avatar} round size="30" />
             )}
             {user.isSuccess && user.data.status == 200 && (
-              <Avatar src={user.data.data.Avatar} name={user.data.data.firstName} round size="30" />
+              <Avatar
+                src={user.data.data.Avatar}
+                name={user.data.data.firstName}
+                round
+                size="30"
+              />
             )}
           </DropDownButton>
           {isClickDropDown && (
@@ -390,7 +401,9 @@ export default function CustomerHeader() {
           )}
         </Right>
       </Container>
-      {isRegisterPopUp && <RegisterPopUp action={() => setIsRegisterPopUp(false)} />}
+      {isRegisterPopUp && (
+        <RegisterPopUp action={() => setIsRegisterPopUp(false)} />
+      )}
     </>
   );
 }

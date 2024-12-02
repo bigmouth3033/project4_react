@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const PropertiesRequest = () => {
   const request = async () => {
-    const response = await axiosClient.get("propertyCM");
+    const response = await axiosClient.get("listingCM/propertyCM");
     return response.data;
   };
 

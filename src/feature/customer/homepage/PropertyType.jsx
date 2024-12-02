@@ -24,7 +24,7 @@ const StyleProItem = styled.div`
   margin: 0.3rem;
   padding: 1rem;
   border-radius: 1rem;
-  width: 35%;
+  width: 30%;
 
   text-align: center;
   font-weight: bold;
@@ -64,9 +64,17 @@ const propertyOptions = [
 
 function PropertyType() {
   const [selectedItem, setSelectedItem] = useState(null);
+  const [propertyType, setPropertyType] = useState(null);
 
+  //handle click/unclick
   const handleClick = (pro) => {
-    setSelectedItem(pro);
+    if (selectedItem != pro) {
+      setPropertyType(pro.value);
+      setSelectedItem(pro);
+      return;
+    }
+    setPropertyType(null); //gửi đi cái null nghĩa là filter all type
+    setSelectedItem(null);
   };
   return (
     <div>
@@ -77,7 +85,6 @@ function PropertyType() {
             key={pro.value}
             selected={selectedItem == pro}
             onClick={() => handleClick(pro)}
-            value={pro.value}
           >
             {pro.label}
           </StyleProItem>
