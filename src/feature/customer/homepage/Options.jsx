@@ -93,13 +93,8 @@ const bookingOptions = [
 ];
 
 export const Options = ({ selectedOption, setSelectedOption }) => {
-  const [pet, setPet] = useState(null);
-  const [selfCheckin, setSelfCheckin] = useState(null);
-
-  const [instantBook, setInstantBook] = useState(null);
-  //2 state to manage click/unclick
+  //state to manage click/unclick
   const [selectedItem, setSelectedItem] = useState(null);
-  const [selectedBookingOption, setSelectedBookingOption] = useState(null);
 
   //Guest favourite
   const handleFavClick = (value) => {
@@ -124,22 +119,6 @@ export const Options = ({ selectedOption, setSelectedOption }) => {
     });
   };
 
-  // const handleClickBookingOption = (item) => {
-  //   //save value to each state to send to API
-  //   if (item.name == "instant") {
-  //     setInstantBook(item.value);
-  //   } else if (item.name == "pet") {
-  //     setPet(item.value);
-  //   } else {
-  //     setSelfCheckin(item.value);
-  //   }
-
-  //   //click/unclick
-  //   if (selectedBookingOption == null) {
-  //     return setSelectedBookingOption(item);
-  //   }
-  //   setSelectedBookingOption(null);
-  // };
   return (
     <div>
       <div>

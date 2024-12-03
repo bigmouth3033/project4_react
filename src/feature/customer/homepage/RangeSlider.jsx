@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { Range, getTrackBackground } from "react-range";
 import styled from "styled-components";
 
@@ -7,8 +7,25 @@ const StyleTitle = styled.div`
   font-weight: 600;
 `;
 
-const RangeSlider = ({ min, max, step, onChange }) => {
+const RangeSlider = ({
+  min,
+  max,
+  step,
+  onChange,
+  selectedPrice,
+  setSelectedPrice,
+}) => {
   const [values, setValues] = useState([min, max]);
+
+  //to update clearAll
+  useEffect(() => {
+    if (selectedPrice[0] == min && selectedPrice[1] == max) {
+      setValues(selectedPrice); //to clearAll
+    }
+
+    //to save the value to send API
+    setSelectedPrice(values);
+  }, [selectedPrice, values]);
 
   return (
     <>

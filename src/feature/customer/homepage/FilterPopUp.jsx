@@ -91,9 +91,6 @@ export const FilterPopUp = ({
     setSelectedBed(1);
     setSelectedBathRoom(1);
   };
-  useEffect(() => {
-    console.log(selectedRoom, selectedBed, selectedBathRoom);
-  }, [selectedRoom]);
 
   return (
     <StylePopUp action={action}>
@@ -107,9 +104,10 @@ export const FilterPopUp = ({
           min={0}
           max={100000}
           step={0.1}
+          selectedPrice={selectedPrice}
+          setSelectedPrice={setSelectedPrice}
           onChange={(value) => {
             setSelectedPrice(value);
-            console.log(value);
           }}
         />
         <RoomAndBed
