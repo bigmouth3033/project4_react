@@ -111,7 +111,23 @@ const StyleFilterButton = styled.button`
   }
 `;
 
-export const FilterBar = () => {
+export const FilterBar = ({
+  selectedAmentity,
+  selectedPropertyType,
+  selectedOption,
+  selectedPrice,
+  selectedRoom,
+  selectedBed,
+  selectedBathRoom,
+  setSelectedAmentity,
+  setSelectedPropertyType,
+  setSelectedOption,
+  setSelectedPrice,
+  setSelectedRoom,
+  setSelectedBed,
+  setSelectedBathRoom,
+  action,
+}) => {
   const scrollRef = useRef(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showLeftButton, setShowLeftButton] = useState(false);
@@ -190,7 +206,26 @@ export const FilterBar = () => {
           <div>Filter</div>
         </StyleFilterButton>
       </StyleScrollContainer>
-      {isPopUp && <FilterPopUp action={() => setIsPopUp(false)} />}
+
+      {isPopUp && (
+        <FilterPopUp
+          selectedAmentity={selectedAmentity}
+          setSelectedAmentity={setSelectedAmentity}
+          selectedPropertyType={selectedPropertyType}
+          setSelectedPropertyType={setSelectedPropertyType}
+          selectedOption={selectedOption}
+          setSelectedOption={setSelectedOption}
+          selectedPrice={selectedPrice}
+          setSelectedPrice={setSelectedPrice}
+          selectedRoom={selectedRoom}
+          setSelectedRoom={setSelectedRoom}
+          selectedBed={selectedBed}
+          setSelectedBed={setSelectedBed}
+          selectedBathRoom={selectedBathRoom}
+          setSelectedBathRoom={setSelectedBathRoom}
+          action={() => setIsPopUp(false)}
+        />
+      )}
     </>
   );
 };

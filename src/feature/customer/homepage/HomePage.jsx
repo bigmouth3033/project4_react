@@ -7,6 +7,7 @@ import "react-multi-carousel/lib/styles.css";
 import { Image } from "semantic-ui-react";
 import { GrFormNext } from "react-icons/gr";
 import { GrFormPrevious } from "react-icons/gr";
+import { useState } from "react";
 
 //npm install react-multi-carousel --save
 //npm install semantic-ui-react semantic-ui-css --save
@@ -123,12 +124,35 @@ const CustomRightArrow = ({ onClick }) => (
 
 export default function HomePage() {
   const properties = PropertiesRequest();
+  const [selectedAmentity, setSelectedAmentity] = useState([]);
+  const [selectedPropertyType, setSelectedPropertyType] = useState(null);
+  const [selectedOption, setSelectedOption] = useState([]);
+  const [selectedPrice, setSelectedPrice] = useState([]);
+  const [selectedRoom, setSelectedRoom] = useState(1);
+  const [selectedBed, setSelectedBed] = useState(1);
+  const [selectedBathRoom, setSelectedBathRoom] = useState(1);
+
   return (
     <StyleContainer>
       <StyleHeaderContainer>
         <CustomerHeader />
         <div>
-          <FilterBar />
+          <FilterBar
+            selectedAmentity={selectedAmentity}
+            setSelectedAmentity={setSelectedAmentity}
+            selectedPropertyType={selectedPropertyType}
+            setSelectedPropertyType={setSelectedPropertyType}
+            selectedOption={selectedOption}
+            setSelectedOption={setSelectedOption}
+            selectedPrice={selectedPrice}
+            setSelectedPrice={setSelectedPrice}
+            selectedRoom={selectedRoom}
+            setSelectedRoom={setSelectedRoom}
+            selectedBed={selectedBed}
+            setSelectedBed={setSelectedBed}
+            selectedBathRoom={selectedBathRoom}
+            setSelectedBathRoom={setSelectedBathRoom}
+          />
         </div>
       </StyleHeaderContainer>
       <StyleBody>
@@ -146,8 +170,8 @@ export default function HomePage() {
                 >
                   {item.propertyImages.slice(0, 5).map((image) => {
                     return (
-                      <div className="box">
-                        <img key={image.id} src={image.imageName} />
+                      <div className="box" key={image.id}>
+                        <img src={image.imageName} />
                       </div>
                     );
                   })}

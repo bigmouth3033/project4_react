@@ -92,7 +92,7 @@ const bookingOptions = [
   },
 ];
 
-export const Options = () => {
+export const Options = ({ selectedOption, setSelectedOption }) => {
   const [pet, setPet] = useState(null);
   const [selfCheckin, setSelfCheckin] = useState(null);
 
@@ -102,7 +102,7 @@ export const Options = () => {
   const [selectedBookingOption, setSelectedBookingOption] = useState(null);
 
   //Guest favourite
-  const handleClick = (value) => {
+  const handleFavClick = (value) => {
     if (selectedItem == null) {
       return setSelectedItem(value);
     }
@@ -110,22 +110,36 @@ export const Options = () => {
   };
 
   //Booking Option
-  const handleClickBookingOption = (item) => {
-    //save value to each state to send to API
-    if (item.name == "instant") {
-      setInstantBook(item.value);
-    } else if (item.name == "pet") {
-      setPet(item.value);
-    } else {
-      setSelfCheckin(item.value);
-    }
 
-    //click/unclick
-    if (selectedBookingOption == null) {
-      return setSelectedBookingOption(item);
-    }
-    setSelectedBookingOption(null);
+  const handleClick = (pickedItem) => {
+    setSelectedOption((prevSelectedItems) => {
+      // Kiểm tra xem amenity đã được chọn chưa
+      if (prevSelectedItems.includes(pickedItem)) {
+        // Nếu đã chọn, loại bỏ nó
+        return prevSelectedItems.filter((item) => item !== pickedItem);
+      } else {
+        // Nếu chưa chọn, thêm nó vào danh sách đã chọn
+        return [...prevSelectedItems, pickedItem];
+      }
+    });
   };
+
+  // const handleClickBookingOption = (item) => {
+  //   //save value to each state to send to API
+  //   if (item.name == "instant") {
+  //     setInstantBook(item.value);
+  //   } else if (item.name == "pet") {
+  //     setPet(item.value);
+  //   } else {
+  //     setSelfCheckin(item.value);
+  //   }
+
+  //   //click/unclick
+  //   if (selectedBookingOption == null) {
+  //     return setSelectedBookingOption(item);
+  //   }
+  //   setSelectedBookingOption(null);
+  // };
   return (
     <div>
       <div>
@@ -134,8 +148,8 @@ export const Options = () => {
           {bookingOptions.map((item, index) => (
             <StyleItem
               key={index}
-              onClick={() => handleClickBookingOption(item)}
-              selected={item == selectedBookingOption}
+              onClick={() => handleClick(item)}
+              selected={selectedOption.includes(item)}
             >
               <div>{item.icon}</div>
               <div>{item.label}</div>

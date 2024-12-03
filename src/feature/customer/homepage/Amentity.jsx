@@ -49,12 +49,11 @@ const StyleItem = styled.div`
   }
 `;
 
-export const Amentity = () => {
+export const Amentity = ({ selectedAmentity, setSelectedAmentity }) => {
   const amenities = AmenityRequest();
-  const [selectedItems, setSelectedItems] = useState([]);
 
   const handleClick = (amenity) => {
-    setSelectedItems((prevSelectedItems) => {
+    setSelectedAmentity((prevSelectedItems) => {
       // Kiểm tra xem amenity đã được chọn chưa
       if (prevSelectedItems.includes(amenity)) {
         // Nếu đã chọn, loại bỏ nó
@@ -101,7 +100,7 @@ export const Amentity = () => {
                       return (
                         <StyleItem
                           onClick={() => handleClick(amenity)}
-                          selected={selectedItems.includes(amenity)} // Kiểm tra nếu amenity có trong selectedItems
+                          selected={selectedAmentity.includes(amenity)} // Kiểm tra nếu amenity có trong selectedItems
                           key={index}
                         >
                           <div>

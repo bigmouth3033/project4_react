@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PopUp from "@/shared/components/PopUp/PopUp";
 import styled from "styled-components";
 import { Range } from "react-range";
@@ -48,27 +48,90 @@ const StyleSubmit = styled.div`
 const StyleBody = styled.div`
   padding: 0 2rem;
 `;
+const StyleShowButton = styled.div`
+  padding: 1rem 1rem;
+  border-radius: 10px;
+  background-color: black;
+  color: white;
+  cursor: pointer;
+`;
+const StyleClearAll = styled.div`
+  padding: 1rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  &:hover {
+    background-color: #f5f0f0;
+  }
+`;
 
-export const FilterPopUp = ({ action }) => {
-  const [priceRange, setPriceRange] = useState([0, 100]);
+export const FilterPopUp = ({
+  selectedAmentity,
+  selectedPropertyType,
+  selectedOption,
+  selectedPrice,
+  selectedRoom,
+  selectedBed,
+  selectedBathRoom,
+  setSelectedAmentity,
+  setSelectedPropertyType,
+  setSelectedOption,
+  setSelectedPrice,
+  setSelectedRoom,
+  setSelectedBed,
+  setSelectedBathRoom,
+  action,
+}) => {
+  // const [priceRange, setPriceRange] = useState(selectedPrice);
+  const HandleClear = () => {
+    setSelectedAmentity([]);
+    setSelectedPropertyType(null);
+    setSelectedOption([]);
+    setSelectedPrice([0, 100000]);
+    setSelectedRoom(1);
+    setSelectedBed(1);
+    setSelectedBathRoom(1);
+  };
+  useEffect(() => {
+    console.log(selectedRoom, selectedBed, selectedBathRoom);
+  }, [selectedRoom]);
+
   return (
     <StylePopUp action={action}>
       <StyleTitle>Filters</StyleTitle>
       <StyleBody>
-        <PropertyType />
+        <PropertyType
+          selectedPropertyType={selectedPropertyType}
+          setSelectedPropertyType={setSelectedPropertyType}
+        />
         <RangeSlider
           min={0}
-          max={10000}
+          max={100000}
           step={0.1}
-          onChange={(value) => setPriceRange(value)}
+          onChange={(value) => {
+            setSelectedPrice(value);
+            console.log(value);
+          }}
         />
-        <RoomAndBed />
-        <Amentity />
-        <Options />
+        <RoomAndBed
+          selectedRoom={selectedRoom}
+          selectedBed={selectedBed}
+          selectedBathRoom={selectedBathRoom}
+          setSelectedRoom={setSelectedRoom}
+          setSelectedBed={setSelectedBed}
+          setSelectedBathRoom={setSelectedBathRoom}
+        />
+        <Amentity
+          selectedAmentity={selectedAmentity}
+          setSelectedAmentity={setSelectedAmentity}
+        />
+        <Options
+          selectedOption={selectedOption}
+          setSelectedOption={setSelectedOption}
+        />
       </StyleBody>
       <StyleSubmit>
-        <div>Clear all</div>
-        <div>Show places</div>
+        <StyleClearAll onClick={() => HandleClear()}>Clear all</StyleClearAll>
+        <StyleShowButton>Show places</StyleShowButton>
       </StyleSubmit>
     </StylePopUp>
   );

@@ -62,19 +62,14 @@ const propertyOptions = [
   },
 ];
 
-function PropertyType() {
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [propertyType, setPropertyType] = useState(null);
-
+function PropertyType({ selectedPropertyType, setSelectedPropertyType }) {
   //handle click/unclick
   const handleClick = (pro) => {
-    if (selectedItem != pro) {
-      setPropertyType(pro.value);
-      setSelectedItem(pro);
+    if (selectedPropertyType != pro.value) {
+      setSelectedPropertyType(pro.value);
       return;
     }
-    setPropertyType(null); //gửi đi cái null nghĩa là filter all type
-    setSelectedItem(null);
+    setSelectedPropertyType(null); //gửi đi cái null nghĩa là filter all type
   };
   return (
     <div>
@@ -83,7 +78,7 @@ function PropertyType() {
         {propertyOptions.map((pro) => (
           <StyleProItem
             key={pro.value}
-            selected={selectedItem == pro}
+            selected={selectedPropertyType == pro.value}
             onClick={() => handleClick(pro)}
           >
             {pro.label}
