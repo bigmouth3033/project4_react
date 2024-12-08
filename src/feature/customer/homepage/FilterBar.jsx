@@ -1,15 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled, { css } from "styled-components";
 import { MdArrowBackIosNew, MdArrowForwardIos } from "react-icons/md";
+import Skeleton from "react-loading-skeleton";
 import { CategoriesRequest } from "../../../shared/api/categoryClientApi";
 import { FaFilter } from "react-icons/fa";
-import Skeleton from "react-loading-skeleton";
 import { FilterPopUp } from "./FilterPopUp";
 
-/**
- * npm install react-loading-skeleton
- */
 const StyleScrollContainer = styled.div`
   display: flex;
   align-items: center;
@@ -20,12 +16,9 @@ const StyleScrollContainer = styled.div`
 
 const StyleCategoryBar = styled.div`
   display: flex;
-  /* position: absolute; */
-
   overflow: hidden;
   scroll-behavior: smooth;
   gap: 1.5rem;
-  /* width: calc(100% - 100px); //Adjust width to make room for buttons */
   padding: 10px 0;
 `;
 
@@ -40,19 +33,17 @@ const StyleCategoryItem = styled.div`
   padding: 1rem;
   width: max-content;
   height: 5rem;
-  box-sizing: border-box !important; //BUT NÓ K CHẠYYYYY
-  /* transition: background-color 0.2s ease, color 0.2s ease; */
+  box-sizing: border-box !important;
+
   > div:nth-child(1) {
-    //style hình
     margin: 0 auto;
     width: 1.5rem;
   }
   > div:nth-child(2) {
-    //style chữ
     margin: 0 auto;
-
     padding: 0.5rem;
   }
+
   &:hover {
     color: #393838;
     border-bottom: 0.15rem solid #a8a7a7;
@@ -64,24 +55,21 @@ const StyleCategoryItem = styled.div`
       color: black;
       border-bottom: 0.19rem solid black;
       font-weight: bold;
-       /* Tắt hiệu ứng hover */
-       &:hover {
+      &:hover {
         color: black;
         border-bottom: 0.19rem solid black;
+      }
     `}
 `;
 
 const StyleButtonLeft = styled.button`
   background: none;
-
   border: 0.5px gray solid;
   border-radius: 50%;
   padding: 8px;
   cursor: pointer;
   color: #333;
-
   display: ${(props) => (props.hidden ? "none" : "block")};
-  transition: display 1s ease;
 
   &:hover {
     box-shadow: 0px 10px 20px #dadada;
@@ -112,27 +100,32 @@ const StyleFilterButton = styled.button`
 `;
 
 export const FilterBar = ({
+  categoryId,
+  setCategoryId,
   selectedAmentity,
   selectedPropertyType,
-  selectedOption,
+  isInstant,
+  isPetAllow,
+  isSelfCheckin,
   selectedPrice,
   selectedRoom,
   selectedBed,
   selectedBathRoom,
   setSelectedAmentity,
   setSelectedPropertyType,
-  setSelectedOption,
+  setIsInstant,
+  setIsSelfCheckin,
+  setIsPetAllow,
   setSelectedPrice,
   setSelectedRoom,
   setSelectedBed,
   setSelectedBathRoom,
-  action,
 }) => {
   const scrollRef = useRef(null);
-  const [selectedItem, setSelectedItem] = useState(null);
   const [showLeftButton, setShowLeftButton] = useState(false);
-  const [showRightButton, setShowRightButton] = useState(true);
-  const [isPopUp, setIsPopUp] = useState(false); //quản lý popup có hiện hay hong
+  const [showRightButton, setShowRightButton] = useState(false);
+  const [isPopUp, setIsPopUp] = useState(false);
+
   const categoriesRequest = CategoriesRequest();
 
   const scrollLeft = () => {
@@ -143,27 +136,39 @@ export const FilterBar = ({
     scrollRef.current.scrollBy({ left: 200, behavior: "smooth" });
   };
 
-  const handleClick = (category) => {
-    setSelectedItem(category);
+  const updateButtonVisibility = () => {
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+
+    // Check if the scroll position is at the start or end of the container
+    setShowLeftButton(scrollLeft > 0);
+    setShowRightButton(scrollLeft + clientWidth < scrollWidth);
   };
 
   const handleScroll = () => {
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-
-    // Check if we're at the start or end of the scrollable area
-    setShowLeftButton(scrollLeft > 0);
-    setShowRightButton(scrollLeft + clientWidth < scrollWidth - 1); // Adjust for rounding issues
+    updateButtonVisibility();
   };
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
-    // console.log(scrollRef.current);
 
+    // Attach scroll event listener
     scrollContainer.addEventListener("scroll", handleScroll);
-    handleScroll(); // Initial check to set button visibility on mount
+
+    // Initial check for overflow
+    updateButtonVisibility();
 
     return () => {
       scrollContainer.removeEventListener("scroll", handleScroll);
+    };
+  }, [categoriesRequest.data]);
+
+  useEffect(() => {
+    // Update button visibility on window resize
+    const handleResize = () => updateButtonVisibility();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -171,17 +176,16 @@ export const FilterBar = ({
     <>
       <StyleScrollContainer>
         <StyleButtonLeft onClick={scrollLeft} hidden={!showLeftButton}>
-          <div>
-            <MdArrowBackIosNew />
-          </div>
+          <MdArrowBackIosNew />
         </StyleButtonLeft>
+
         <StyleCategoryBar ref={scrollRef}>
           {categoriesRequest.isSuccess ? (
             categoriesRequest.data.data.map((category) => (
               <StyleCategoryItem
                 key={category.id}
-                selected={selectedItem === category}
-                onClick={() => handleClick(category)}
+                selected={categoryId === category.id}
+                onClick={() => setCategoryId(category.id)}
               >
                 <div>
                   <img
@@ -196,34 +200,39 @@ export const FilterBar = ({
             <Skeleton count={6} />
           )}
         </StyleCategoryBar>
+
         <StyleButtonRight onClick={scrollRight} hidden={!showRightButton}>
           <MdArrowForwardIos />
         </StyleButtonRight>
         <StyleFilterButton onClick={() => setIsPopUp(true)}>
-          <div>
-            <FaFilter />
-          </div>
+          <FaFilter />
           <div>Filter</div>
         </StyleFilterButton>
       </StyleScrollContainer>
 
       {isPopUp && (
         <FilterPopUp
-          selectedAmentity={selectedAmentity}
-          setSelectedAmentity={setSelectedAmentity}
-          selectedPropertyType={selectedPropertyType}
-          setSelectedPropertyType={setSelectedPropertyType}
-          selectedOption={selectedOption}
-          setSelectedOption={setSelectedOption}
-          selectedPrice={selectedPrice}
-          setSelectedPrice={setSelectedPrice}
-          selectedRoom={selectedRoom}
-          setSelectedRoom={setSelectedRoom}
-          selectedBed={selectedBed}
-          setSelectedBed={setSelectedBed}
-          selectedBathRoom={selectedBathRoom}
-          setSelectedBathRoom={setSelectedBathRoom}
-          action={() => setIsPopUp(false)}
+          {...{
+            selectedAmentity,
+            setSelectedAmentity,
+            selectedPropertyType,
+            setSelectedPropertyType,
+            isInstant,
+            setIsInstant,
+            isPetAllow,
+            setIsPetAllow,
+            isSelfCheckin,
+            setIsSelfCheckin,
+            selectedPrice,
+            setSelectedPrice,
+            selectedRoom,
+            setSelectedRoom,
+            selectedBed,
+            setSelectedBed,
+            selectedBathRoom,
+            setSelectedBathRoom,
+            action: () => setIsPopUp(false),
+          }}
         />
       )}
     </>

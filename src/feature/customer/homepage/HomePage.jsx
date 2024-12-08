@@ -1,13 +1,16 @@
 import styled from "styled-components";
 import CustomerHeader from "../custome_header/CustomerHeader";
 import { FilterBar } from "./FilterBar";
-import { PropertiesRequest } from "../../../shared/api/propertyClientApi";
+import { PropertiesRequest } from "./api/propertyClientApi";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { Image } from "semantic-ui-react";
 import { GrFormNext } from "react-icons/gr";
 import { GrFormPrevious } from "react-icons/gr";
 import { useState } from "react";
+import RangeSlider from "./RangeSlider";
+import { useSearchParams } from "react-router-dom";
+import { CategoriesRequest } from "../../../shared/api/categoryClientApi";
 
 //npm install react-multi-carousel --save
 //npm install semantic-ui-react semantic-ui-css --save
@@ -80,7 +83,6 @@ const CarouselStyled = styled(Carousel)`
 `;
 const StyleContent = styled.div`
   border-radius: 10px;
-  background-color: red;
 `;
 
 const CustomLeftArrow = ({ onClick }) => (
@@ -123,27 +125,64 @@ const CustomRightArrow = ({ onClick }) => (
 );
 
 export default function HomePage() {
-  const properties = PropertiesRequest();
-  const [selectedAmentity, setSelectedAmentity] = useState([]);
-  const [selectedPropertyType, setSelectedPropertyType] = useState(null);
-  const [selectedOption, setSelectedOption] = useState([]);
-  const [selectedPrice, setSelectedPrice] = useState([]);
+  //Call CATE API
+  const categoriesRequest = CategoriesRequest();
+
+  const [categoryId, setCategoryId] = useState(
+    categoriesRequest.isSuccess == true
+      ? categoriesRequest.data.data[0].id
+      : null
+  );
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [selectedAmentity, setSelectedAmentity] = useState(
+    searchParams.get("amentity") || []
+  );
+  const [selectedPropertyType, setSelectedPropertyType] = useState(
+    searchParams.get("propertyType") || null
+  );
+  const [isInstant, setIsInstant] = useState(null);
+  const [isPetAllow, setIsPetAllow] = useState(null);
+  const [isSelfCheckin, setIsSelfCheckin] = useState(null);
+  const [selectedPrice, setSelectedPrice] = useState(
+    searchParams.get("priceRange") || [0, 100000]
+  );
   const [selectedRoom, setSelectedRoom] = useState(1);
   const [selectedBed, setSelectedBed] = useState(1);
   const [selectedBathRoom, setSelectedBathRoom] = useState(1);
 
+  //Call main API
+  const properties = PropertiesRequest(
+    categoryId,
+    selectedPropertyType,
+    isInstant,
+    isPetAllow,
+    isSelfCheckin,
+    selectedPrice,
+    selectedRoom,
+    selectedBed,
+    selectedBathRoom
+  );
+
   return (
     <StyleContainer>
       <StyleHeaderContainer>
-        <CustomerHeader />
+        {/* <CustomerHeader /> */}
         <div>
           <FilterBar
+            categoryId={categoryId}
+            setCategoryId={setCategoryId}
             selectedAmentity={selectedAmentity}
             setSelectedAmentity={setSelectedAmentity}
             selectedPropertyType={selectedPropertyType}
             setSelectedPropertyType={setSelectedPropertyType}
-            selectedOption={selectedOption}
-            setSelectedOption={setSelectedOption}
+            isInstant={isInstant}
+            isPetAllow={isPetAllow}
+            isSelfCheckin={isSelfCheckin}
+            setIsInstant={setIsInstant}
+            setIsPetAllow={setIsPetAllow}
+            setIsSelfCheckin={setIsSelfCheckin}
             selectedPrice={selectedPrice}
             setSelectedPrice={setSelectedPrice}
             selectedRoom={selectedRoom}

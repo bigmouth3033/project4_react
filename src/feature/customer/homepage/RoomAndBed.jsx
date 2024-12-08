@@ -103,8 +103,11 @@ export const RoomAndBed = ({
             >
               <FiMinus />
             </StyleButtonLeft>
-            <p>{value}</p>
-            <StyleButtonRight onClick={() => updateQuantity(key, 1)}>
+            <p>{value}+</p>
+            <StyleButtonRight
+              onClick={() => updateQuantity(key, 1)}
+              hidden={value === 16}
+            >
               <FiPlus />
             </StyleButtonRight>
           </StyleQuantity>

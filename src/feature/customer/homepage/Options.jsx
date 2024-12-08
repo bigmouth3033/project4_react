@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { css } from "styled-components";
 import { MdOutlinePets } from "react-icons/md";
@@ -71,44 +71,78 @@ const StyleItem = styled.div`
   }
 `;
 
-const bookingOptions = [
-  {
-    value: "instant",
-    name: "instant",
-    label: "Instant Book",
-    icon: <AiOutlineThunderbolt />,
-  },
-  {
-    value: true,
-    name: "checkin",
-    label: "Self check-in",
-    icon: <GoKey />,
-  },
-  {
-    value: true,
-    name: "pet",
-    label: "Pet Allowed",
-    icon: <MdOutlinePets />,
-  },
-];
-
-export const Options = ({ selectedOption, setSelectedOption }) => {
+export const Options = ({
+  isInstant,
+  isPetAllow,
+  isSelfCheckin,
+  setIsInstant,
+  setIsPetAllow,
+  setIsSelfCheckin,
+}) => {
+  const bookingOptions = [
+    {
+      value: isInstant,
+      name: "instant",
+      label: "Instant Book",
+      icon: <AiOutlineThunderbolt />,
+    },
+    {
+      value: isSelfCheckin,
+      name: "checkin",
+      label: "Self check-in",
+      icon: <GoKey />,
+    },
+    {
+      value: isPetAllow,
+      name: "pet",
+      label: "Pet Allowed",
+      icon: <MdOutlinePets />,
+    },
+  ];
   //state to manage click/unclick
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState([]);
 
   //Guest favourite
-  const handleFavClick = (value) => {
-    if (selectedItem == null) {
-      return setSelectedItem(value);
-    }
-    setSelectedItem(null);
-  };
+  // const handleFavClick = (value) => {
+  //   if (selectedItem == null) {
+  //     return setSelectedItem(value);
+  //   }
+  //   setSelectedItem(null);
+  // };
 
   //Booking Option
 
   const handleClick = (pickedItem) => {
-    setSelectedOption((prevSelectedItems) => {
-      // Kiểm tra xem amenity đã được chọn chưa
+    if (pickedItem.name == "instant") {
+      if (pickedItem.value == null) {
+        setIsInstant("instant");
+        // setSelectedItem.push(pickedItem);
+      } else {
+        setIsInstant(null);
+        // setSelectedItem.remove(pickedItem);
+      }
+    }
+    if (pickedItem.name == "checkin") {
+      if (pickedItem.value == null) {
+        setIsSelfCheckin(true);
+        // setSelectedItem.push(pickedItem);
+      } else {
+        setIsSelfCheckin(null);
+        // setSelectedItem.remove(pickedItem);
+      }
+    }
+    if (pickedItem.name == "pet") {
+      if (pickedItem.value == null) {
+        setIsPetAllow(true);
+        // setSelectedItem.push(pickedItem);
+      } else {
+        setIsPetAllow(null);
+        // setSelectedItem.remove(pickedItem);
+      }
+    }
+
+    setSelectedItem((prevSelectedItems) => {
+      // Kiểm tra xem option đã được chọn chưa
       if (prevSelectedItems.includes(pickedItem)) {
         // Nếu đã chọn, loại bỏ nó
         return prevSelectedItems.filter((item) => item !== pickedItem);
@@ -119,6 +153,12 @@ export const Options = ({ selectedOption, setSelectedOption }) => {
     });
   };
 
+  // useEffect(() => {
+  //   if (isInstant == null) {
+  //     setSelectedItem.remove();
+  //   }
+  // }, [isInstant, isPetAllow, isSelfCheckin]);
+
   return (
     <div>
       <div>
@@ -128,7 +168,7 @@ export const Options = ({ selectedOption, setSelectedOption }) => {
             <StyleItem
               key={index}
               onClick={() => handleClick(item)}
-              selected={selectedOption.includes(item)}
+              selected={item.value != null}
             >
               <div>{item.icon}</div>
               <div>{item.label}</div>

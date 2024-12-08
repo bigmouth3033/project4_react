@@ -7,6 +7,7 @@ import PropertyType from "./PropertyType";
 import { RoomAndBed } from "./RoomAndBed";
 import { Amentity } from "./Amentity";
 import { Options } from "./Options";
+import { PropertiesRequest } from "@/feature/customer/homepage/api/propertyClientApi";
 
 //npm add react-range
 
@@ -67,14 +68,18 @@ const StyleClearAll = styled.div`
 export const FilterPopUp = ({
   selectedAmentity,
   selectedPropertyType,
-  selectedOption,
+  isInstant,
+  isPetAllow,
+  isSelfCheckin,
   selectedPrice,
   selectedRoom,
   selectedBed,
   selectedBathRoom,
   setSelectedAmentity,
   setSelectedPropertyType,
-  setSelectedOption,
+  setIsInstant,
+  setIsPetAllow,
+  setIsSelfCheckin,
   setSelectedPrice,
   setSelectedRoom,
   setSelectedBed,
@@ -82,14 +87,22 @@ export const FilterPopUp = ({
   action,
 }) => {
   // const [priceRange, setPriceRange] = useState(selectedPrice);
+  const properties = PropertiesRequest();
+
+  //CLEAR ALL
   const HandleClear = () => {
     setSelectedAmentity([]);
     setSelectedPropertyType(null);
-    setSelectedOption([]);
+    setIsInstant(null);
+    setIsPetAllow(null);
+    setIsSelfCheckin(null);
     setSelectedPrice([0, 100000]);
     setSelectedRoom(1);
     setSelectedBed(1);
     setSelectedBathRoom(1);
+  };
+  const HandleSubmit = () => {
+    action();
   };
 
   return (
@@ -123,13 +136,19 @@ export const FilterPopUp = ({
           setSelectedAmentity={setSelectedAmentity}
         />
         <Options
-          selectedOption={selectedOption}
-          setSelectedOption={setSelectedOption}
+          isInstant={isInstant}
+          isPetAllow={isPetAllow}
+          isSelfCheckin={isSelfCheckin}
+          setIsInstant={setIsInstant}
+          setIsPetAllow={setIsPetAllow}
+          setIsSelfCheckin={setIsSelfCheckin}
         />
       </StyleBody>
       <StyleSubmit>
         <StyleClearAll onClick={() => HandleClear()}>Clear all</StyleClearAll>
-        <StyleShowButton>Show places</StyleShowButton>
+        <StyleShowButton onClick={() => HandleSubmit()}>
+          Show places
+        </StyleShowButton>
       </StyleSubmit>
     </StylePopUp>
   );

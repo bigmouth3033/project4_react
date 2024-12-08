@@ -36,6 +36,7 @@
     "leaflet": "^1.9.4",
     "lodash": "^4.17.21",
     "project4_react": "file:",
+    "qs": "^6.13.1",
     "react": "^18.3.1",
     "react-avatar": "^5.0.3",
     "react-date-picker": "^11.0.0",

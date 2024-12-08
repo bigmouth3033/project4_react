@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 const initBox = keyframes`
   from {
-    transform: scale(110%);
+    transform: scale(100%);
   }
 
   to {

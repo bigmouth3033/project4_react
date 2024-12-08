@@ -22,10 +22,9 @@ const RangeSlider = ({
     if (selectedPrice[0] == min && selectedPrice[1] == max) {
       setValues(selectedPrice); //to clearAll
     }
-
     //to save the value to send API
-    setSelectedPrice(values);
-  }, [selectedPrice, values]);
+    // setSelectedPrice(values);
+  }, [selectedPrice]);
 
   return (
     <>
@@ -46,6 +45,7 @@ const RangeSlider = ({
           onChange={(values) => {
             setValues(values);
             onChange(values);
+            setSelectedPrice(values);
           }}
           renderTrack={({ props, children }) => {
             const { key, ...restProps } = props; // Tách key ra khỏi props
