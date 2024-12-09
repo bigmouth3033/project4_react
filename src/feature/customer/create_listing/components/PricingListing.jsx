@@ -4,6 +4,7 @@ import { useOutletContext } from "react-router-dom";
 import TextInput from "@/shared/components/Input/TextInput";
 import NumberInput from "@/shared/components/Input/NumberInput";
 import Radio from "@/shared/components/Input/RadioInput";
+import InputCheckBox from "@/shared/components/Input/InputCheckBox";
 
 const Container = styled.div`
   & hr {
@@ -104,9 +105,16 @@ const RadioContainer = styled.div`
   }
 `;
 
+const StayStyled = styled.div`
+  margin: 0.5rem 0;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+`;
+
 export default function PricingListing() {
   const [state, dispatch, ACTIONS] = useOutletContext();
-  const [money, setMoney] = useState(1);
 
   return (
     <>
@@ -130,7 +138,7 @@ export default function PricingListing() {
             </BasePrice>
             <hr />
             <div>
-              <h2>Add discounts</h2>
+              <h3>Add discounts</h3>
               <p>Help your place stand out to get booked faster and earn your first reviews.</p>
             </div>
             <Discount>
@@ -171,7 +179,7 @@ export default function PricingListing() {
             </Discount>
             <hr />
             <div>
-              <h2>How far in advance can guests</h2>
+              <h3>How far in advance can guests</h3>
               <p>
                 Tip: You'll get more reservation if you keep your calendar available and only block
                 days you can't host
@@ -229,8 +237,76 @@ export default function PricingListing() {
                 </div>
               </RadioContainer>
             </div>
+            <hr />
+            <div>
+              <h3>Trip length</h3>
+              <StayStyled>
+                <InputCheckBox
+                  checked={state.minimumStay}
+                  onChange={() =>
+                    dispatch({
+                      type: ACTIONS.CHANGE_MINIMUM_STAY,
+                      next: state.minimumStay != null ? null : 1,
+                    })
+                  }
+                />
+                <p>Set minimum stay</p>
+              </StayStyled>
+              {state.minimumStay && (
+                <Discount>
+                  <div>
+                    <DiscountTextInput
+                      state={state.minimumStay}
+                      setState={(value) => {
+                        if (!state.maximumStay || Number(value) <= Number(state.maximumStay)) {
+                          dispatch({ type: ACTIONS.CHANGE_MINIMUM_STAY, next: value });
+                        }
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <h4>Minimum stay</h4>
+                    <p>Minimum stay is {state.minimumStay} days</p>
+                  </div>
+                </Discount>
+              )}
+              <StayStyled>
+                <InputCheckBox
+                  checked={state.maximumStay != null}
+                  onChange={() =>
+                    dispatch({
+                      type: ACTIONS.CHANGE_MAXIMUM_STAY,
+                      next:
+                        state.maximumStay == null
+                          ? state.minimumStay != null
+                            ? state.minimumStay
+                            : 1
+                          : null,
+                    })
+                  }
+                />
+                <p>Set maximum stay</p>
+              </StayStyled>
+              {state.maximumStay && (
+                <Discount>
+                  <div>
+                    <DiscountTextInput
+                      state={state.maximumStay}
+                      setState={(value) => {
+                        if (!state.minimumStay || Number(value) >= Number(state.minimumStay)) {
+                          dispatch({ type: ACTIONS.CHANGE_MAXIMUM_STAY, next: value });
+                        }
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <h4>Maximum stay</h4>
+                    <p>Maximum stay is {state.maximumStay} days</p>
+                  </div>
+                </Discount>
+              )}
+            </div>
           </Left>
-
           <Right></Right>
         </Body>
       </Container>

@@ -11,6 +11,7 @@ import { useState } from "react";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import AlertPopUp from "@/shared/components/PopUp/AlertPopUp";
+import { AdminRequest } from "@/shared/api/adminApi";
 
 const Container = styled.div`
   background-color: rgb(248, 249, 251);
@@ -91,6 +92,7 @@ const Intro = styled.div`
 const EmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const AdminLogin = () => {
+  const admin = AdminRequest();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const adminLogin = AdminLoginRequest();
@@ -147,6 +149,7 @@ const AdminLogin = () => {
           if (response.status == 200) {
             Cookies.set("ADMIN_ACCESS_TOKEN", response.data);
             navigate("/admin");
+            return;
           }
 
           if (response.status == 403) {

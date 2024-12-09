@@ -14,6 +14,8 @@ import { LoginRequest } from "../api/loginSignUpApi";
 import Cookies from "js-cookie";
 import { UserRequest } from "@/shared/api/userApi";
 import SuccessPopUp from "@/shared/components/PopUp/SuccessPopUp";
+import google_logo from "@/feature/customer/custome_header/assets/icons8-google-48.png";
+import { IoQrCodeOutline } from "react-icons/io5";
 
 const PopUpContainer = styled(PopUp)`
   width: 33rem;
@@ -109,6 +111,7 @@ const Footer = styled.div`
   padding: 10px 2rem 15px;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
   align-items: center;
   position: relative;
 `;
@@ -129,6 +132,26 @@ const ForgotPassword = styled.h4`
   font-size: 15px;
   cursor: pointer;
   text-decoration: underline;
+`;
+
+const LogonStyled = styled.div`
+  height: 30px;
+
+  > img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+  }
+`;
+
+const WhiteButtonStyled = styled(WhiteButton)`
+  display: grid;
+  grid-template-columns: 1fr 20fr;
+  align-items: center;
+
+  svg {
+    font-size: 18px;
+  }
 `;
 
 const EmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -209,7 +232,16 @@ function Init({ action, email, setEmail, setStep }) {
         <span></span>
       </Hr>
       <Footer>
-        <WhiteButton>Continue with Google</WhiteButton>
+        <WhiteButtonStyled>
+          <LogonStyled>
+            <img src={google_logo} />
+          </LogonStyled>{" "}
+          Continue with Google
+        </WhiteButtonStyled>
+        <WhiteButtonStyled>
+          <IoQrCodeOutline />
+          Continue with Qr
+        </WhiteButtonStyled>
       </Footer>
     </>
   );

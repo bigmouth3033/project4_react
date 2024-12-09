@@ -60,6 +60,14 @@ const CategoryItem = styled.button`
       `;
     }
   }}
+
+  ${(props) => {
+    if (props.$unavailable == true) {
+      return css`
+        text-decoration: line-through;
+      `;
+    }
+  }}
 `;
 
 const propertyOptions = [
@@ -103,28 +111,39 @@ export default function CategoryListing() {
                 dispatch({ type: ACTIONS.CHANGE_PROPERTY_TYPE, next: type.value })
               }
               options={propertyOptions}
+              isDisable={state.status != "PROGRESS" && true}
             />
           </div>
           <div>
             <h2>Which of these best describes your place?</h2>
             <CategoryContainer>
               {categories.isSuccess &&
-                categories.data.data.map((category, index) => {
-                  return (
-                    <CategoryItem
-                      $active={state.propertyCategoryID == category.id}
-                      onClick={() => {
-                        dispatch({ type: ACTIONS.CHANGE_PROPERTY_CATEGORY_ID, next: category.id });
-                      }}
-                      key={index}
-                    >
-                      <div>
-                        <img src={category.categoryImage} />
-                      </div>
-                      {category.categoryName}
-                    </CategoryItem>
-                  );
-                })}
+                categories.data.data
+                  .filter(
+                    (category) => category.status == true || state.propertyCategoryID == category.id
+                  )
+                  .map((category, index) => {
+                    return (
+                      <CategoryItem
+                        $unavailable={category.status == false}
+                        $active={state.propertyCategoryID == category.id}
+                        onClick={() => {
+                          if (state.status == "PROGRESS") {
+                            dispatch({
+                              type: ACTIONS.CHANGE_PROPERTY_CATEGORY_ID,
+                              next: category.id,
+                            });
+                          }
+                        }}
+                        key={index}
+                      >
+                        <div>
+                          <img src={category.categoryImage} />
+                        </div>
+                        {category.categoryName}
+                      </CategoryItem>
+                    );
+                  })}
             </CategoryContainer>
           </div>
         </Left>

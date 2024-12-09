@@ -3,6 +3,9 @@ import styled from "styled-components";
 import { formatDate } from "@/shared/utils/DateTimeHandle";
 import { PiLightningFill } from "react-icons/pi";
 import { PiLightningSlashBold } from "react-icons/pi";
+import PopUp from "@/shared/components/PopUp/PopUp";
+import XButton from "@/shared/components/Button/XButton";
+import TextEditor from "@/shared/components/editor/TextEditor";
 
 const Container = styled.div`
   padding: 1rem 3rem 0;
@@ -58,28 +61,121 @@ const RightStyled = styled.div`
   }
 `;
 
-export default function CreateListingHeader({ state, listing }) {
-  return (
-    <Container>
-      <h1>
-        {state.propertyTitle
-          ? state.propertyTitle
-          : `Your new listing started at ${formatDate(listing.data.data.createdAt)}`}
-      </h1>
-      <RightStyled>
-        <div>
-          {state.bookingType && (
-            <>
-              {state.bookingType == "instant" ? <PiLightningFill /> : <PiLightningSlashBold />}
-              <p>Instant book {state.bookingType == "instant" ? "on" : "off"}</p>
-            </>
-          )}
-        </div>
+const ButtonContainerStyled = styled.div`
+  > button {
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+    color: white;
+    background-color: black;
+  }
 
-        <div>
-          <Active /> <h4>{listing.data.data.status}</h4>
-        </div>
-      </RightStyled>
-    </Container>
+  > button:active {
+    transform: scale(0.9);
+  }
+`;
+
+export default function CreateListingHeader({ state, listing }) {
+  const [viewSuggestion, setViewSuggestion] = useState(false);
+
+  return (
+    <>
+      <Container>
+        <h1>
+          {state.propertyTitle
+            ? state.propertyTitle
+            : `Your new listing started at ${formatDate(listing.data.data.createdAt)}`}
+        </h1>
+        <RightStyled>
+          <ButtonContainerStyled>
+            {" "}
+            {listing.data.data.suggestion && (
+              <button onClick={() => setViewSuggestion(true)}>View suggestion</button>
+            )}
+          </ButtonContainerStyled>
+          <div>
+            {state.bookingType && (
+              <>
+                {state.bookingType == "instant" ? <PiLightningFill /> : <PiLightningSlashBold />}
+                <p>Instant book {state.bookingType == "instant" ? "on" : "off"}</p>
+              </>
+            )}
+          </div>
+
+          <div>
+            <Active /> <h4>{listing.data.data.status}</h4>
+          </div>
+        </RightStyled>
+      </Container>
+      {viewSuggestion && (
+        <SuggestionPopUp
+          suggestion={listing.data.data.suggestion}
+          action={() => setViewSuggestion(false)}
+        />
+      )}
+    </>
+  );
+}
+
+const PopUpStyled = styled(PopUp)`
+  padding: 0;
+  min-width: 35rem;
+  border-radius: 25px;
+
+  & hr {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const HeaderStyled = styled.div`
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+
+  h4 {
+    font-size: 18px;
+  }
+`;
+
+const BodyStyled = styled.div`
+  padding: 1rem 1.5rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  & h4 {
+    font-size: 17px;
+    font-weight: 600;
+    padding: 0.5rem 0;
+  }
+`;
+
+const SuggestionContainerStyled = styled.div`
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 15px;
+  min-height: 15rem;
+`;
+
+function SuggestionPopUp({ action, suggestion }) {
+  const theObj = { __html: suggestion };
+
+  return (
+    <PopUpStyled>
+      <HeaderStyled>
+        <h4>Suggestion</h4>
+        <XButton action={action} />
+      </HeaderStyled>
+      <hr />
+      <BodyStyled>
+        <SuggestionContainerStyled>
+          <div dangerouslySetInnerHTML={theObj} />
+        </SuggestionContainerStyled>
+      </BodyStyled>
+    </PopUpStyled>
   );
 }

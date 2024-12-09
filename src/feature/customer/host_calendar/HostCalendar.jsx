@@ -21,9 +21,11 @@ import { OpenNotAvailableDateRequest } from "./api/hostCalendarApi";
 import NumberInput from "@/shared/components/Input/NumberInput";
 import BookingDetail from "../hosting/components/BookingDetail";
 import formatDollar from "@/shared/utils/FormatDollar";
+import { useParams } from "react-router";
 
 const localizer = momentLocalizer(moment);
 
+/* #region  styled */
 const ContainerStyled = styled.div`
   display: grid;
   grid-template-columns: 3fr 1fr;
@@ -372,6 +374,8 @@ const CustomPricesStyled = styled.div`
   }
 `;
 
+/* #endregion */
+
 const CustomEvent = ({ event }) => {
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
@@ -384,6 +388,8 @@ const CustomEvent = ({ event }) => {
 };
 
 export default function HostCalendar() {
+  /* #region state */
+
   const [showBookingDetail, setShowBookingDetail] = useState();
   const [isChangeCustomPrice, setIsChangeCustomPrice] = useState(false);
   const [changeCustomPrice, setChangeCustomPrice] = useState();
@@ -407,15 +413,23 @@ export default function HostCalendar() {
   const [isChangePrice, setIsChangePrice] = useState();
   const [isChangeWeeklyDiscount, setIsChangeWeeklyDiscount] = useState();
   const [isChangeMonthlyDiscount, setIsChangeMonthlyDiscount] = useState();
+  /* #endregion */
 
+  /* #region process */
   useEffect(() => {
     if (getHostCalendar.isSuccess) {
-      if (getHostCalendar.data.data.length > 0 && chosenProperty.id == null) {
-        setChosenProperty(getHostCalendar.data.data[0]);
+      const properties = getHostCalendar.data.data.filter(
+        (property) =>
+          property.status != "PENDING" &&
+          property.status != "DENIED" &&
+          property.status != "PROGRESS"
+      );
+      if (properties.length > 0 && chosenProperty.id == null) {
+        setChosenProperty(properties[0]);
       }
 
-      if (getHostCalendar.data.data.length > 0 && chosenProperty.id != null) {
-        setChosenProperty((prev) => getHostCalendar.data.data.find((item) => item.id == prev.id));
+      if (properties.length > 0 && chosenProperty.id != null) {
+        setChosenProperty((prev) => properties.find((item) => item.id == prev.id));
       }
     }
   }, [getHostCalendar.fetchStatus]);
@@ -712,6 +726,7 @@ export default function HostCalendar() {
       },
     });
   };
+  /* #endregion */
 
   return (
     <>

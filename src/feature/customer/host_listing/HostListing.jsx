@@ -137,9 +137,14 @@ const BookingTypeStyled = styled.div`
   }
 `;
 
+const CustomSelectInput = styled(SelectInput)`
+  width: 10rem;
+`;
+
 const options = [
   { label: "All", value: "All" },
   { label: "In progress", value: "PROGRESS" },
+  { label: "Public", value: "PUBLIC" },
 ];
 
 export default function HostListing() {
@@ -158,7 +163,7 @@ export default function HostListing() {
             <TextInput state={search} setState={setSearch} placeholder={"Search for name"} />
           </div>
           <div>
-            <SelectInput state={status} setState={setStatus} options={options} />
+            <CustomSelectInput state={status} setState={setStatus} options={options} />
           </div>
           <div>
             <RedButton onClick={() => navigate("/become_a_host")}>Add</RedButton>
@@ -241,7 +246,22 @@ export default function HostListing() {
                     <td>
                       {listing.status == "PROGRESS" && (
                         <StatusStyled>
-                          <Active /> <p>In progress</p>
+                          <p>In progress</p>
+                        </StatusStyled>
+                      )}
+                      {listing.status == "PUBLIC" && (
+                        <StatusStyled>
+                          <Active /> <p>Public</p>
+                        </StatusStyled>
+                      )}
+                      {listing.status == "PENDING" && (
+                        <StatusStyled>
+                          <p>Pending</p>
+                        </StatusStyled>
+                      )}
+                      {listing.status == "DENIED" && (
+                        <StatusStyled>
+                          <p>Denied</p>
                         </StatusStyled>
                       )}
                     </td>

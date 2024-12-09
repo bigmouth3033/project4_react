@@ -54,9 +54,12 @@ export default function SelectInput({
   selectRef,
   placeholder,
   className,
+  isMulti,
+  isDisabled,
 }) {
   return (
     <Input
+      isMulti={isMulti}
       styles={customStyles}
       className={className}
       placeholder={placeholder}
@@ -65,6 +68,7 @@ export default function SelectInput({
       onChange={setState}
       options={options}
       isSearchable
+      isDisabled={isDisabled}
     />
   );
 }

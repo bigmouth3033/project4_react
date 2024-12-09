@@ -52,3 +52,14 @@ export const UpdatePropertyRequest = () => {
     mutationFn: request,
   });
 };
+
+export const PublicListingRequest = () => {
+  const request = async (payload) => {
+    const response = await axiosClient.put("listingCM/public_request", payload);
+    return response.data;
+  };
+
+  return useMutation({
+    mutationFn: request,
+  });
+};

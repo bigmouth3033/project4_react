@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import AddMinusButton from "@/shared/components/Button/AddMinusButton";
 import TextInput from "@/shared/components/Input/TextInput";
+import TextEditor from "@/shared/components/editor/TextEditor";
 
 const Container = styled.div`
   & hr {
@@ -110,22 +111,18 @@ export default function DetailListing() {
                 Give guest a sense of what it's like to live in your space, including why they'll
                 love staying there
               </p>
-              <CustomTextInput
-                value={state.aboutProperty}
-                onChange={(ev) =>
-                  dispatch({ type: ACTIONS.CHANGE_ABOUT_PROPERTY, next: ev.target.value })
-                }
+              <TextEditor
+                state={state.aboutProperty}
+                setState={(value) => dispatch({ type: ACTIONS.CHANGE_ABOUT_PROPERTY, next: value })}
               />
             </Description>
             <hr />
             <Description>
               <h4>Guest access (Optional)</h4>
               <p>Let guests know which parts of the space they'll be able to access</p>
-              <CustomTextInput
-                value={state.guestAccess}
-                onChange={(ev) =>
-                  dispatch({ type: ACTIONS.CHANGE_GUEST_ACCESS, next: ev.target.value })
-                }
+              <TextEditor
+                state={state.guestAccess}
+                setState={(value) => dispatch({ type: ACTIONS.CHANGE_GUEST_ACCESS, next: value })}
               />
             </Description>
             <hr />
@@ -135,11 +132,9 @@ export default function DetailListing() {
                 Include any special info you want potential guests to know before booking that isn't
                 covered in other settings
               </p>
-              <CustomTextInput
-                value={state.detailToNote}
-                onChange={(ev) =>
-                  dispatch({ type: ACTIONS.CHANGE_DETAIL_TO_NOTE, next: ev.target.value })
-                }
+              <TextEditor
+                state={state.detailToNote}
+                setState={(value) => dispatch({ type: ACTIONS.CHANGE_DETAIL_TO_NOTE, next: value })}
               />
             </Description>
           </Left>

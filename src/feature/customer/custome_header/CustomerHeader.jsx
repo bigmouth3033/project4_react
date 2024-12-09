@@ -176,6 +176,43 @@ const DropDownContainer = styled.div`
   display: flex;
   flex-direction: column;
   background-color: white;
+  transform: translate(-20px, 50px);
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  border-radius: 15px;
+
+  > button {
+    width: 15rem;
+    padding: 10px 1rem;
+    border: none;
+    background-color: white;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  > .focus {
+    font-weight: 600;
+  }
+
+  > button:hover {
+    background-color: #f1f1f1;
+  }
+
+  > button:nth-of-type(1) {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+  }
+
+  > button:nth-last-child(1) {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+  }
+`;
+
+const NotSignUpDropDownContainer = styled.div`
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
   transform: translate(-150px, 50px);
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   border-radius: 15px;
@@ -216,8 +253,8 @@ export default function CustomerHeader() {
   const dropDownButtonRef = useRef();
   const containerRef = useRef();
   const [isRegisterPopUp, setIsRegisterPopUp] = useState("");
-  const user = UserRequest();
   const navigate = useNavigate();
+  const user = UserRequest();
 
   useEffect(() => {
     const event = function () {
@@ -330,10 +367,10 @@ export default function CustomerHeader() {
           </FilterBar>
         </Center>
         <Right>
-          {user.isSuccess && user.data.status == 200 && user.data.data.properties.length > 0 && (
+          {user.isSuccess && user.data.status == 200 && user.data.data.host == true && (
             <h5 onClick={() => navigate("/hosting")}>Switch to hosting</h5>
           )}
-          {user.isSuccess && user.data.status == 200 && user.data.data.properties.length == 0 && (
+          {user.isSuccess && user.data.status == 200 && user.data.data.host == false && (
             <h5 onClick={() => navigate("/become_a_host")}>Become a host</h5>
           )}
           <DropDownButton
@@ -349,9 +386,9 @@ export default function CustomerHeader() {
             )}
           </DropDownButton>
           {isClickDropDown && (
-            <DropDownContainer ref={dropDownRef}>
+            <>
               {user.isSuccess && user.data.status == 404 && (
-                <>
+                <NotSignUpDropDownContainer>
                   <button
                     onClick={() => {
                       setIsCLickDropDown(false);
@@ -369,10 +406,10 @@ export default function CustomerHeader() {
                   >
                     Log in
                   </button>
-                </>
+                </NotSignUpDropDownContainer>
               )}
               {user.isSuccess && user.data.status == 200 && (
-                <>
+                <DropDownContainer ref={dropDownRef}>
                   <button className="focus">Message</button>
                   <button className="focus">Notification</button>
                   <button className="focus">Trips</button>
@@ -391,9 +428,9 @@ export default function CustomerHeader() {
                   >
                     Log out
                   </button>
-                </>
+                </DropDownContainer>
               )}
-            </DropDownContainer>
+            </>
           )}
         </Right>
       </Container>

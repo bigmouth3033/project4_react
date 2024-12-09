@@ -13,6 +13,11 @@ import PopUp from "@/shared/components/PopUp/PopUp";
 import Button1 from "@/shared/components/Button/Button1";
 import { AdminRequest } from "@/shared/api/adminApi";
 import Cookies from "js-cookie";
+import { MdKeyboardArrowRight } from "react-icons/md";
+import { QueryClient } from "@tanstack/react-query";
+import { FaBell } from "react-icons/fa";
+import { FaMessage } from "react-icons/fa6";
+import { IoMdSettings } from "react-icons/io";
 
 const Container = styled.div`
   position: sticky;
@@ -41,9 +46,19 @@ const Left = styled.div`
   font-size: 20px;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.6);
+
+  & p {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
 `;
 
-const Right = styled.div``;
+const Right = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
 
 const ProfileGroup = styled.div`
   position: relative;
@@ -102,6 +117,24 @@ const DropDownButton = styled.button`
   }
 `;
 
+const IconContainer = styled.button`
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  border-radius: 25px;
+
+  padding: 9px 9px;
+  & svg {
+    font-size: 15px;
+    color: black;
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
+`;
+
+const queryClient = new QueryClient();
+
 export default function Header({ isSideBarSmall, setIsSideBarSmall }) {
   const admin = AdminRequest();
   const [isPopUp, setIsPopUp] = useState(false);
@@ -154,7 +187,11 @@ export default function Header({ isSideBarSmall, setIsSideBarSmall }) {
       if (item.children != null) {
         for (let child of item.children) {
           if (child.link == location.pathname) {
-            setCurrentPage(child.name);
+            setCurrentPage(
+              <>
+                <p>{item.name}</p> <MdKeyboardArrowRight /> <p>{child.name}</p>
+              </>
+            );
           }
         }
       }
@@ -182,6 +219,7 @@ export default function Header({ isSideBarSmall, setIsSideBarSmall }) {
 
   const onLogout = () => {
     Cookies.remove("ADMIN_ACCESS_TOKEN");
+    queryClient.removeQueries("admin");
     admin.refetch();
   };
 
@@ -196,6 +234,15 @@ export default function Header({ isSideBarSmall, setIsSideBarSmall }) {
             <p>{currentPage}</p>
           </Left>
           <Right>
+            <IconContainer>
+              <IoMdSettings />
+            </IconContainer>
+            <IconContainer>
+              <FaMessage />
+            </IconContainer>
+            <IconContainer>
+              <FaBell />
+            </IconContainer>
             <ProfileGroup ref={dropDownButton}>
               <Profile onClick={() => setDropDown((prev) => !prev)}>
                 <div>

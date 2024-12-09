@@ -109,7 +109,9 @@ export default function LocationListing() {
   useEffect(() => {
     if (managedCity.isSuccess) {
       var provincesData = dchc.data.filter((province) =>
-        managedCity.data.data.find((city) => city.cityName == province.name)
+        managedCity.data.data
+          .filter((city) => city.managed == true)
+          .find((city) => city.cityName == province.name)
       );
       setProvinces((_) =>
         provincesData.map((item) => {
@@ -121,6 +123,16 @@ export default function LocationListing() {
       );
     }
   }, [managedCity.isSuccess]);
+
+  useEffect(() => {
+    if (chosenProvince && managedCity.isSuccess) {
+      var cityId = managedCity.data.data.find((city) => city.cityName == chosenProvince.label).id;
+      dispatch({
+        type: ACTIONS.CHANGE_MANAGED_CITY_ID,
+        next: cityId,
+      });
+    }
+  }, [chosenProvince]);
 
   useEffect(() => {
     if (state.addressCode && isRead == true) {
@@ -242,6 +254,7 @@ export default function LocationListing() {
                 state={chosenProvince}
                 setState={setChosenProvince}
                 options={provinces}
+                isDisabled={state.status != "PROGRESS" && true}
               />
             </div>
             <div>
@@ -250,15 +263,22 @@ export default function LocationListing() {
                 options={districts}
                 state={chosenDistrict}
                 setState={setChosenDistrict}
+                isDisabled={state.status != "PROGRESS" && true}
               />
             </div>
             <div>
               <label>Ward</label>
-              <SelectInput options={wards} state={chosenWard} setState={setChosenWard} />
+              <SelectInput
+                options={wards}
+                state={chosenWard}
+                setState={setChosenWard}
+                isDisabled={state.status != "PROGRESS" && true}
+              />
             </div>
             <div>
               <label>Address Detail</label>
               <AddressDetail
+                readOnly={state.status != "PROGRESS" && true}
                 value={state.addressDetail}
                 onChange={(ev) =>
                   dispatch({ type: ACTIONS.CHANGE_ADDRESS_DETAIL, next: ev.target.value })
@@ -267,9 +287,11 @@ export default function LocationListing() {
             </div>
             {state.addressDetail && state.addressCode && (
               <>
-                <div>
-                  <WhiteButton onClick={getCoordinate}>Get Coordinates</WhiteButton>
-                </div>
+                {state.status == "PROGRESS" && (
+                  <div>
+                    <WhiteButton onClick={getCoordinate}>Get Coordinates</WhiteButton>
+                  </div>
+                )}
                 {state.coordinatesX && state.coordinatesY && (
                   <CoordinateContainer>
                     <MapContainer

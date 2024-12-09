@@ -20,7 +20,7 @@ export default function useListing() {
     CHANGE_NUMBER_OF_BED: "CHANGE_NUMBER_OF_BED",
     CHANGE_ADDITIONAL_RULES: "CHANGE_ADDITIONAL_RULES",
     CHANGE_MAXIMUM_STAY: "CHANGE_MAXIMUM_STAY",
-    CHANGE_MINIMUM_STAY: "CHANGE_MAXIMUM_STAY",
+    CHANGE_MINIMUM_STAY: "CHANGE_MINIMUM_STAY",
     CHANGE_ABOUT_PROPERTY: "CHANGE_ABOUT_PROPERTY",
     CHANGE_GUEST_ACCESS: "CHANGE_GUEST_ACCESS",
     CHANGE_DETAIL_TO_NOTE: "CHANGE_DETAIL_TO_NOTE",
@@ -35,7 +35,9 @@ export default function useListing() {
     CHANGE_PROPERTY_IMAGES: "CHANGE_PROPERTY_IMAGES",
     CHANGE_PROPERTY_AMENITIES: "CHANGE_PROPERTY_AMENITIES",
     CHANGE_PET_ALLOWED: "CHANGE_PET_ALLOWED",
+    CHANGE_SMOKING_ALLOWED: "CHANGE_SMOKING_ALLOWED",
     CHANGE_SELF_CHECK_IN: "CHANGE_SELF_CHECK_IN",
+    CHANGE_SELF_CHECK_IN_TYPE: "CHANGE_SELF_CHECK_IN_TYPE",
   };
 
   function reducer(state, action) {
@@ -106,8 +108,12 @@ export default function useListing() {
         return { ...state, propertyAmenities: action.next };
       case ACTIONS.CHANGE_PET_ALLOWED:
         return { ...state, petAllowed: action.next };
+      case ACTIONS.CHANGE_SMOKING_ALLOWED:
+        return { ...state, smokingAllowed: action.next };
       case ACTIONS.CHANGE_SELF_CHECK_IN:
         return { ...state, selfCheckIn: action.next };
+      case ACTIONS.CHANGE_SELF_CHECK_IN_TYPE:
+        return { ...state, selfCheckInType: action.next };
       default:
         return state;
     }
@@ -147,7 +153,9 @@ export default function useListing() {
     propertyImages: [],
     propertyAmenities: [],
     petAllowed: null,
+    smokingAllowed: null,
     selfCheckIn: null,
+    selfCheckInType: null,
   });
 
   return [state, dispatch, ACTIONS];

@@ -108,7 +108,7 @@ export default function ListingSidebar({ listing, state }) {
   return (
     <Container>
       <Item $active={location.pathname == `/become_a_host/${listing.data.data.id}`}>
-        <button>Overview</button>
+        <button onClick={() => navigate("/become_a_host/" + listing.data.data.id)}>Overview</button>
       </Item>
       <ItemDropDown $active={isDropDown}>
         <button onClick={() => setIsDropDOwn((prev) => !prev)}>Listing details</button>
@@ -142,19 +142,19 @@ export default function ListingSidebar({ listing, state }) {
               onClick={() => navigate(listing.data.data.id + "/detail")}
             >
               <span>Listing details</span>
-              {(state.propertyTitle.length == 0 || state.aboutProperty == 0) && <Active />}
+              {(state.propertyTitle.length == 0 || state.aboutProperty.length == 0) && <Active />}
             </DropDownButton>
             <DropDownButton
               $active={location.pathname.includes("amenity")}
               onClick={() => navigate(listing.data.data.id + "/amenity")}
             >
-              <span>Amenities</span> {state.propertyAmenities.length == [] && <Active />}
+              <span>Amenities</span> {state.propertyAmenities.length == 0 && <Active />}
             </DropDownButton>
             <DropDownButton
               $active={location.pathname.includes("photo")}
               onClick={() => navigate(listing.data.data.id + "/photo")}
             >
-              <span>Photos</span> {state.propertyImages.length == 0 && <Active />}
+              <span>Photos</span> {state.propertyImages.length < 5 && <Active />}
             </DropDownButton>
             {/* <DropDownButton>Accessibility</DropDownButton>
             <DropDownButton>Guest safety</DropDownButton> */}

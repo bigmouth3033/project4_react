@@ -6,6 +6,7 @@ import InputCheckBox from "@/shared/components/Input/InputCheckBox";
 import TextInput from "@/shared/components/Input/TextInput";
 import SelectInput from "@/shared/components/Input/SelectInput";
 import { UpdateCityStatusRequest } from "./api/managedCityAp";
+import { Link } from "react-router-dom";
 
 const Container = styled.div`
   background-color: white;
@@ -58,8 +59,27 @@ const Filter = styled.div`
   margin-bottom: 1rem;
 `;
 
+const PropertyCount = styled.p`
+  font-weight: 600;
+
+  color: rgba(0, 0, 0, 0.7);
+`;
+
 const CustomSelectInput = styled(SelectInput)`
   width: 12rem;
+`;
+
+const ActionStyled = styled.div`
+  display: flex;
+  gap: 1rem;
+
+  & a {
+    color: #701e8b;
+  }
+
+  & a:hover {
+    color: red;
+  }
 `;
 
 const optionsPage = [
@@ -107,6 +127,7 @@ export default function ManagedCity() {
         <thead>
           <tr>
             <th>CITY</th>
+            <th>PROPERTY TOTAL</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -117,10 +138,20 @@ export default function ManagedCity() {
                 <tr key={index}>
                   <td>{city.cityName}</td>
                   <td>
+                    <PropertyCount>{city.propertyCount} property</PropertyCount>
+                  </td>
+                  <td>
                     <InputCheckBox
                       onChange={() => onChangeCityStatus(city.id, !city.managed)}
                       checked={city.managed}
                     />
+                  </td>
+                  <td>
+                    {" "}
+                    <ActionStyled>
+                      <Link to={"/admin/edit_amenity?id=" + city.id}>Send mail</Link>
+                      <Link to={"/admin/listing_list?city=" + city.id}>View property</Link>
+                    </ActionStyled>
                   </td>
                 </tr>
               );

@@ -15,6 +15,7 @@ import { UpdatePropertyRequest } from "./api/createListingApi";
 import { UserRequest } from "@/shared/api/userApi";
 import { useNavigate } from "react-router-dom";
 import CreateListingHeader from "./components/CreateListingHeader";
+import ErrorPopUp from "@/shared/components/PopUp/ErrorPopUp";
 
 const Container = styled.div`
   background-color: white;
@@ -78,6 +79,7 @@ export default function CreateListing() {
   const getHostListingById = GetHostListingById(listing_id);
   const updateProperty = UpdatePropertyRequest();
   const [isLoadAllDataDone, setIsLoadAllDataDone] = useState(false);
+  const [error, setError] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -132,7 +134,11 @@ export default function CreateListing() {
       dispatch({ type: ACTIONS.CHANGE_PROPERTY_IMAGES, next: data.propertyImages });
       dispatch({ type: ACTIONS.CHANGE_PROPERTY_AMENITIES, next: data.propertyAmenities });
       dispatch({ type: ACTIONS.CHANGE_PET_ALLOWED, next: data.petAllowed });
+      dispatch({ type: ACTIONS.CHANGE_SMOKING_ALLOWED, next: data.smokingAllowed });
       dispatch({ type: ACTIONS.CHANGE_SELF_CHECK_IN, next: data.selfCheckIn });
+      dispatch({ type: ACTIONS.CHANGE_SELF_CHECK_IN_TYPE, next: data.selfCheckInType });
+      dispatch({ type: ACTIONS.CHANGE_MINIMUM_STAY, next: data.minimumStay });
+      dispatch({ type: ACTIONS.CHANGE_MAXIMUM_STAY, next: data.maximumStay });
       setIsLoadAllDataDone(true);
     }
   }, [getHostListingById.isSuccess]);
@@ -165,105 +171,159 @@ export default function CreateListing() {
   }
 
   const onUpdateProperty = () => {
-    const formData = new FormData();
+    let isOk = true;
 
-    formData.append("id", state.id);
-
-    formData.append("propertyType", state.propertyType);
-    formData.append("propertyTitle", state.propertyTitle);
-    formData.append("maximumMonthPreBook", state.maximumMonthPreBook);
-    formData.append("bookingType", state.bookingType);
-    formData.append("basePrice", state.basePrice);
-    formData.append("weeklyDiscount", state.weeklyDiscount);
-    formData.append("monthlyDiscount", state.monthlyDiscount);
-
-    if (state.addressCode) {
-      formData.append("addressCode", state.addressCode);
-    }
-
-    if (state.addressDetail) {
-      formData.append("addressDetail", state.addressDetail);
-    }
-
-    if (state.checkInAfter) {
-      formData.append("checkInAfter", state.checkInAfter);
-    }
-
-    if (state.checkOutBefore) {
-      formData.append("checkOutBefore", state.checkOutBefore);
-    }
-
-    formData.append("maximumGuest", state.maximumGuest);
-    formData.append("numberOfBathRoom", state.numberOfBathRoom);
-    formData.append("numberOfBedRoom", state.numberOfBedRoom);
-    formData.append("numberOfBed", state.numberOfBed);
-    formData.append("isPetAllowed", state.isPetAllowed);
-    formData.append("additionalRules", state.additionalRules);
-
-    if (state.maximumStay) {
-      formData.append("maximumStay", state.maximumStay);
-    }
-
-    if (state.minimumStay) {
-      formData.append("minimumStay", state.minimumStay);
-    }
-
-    formData.append("aboutProperty", state.aboutProperty);
-    if (state.guestAccess) {
-      formData.append("guestAccess", state.guestAccess);
-    }
-
-    if (state.detailToNote) {
-      formData.append("detailToNote", state.detailToNote);
-    }
-
-    formData.append("isSelfCheckIn", state.isSelfCheckIn);
-
-    if (state.coordinatesX) {
-      formData.append("coordinatesX", state.coordinatesX);
-      formData.append("coordinatesY", state.coordinatesY);
-    }
-
-    formData.append("status", state.status);
-
-    if (state.managedCityId) {
-      formData.append("managedCityId", state.managedCityId);
-    }
-
-    if (state.refundPolicyId) {
-      formData.append("refundPolicyId", state.refundPolicyId);
-    }
-
-    formData.append("userId", user.data.data.id);
-    formData.append("propertyCategoryID", state.propertyCategoryID);
-
-    if (state.instantBookRequirementID) {
-      formData.append("instantBookRequirementID", state.instantBookRequirementID);
-    }
-
-    state.propertyImages.forEach((image) => {
-      if (typeof image == "string") {
-        formData.append("propertyImages", image);
+    if (state.status != "PROGRESS") {
+      const errors = [];
+      if (!state.propertyTitle) {
+        isOk = false;
+        errors.push(<h4>Title cannot be empty</h4>);
       }
-    });
 
-    state.propertyImages.forEach((image) => {
-      if (typeof image == "object") {
-        formData.append("newImages", image);
+      if (state.propertyAmenities.length == 0) {
+        isOk = false;
+        errors.push(<h4>Amenity cannot be empty</h4>);
       }
-    });
 
-    state.propertyAmenities.forEach((amenity) => {
-      formData.append("propertyAmenities", amenity);
-    });
+      if (state.propertyImages.length < 5) {
+        isOk = false;
+        errors.push(<h4>Image must be more or equal 5</h4>);
+      }
 
-    updateProperty.mutate(formData, {
-      onSuccess: (response) => {
-        if (response.status == 200) {
-          navigate("/hosting/listing");
+      if (!state.basePrice) {
+        isOk = false;
+        errors.push(<h4>Base price cannot be empty</h4>);
+      }
+      if (!state.refundPolicyId) {
+        isOk = false;
+        errors.push(<h4>You need to set refund policy</h4>);
+      }
+
+      if (!state.checkInAfter) {
+        isOk = false;
+        errors.push(<h4>Check in hour cannot be empty</h4>);
+      }
+
+      if (!state.checkOutBefore) {
+        isOk = false;
+        errors.push(<h4>Check out hour cannot be empty</h4>);
+      }
+
+      if (!state.aboutProperty) {
+        isOk = false;
+        errors.push(<h4>About property cannot be empty</h4>);
+      }
+
+      setError(errors);
+    }
+
+    if (isOk || state.status == "PROGRESS") {
+      const formData = new FormData();
+
+      formData.append("id", state.id);
+
+      formData.append("propertyType", state.propertyType);
+      formData.append("propertyTitle", state.propertyTitle);
+      formData.append("maximumMonthPreBook", state.maximumMonthPreBook);
+      formData.append("bookingType", state.bookingType);
+      formData.append("basePrice", state.basePrice);
+      formData.append("weeklyDiscount", state.weeklyDiscount);
+      formData.append("monthlyDiscount", state.monthlyDiscount);
+
+      if (state.addressCode) {
+        formData.append("addressCode", state.addressCode);
+      }
+
+      if (state.addressDetail) {
+        formData.append("addressDetail", state.addressDetail);
+      }
+
+      if (state.checkInAfter) {
+        formData.append("checkInAfter", state.checkInAfter);
+      }
+
+      if (state.checkOutBefore) {
+        formData.append("checkOutBefore", state.checkOutBefore);
+      }
+
+      formData.append("maximumGuest", state.maximumGuest);
+      formData.append("numberOfBathRoom", state.numberOfBathRoom);
+      formData.append("numberOfBedRoom", state.numberOfBedRoom);
+      formData.append("numberOfBed", state.numberOfBed);
+      formData.append("petAllowed", state.petAllowed);
+      formData.append("smokingAllowed", state.smokingAllowed);
+      formData.append("additionalRules", state.additionalRules);
+
+      if (state.maximumStay) {
+        formData.append("maximumStay", state.maximumStay);
+      }
+
+      if (state.minimumStay) {
+        formData.append("minimumStay", state.minimumStay);
+      }
+
+      formData.append("aboutProperty", state.aboutProperty);
+      if (state.guestAccess) {
+        formData.append("guestAccess", state.guestAccess);
+      }
+
+      if (state.detailToNote) {
+        formData.append("detailToNote", state.detailToNote);
+      }
+
+      formData.append("selfCheckIn", state.selfCheckIn);
+
+      if (state.selfCheckInType) {
+        formData.append("selfCheckInType", state.selfCheckInType);
+      }
+
+      if (state.coordinatesX) {
+        formData.append("coordinatesX", state.coordinatesX);
+        formData.append("coordinatesY", state.coordinatesY);
+      }
+
+      formData.append("status", state.status);
+
+      if (state.managedCityId) {
+        formData.append("managedCityId", state.managedCityId);
+      }
+
+      if (state.refundPolicyId) {
+        formData.append("refundPolicyId", state.refundPolicyId);
+      }
+
+      formData.append("userId", user.data.data.id);
+      formData.append("propertyCategoryID", state.propertyCategoryID);
+
+      if (state.instantBookRequirementID) {
+        formData.append("instantBookRequirementID", state.instantBookRequirementID);
+      }
+
+      state.propertyImages.forEach((image) => {
+        if (typeof image == "string") {
+          formData.append("propertyImages", image);
         }
-      },
-    });
+      });
+
+      state.propertyImages.forEach((image) => {
+        if (typeof image == "object") {
+          formData.append("newImages", image);
+        }
+      });
+
+      state.propertyAmenities.forEach((amenity) => {
+        formData.append("propertyAmenities", amenity);
+      });
+
+      updateProperty.mutate(formData, {
+        onSuccess: (response) => {
+          if (response.status == 200) {
+            getHostListingById.refetch();
+            navigate("/hosting/listing");
+          }
+        },
+      });
+    }
   };
 
   if (updateProperty.isPending) {
@@ -271,39 +331,42 @@ export default function CreateListing() {
   }
 
   return (
-    <Container>
-      <Header>
-        <Image onClick={() => navigate("/hosting")}>
-          <img src={logo} />
-        </Image>
-        {location.pathname == "/become_a_host" ? (
-          <ButtonContainer>
-            <WhiteButton onClick={onInitializeListing}>Create new listing</WhiteButton>
-          </ButtonContainer>
-        ) : (
-          <ButtonContainer>
-            <WhiteButton onClick={onUpdateProperty}>Save and Exit</WhiteButton>
-          </ButtonContainer>
+    <>
+      <Container>
+        <Header>
+          <Image onClick={() => navigate("/hosting")}>
+            <img src={logo} />
+          </Image>
+          {location.pathname == "/become_a_host" ? (
+            <ButtonContainer>
+              <WhiteButton onClick={onInitializeListing}>Create new listing</WhiteButton>
+            </ButtonContainer>
+          ) : (
+            <ButtonContainer>
+              <WhiteButton onClick={onUpdateProperty}>Save and Exit</WhiteButton>
+            </ButtonContainer>
+          )}
+        </Header>
+
+        {location.pathname == "/become_a_host" && (
+          <OutletContainerInitial>
+            <Outlet />
+          </OutletContainerInitial>
         )}
-      </Header>
 
-      {location.pathname == "/become_a_host" && (
-        <OutletContainerInitial>
-          <Outlet />
-        </OutletContainerInitial>
-      )}
-
-      {isLoadAllDataDone && (
-        <>
-          <CreateListingHeader state={state} listing={getHostListingById} />
-          <OutletContainerDetail>
-            <SidebarContainer>
-              <ListingSidebar state={state} listing={getHostListingById} />
-            </SidebarContainer>
-            <Outlet context={[state, dispatch, ACTIONS]} />
-          </OutletContainerDetail>
-        </>
-      )}
-    </Container>
+        {isLoadAllDataDone && (
+          <>
+            <CreateListingHeader state={state} listing={getHostListingById} />
+            <OutletContainerDetail>
+              <SidebarContainer>
+                <ListingSidebar state={state} listing={getHostListingById} />
+              </SidebarContainer>
+              <Outlet context={[state, dispatch, ACTIONS]} />
+            </OutletContainerDetail>
+          </>
+        )}
+      </Container>
+      {error.length != 0 && <ErrorPopUp message={error} action={() => setError([])} />}
+    </>
   );
 }

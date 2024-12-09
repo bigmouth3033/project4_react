@@ -62,6 +62,7 @@ export default function SelectInputDescription({
   selectRef,
   placeholder,
   className,
+  isDisable,
 }) {
   return (
     <Input
@@ -74,6 +75,7 @@ export default function SelectInputDescription({
       options={options}
       isSearchable
       formatOptionLabel={customOption}
+      isDisabled={isDisable}
     />
   );
 }

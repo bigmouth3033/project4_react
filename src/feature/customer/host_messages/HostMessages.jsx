@@ -407,10 +407,13 @@ export default function HostMessages() {
 
   const sendPrivateMessage = (ev) => {
     ev.preventDefault();
+    const messageId = uuidv4();
+
+    lastMessageIdRef.current = messageId;
 
     if (stompClient.current) {
       var chatMessage = {
-        messageId: uuidv4(),
+        messageId,
         senderId: user.data.data.id,
         senderAvatar: user.data.data.avatar,
         message: message,

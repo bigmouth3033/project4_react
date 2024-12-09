@@ -15,3 +15,14 @@ export const GetCategoryListRequest = (pageNumber, pageSize, search, status) => 
     queryFn: () => request(pageNumber, pageSize, search, status),
   });
 };
+
+export const UpdateCategoryStatusRequest = () => {
+  const request = async (payload) => {
+    const response = await axiosAdmin.put("categoryAD/change_category_status", payload);
+    return response.data;
+  };
+
+  return useMutation({
+    mutationFn: request,
+  });
+};

@@ -9,6 +9,7 @@ import { AdminRequest } from "../api/adminApi";
 import WaitingPopUp from "../components/PopUp/WaitingPopUp";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import { QueryClient } from "@tanstack/react-query";
 
 const Container = styled.div`
   display: grid;
@@ -29,6 +30,7 @@ const Container = styled.div`
 const AdminBody = styled.div`
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const OutletContainer = styled.div`
@@ -53,7 +55,6 @@ export default function AdminLayout() {
   }
 
   if (admin.isError) {
-    Cookies.remove("ADMIN_ACCESS_TOKEN");
     navigate("/admin_login");
   }
 
@@ -65,6 +66,7 @@ export default function AdminLayout() {
   if (admin.isSuccess && admin.data.status == 200 && admin.data.data.status == false) {
     Cookies.remove("ADMIN_ACCESS_TOKEN");
     admin.refetch();
+    return;
   }
 
   return (
@@ -78,4 +80,5 @@ export default function AdminLayout() {
       </AdminBody>
     </Container>
   );
+  s;
 }

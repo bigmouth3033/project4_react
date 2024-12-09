@@ -6,6 +6,8 @@ import TextInput from "@/shared/components/Input/TextInput";
 import InputCheckBox from "@/shared/components/Input/InputCheckBox";
 import SelectInput from "@/shared/components/Input/SelectInput";
 import { Link } from "react-router-dom";
+import { UpdateAmenityStatusRequest } from "./api/amenityListApi";
+import { BsFillHouseFill } from "react-icons/bs";
 
 const Container = styled.div`
   background-color: white;
@@ -72,6 +74,25 @@ const AmenityColumn = styled.div`
   gap: 1rem;
 `;
 
+const ActionStyled = styled.div`
+  display: flex;
+  gap: 1rem;
+
+  & a {
+    color: #701e8b;
+  }
+
+  & a:hover {
+    color: red;
+  }
+`;
+
+const PropertyCount = styled.p`
+  font-weight: 600;
+
+  color: rgba(0, 0, 0, 0.7);
+`;
+
 const optionsPage = [
   { label: "10 items", value: 10 },
   { label: "20 items", value: 20 },
@@ -88,6 +109,7 @@ export default function Amenity() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(optionsPage[0]);
   const [status, setStatus] = useState(optionStatus[0]);
+  const updateAmenityStatus = UpdateAmenityStatusRequest();
 
   const [search, setSearch] = useState("");
   const getAmenityList = GetAmenityListRequest(
@@ -96,6 +118,20 @@ export default function Amenity() {
     search,
     status.value
   );
+
+  const onChangeStatus = (id, status) => {
+    const formData = new FormData();
+    formData.append("id", id);
+    formData.append("status", status);
+
+    updateAmenityStatus.mutate(formData, {
+      onSuccess: (response) => {
+        if (response.status == 200) {
+          getAmenityList.refetch();
+        }
+      },
+    });
+  };
 
   return (
     <Container>
@@ -108,7 +144,8 @@ export default function Amenity() {
         <thead>
           <tr>
             <th>AMENITY</th>
-            <th>Type</th>
+            <th>TYPE</th>
+            <th>PROPERTY TOTAL</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -127,13 +164,20 @@ export default function Amenity() {
                   </td>
                   <td>{amenity.type}</td>
                   <td>
+                    <PropertyCount>{amenity.propertyAmenities.length} Properties</PropertyCount>
+                  </td>
+                  <td>
                     <InputCheckBox
-                      // onChange={() => onChangeCityStatus(amenity.id, !amenity.status)}
+                      onChange={() => onChangeStatus(amenity.id, !amenity.status)}
                       checked={amenity.status}
                     />
                   </td>
                   <td>
-                    <Link to={"/admin/edit_amenity?id=" + amenity.id}>Edit</Link>
+                    <ActionStyled>
+                      <Link to={"/admin/edit_amenity?id=" + amenity.id}>Edit</Link>
+                      <Link to={"/admin/edit_amenity?id=" + amenity.id}>Send mail</Link>
+                      <Link to={"/admin/listing_list?amenity=" + amenity.id}>View property</Link>
+                    </ActionStyled>
                   </td>
                 </tr>
               );

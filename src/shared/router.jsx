@@ -29,6 +29,15 @@ import HostListing from "@/feature/customer/host_listing/HostListing";
 import HostCalendar from "@/feature/customer/host_calendar/HostCalendar";
 import HostMessages from "@/feature/customer/host_messages/HostMessages";
 import HostReservation from "@/feature/customer/host_reservation/HostReservation";
+import CreateEmployee from "@/feature/admin/create_employee/CreateEmployee";
+import EmployeeList from "@/feature/admin/employee_list/EmployeeList";
+import UpdateEmployee from "@/feature/admin/update_employee/UpdateEmployee";
+import UserList from "@/feature/admin/user_list/UserList";
+import UserDocument from "@/feature/admin/user_document/UserDocument";
+import ListingList from "@/feature/admin/listing_list/ListingList";
+import AdminPropertyDetail from "@/feature/admin/admin_property_detail/AdminPropertyDetail";
+import AmenityChart from "@/feature/admin/amenity_chart/AmenityChart";
+import Transaction from "@/feature/customer/booking/components/Transacsion";
 
 const router = createBrowserRouter(
   [
@@ -38,6 +47,8 @@ const router = createBrowserRouter(
       children: [
         { path: "", element: <HomePage /> },
         { path: "/property_detail", element: <PropertyDetail /> },
+        { path: "/property_detail/:property_id", element: <PropertyDetail /> },
+        { path: "/booking/transaction", element: <Transaction /> },
         {
           path: "/hosting",
           element: <HostLayout />,
@@ -132,6 +143,38 @@ const router = createBrowserRouter(
         {
           path: "edit_category",
           element: <UpdateCategory />,
+        },
+        {
+          path: "create_employee",
+          element: <CreateEmployee />,
+        },
+        {
+          path: "employee_list",
+          element: <EmployeeList />,
+        },
+        {
+          path: "update_employee/:id",
+          element: <UpdateEmployee />,
+        },
+        {
+          path: "user_list",
+          element: <UserList />,
+        },
+        {
+          path: "user_document",
+          element: <UserDocument />,
+        },
+        {
+          path: "listing_list",
+          element: <ListingList />,
+        },
+        {
+          path: "admin_property_detail/:id",
+          element: <AdminPropertyDetail />,
+        },
+        {
+          path: "amenity_chart",
+          element: <AmenityChart />,
         },
       ],
     },

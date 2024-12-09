@@ -14,3 +14,4 @@ export const GetHostListingsRequest = (pageNumber, pageSize, search, status) => 
     queryFn: () => request(pageNumber, pageSize, search, status),
   });
 };
+``;

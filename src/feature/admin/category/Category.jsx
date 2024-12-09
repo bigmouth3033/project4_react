@@ -6,6 +6,7 @@ import TextInput from "@/shared/components/Input/TextInput";
 import InputCheckBox from "@/shared/components/Input/InputCheckBox";
 import SelectInput from "@/shared/components/Input/SelectInput";
 import { Link } from "react-router-dom";
+import { UpdateCategoryStatusRequest } from "./api/categoryListApi";
 
 const Container = styled.div`
   background-color: white;
@@ -72,6 +73,25 @@ const AmenityColumn = styled.div`
   gap: 1rem;
 `;
 
+const ActionStyled = styled.div`
+  display: flex;
+  gap: 1rem;
+
+  & a {
+    color: #701e8b;
+  }
+
+  & a:hover {
+    color: red;
+  }
+`;
+
+const PropertyCount = styled.p`
+  font-weight: 600;
+
+  color: rgba(0, 0, 0, 0.7);
+`;
+
 const optionsPage = [
   { label: "10 items", value: 10 },
   { label: "20 items", value: 20 },
@@ -88,6 +108,7 @@ export default function Category() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(optionsPage[0]);
   const [status, setStatus] = useState(optionStatus[0]);
+  const updateCategoryStatus = UpdateCategoryStatusRequest();
 
   const [search, setSearch] = useState("");
   const getCategoryList = GetCategoryListRequest(
@@ -96,6 +117,20 @@ export default function Category() {
     search,
     status.value
   );
+
+  const onChangeStatus = (id, status) => {
+    const formData = new FormData();
+    formData.append("id", id);
+    formData.append("status", status);
+
+    updateCategoryStatus.mutate(formData, {
+      onSuccess: (response) => {
+        if (response.status == 200) {
+          getCategoryList.refetch();
+        }
+      },
+    });
+  };
 
   return (
     <Container>
@@ -108,6 +143,7 @@ export default function Category() {
         <thead>
           <tr>
             <th>CATEGORY</th>
+            <th>PROPERTY TOTAL</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -124,15 +160,21 @@ export default function Category() {
                       {category.categoryName}
                     </AmenityColumn>
                   </td>
-
+                  <td>
+                    <PropertyCount>{category.propertyCount} Properties</PropertyCount>
+                  </td>
                   <td>
                     <InputCheckBox
-                      // onChange={() => onChangeCityStatus(amenity.id, !amenity.status)}
+                      onChange={() => onChangeStatus(category.id, !category.status)}
                       checked={category.status}
                     />
                   </td>
                   <td>
-                    <Link to={"/admin/edit_category?id=" + category.id}>Edit</Link>
+                    <ActionStyled>
+                      <Link to={"/admin/edit_category?id=" + category.id}>Edit</Link>
+                      <Link to={"/admin/edit_amenity?id=" + category.id}>Send mail</Link>
+                      <Link to={"/admin/listing_list?category=" + category.id}>View property</Link>
+                    </ActionStyled>
                   </td>
                 </tr>
               );

@@ -1,5 +1,7 @@
-import React from "react";
 import styled from "styled-components";
+import { useEffect } from "react";
+import { useState } from "react";
+import { useRef } from "react";
 
 const Input = styled.input`
   padding: 8px;
@@ -23,17 +25,44 @@ const Input = styled.input`
 const regex = /^-?\d+(\.\d+)?$/;
 
 export default function NumberInput({ state, setState, placeholder, readOnly, className }) {
+  const [fakeText, setFakeText] = useState(state);
+  const [isChanged, setIsChanged] = useState(false);
+  const timeOutRef = useRef();
+
+  const onChange = (ev) => {
+    if (timeOutRef.current != null) {
+      clearTimeout(timeOutRef.current);
+      timeOutRef.current = null;
+    }
+
+    const value = ev.target.value;
+
+    if (regex.test(value) || value == "") {
+      setFakeText(value);
+    }
+
+    timeOutRef.current = setTimeout(() => {
+      if (regex.test(value) || value == "") {
+        setState(value);
+        setIsChanged(true);
+      }
+    }, 500);
+  };
+
+  useEffect(() => {
+    if (isChanged) {
+      setFakeText(state);
+      setIsChanged(false);
+    }
+  }, [isChanged, state]);
+
   return (
     <Input
       className={className}
       readOnly={readOnly}
       placeholder={placeholder}
-      value={state}
-      onChange={(ev) => {
-        if (regex.test(ev.target.value) || ev.target.value == "") {
-          setState(ev.target.value);
-        }
-      }}
+      value={fakeText}
+      onChange={onChange}
     />
   );
 }

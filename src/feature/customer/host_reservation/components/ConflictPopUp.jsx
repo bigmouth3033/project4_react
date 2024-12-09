@@ -99,6 +99,11 @@ const FooterStyled = styled.div`
   > button:active {
     transform: scale(0.9);
   }
+
+  > button:nth-of-type(2) {
+    background-color: black;
+    color: white;
+  }
 `;
 
 export default function ConflictPopUp({ action, book, getHostReservation }) {
