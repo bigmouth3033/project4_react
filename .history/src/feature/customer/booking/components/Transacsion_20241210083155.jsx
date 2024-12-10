@@ -206,19 +206,7 @@ const Transaction = () => {
 
   const { checkInDay, checkOutDay, data, children, adult, finalPrice } =
     location.state || {}; // Extract data from location.state
-  useEffect(() => {
-    if (data?.refundPolicyId == 1) {
-      setCancelInfo("Full refund if canceled at least 7 days before check-in");
-    }
-    if (data?.refundPolicyId == 2) {
-      setCancelInfo(
-        "Full refund if canceled at least 5 days before check-in; 50% refund if canceled at least 2 days before check-in"
-      );
-    }
-    if (data?.refundPolicyId == 2) {
-      setCancelInfo("No refunds under any circumstances.");
-    }
-  }, [data]);
+
   if (!location.state || !checkInDay || !checkOutDay || !data) {
     return <PageNotFound />;
   }
@@ -281,7 +269,22 @@ const Transaction = () => {
       });
     }
   };
-
+  // useEffect(() => {
+  //   if (data.refundPolicyId == 1) {
+  //     // Full refund if canceled at least 7 days before check-in
+  //     // You can cancel the booking before February 2, 2025.
+  //     setCancelInfo("You can cancel the booking before ");
+  //   }
+  //   if (data.refundPolicyId == 2) {
+  //     // Full refund if canceled at least 5 days before check-in; 50% refund if canceled at least 2 days before check-in
+  //     // You can cancel the booking before February 2, 2025.
+  //     setCancelInfo("You can cancel the booking before ");
+  //   }
+  //   if (data.refundPolicyId == 2) {
+  //     // No refunds under any circumstances
+  //     setCancelInfo("No refunds under any circumstances");
+  //   }
+  // }, [data]);
   return (
     <StyledContainerAll>
       {transactionError && (
@@ -338,7 +341,9 @@ const Transaction = () => {
           </StyledFormPay>
           <StyledContainerCancel>
             <div>Cancellation policy</div>
-            <div>{cancelInfo}</div>
+            <div>
+              <strong>{cancelInfo}</strong>
+            </div>
           </StyledContainerCancel>
           <StyledContainerRule>
             <div>Ground rules</div>

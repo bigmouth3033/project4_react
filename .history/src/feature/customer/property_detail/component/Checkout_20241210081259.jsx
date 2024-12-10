@@ -693,6 +693,8 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                     return null;
                   })}
 
+                  {/* Display normal days*/}
+
                   <StyledTotalForManyDate>
                     <div>
                       Normal days:{" "}

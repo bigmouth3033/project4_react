@@ -245,29 +245,9 @@ const StyledBeforeTaxes = styled.div`
   }
 `;
 const StyledReadCalendar = styled.div`
-  column-gap: 10px;
   display: flex;
   justify-content: stretch;
   align-items: center;
-`;
-const StyledContainerClearClose = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  cursor: pointer;
-  font-weight: 600;
-  column-gap: 1rem;
-  & > div:first-child {
-    text-decoration: 0.5px underline rgba(0, 0, 0, 0.3);
-  }
-`;
-const Styledbutton = styled.button`
-  right: 0;
-  padding: 5px 15px;
-  border: none;
-  border-radius: 8px;
-  background-color: black;
-  color: white;
 `;
 export default function Checkout({ data, selectedDates, setSelectedDates }) {
   const [isShowCalendar, setIsShowCalendar] = useState(false);
@@ -420,8 +400,8 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
       <StyledForm>
         <StyledHeaderForm>
           <div>
-            ${data.basePrice}
-            <span> /night</span>
+            {data.basePrice}
+            <span>$ night</span>
           </div>
         </StyledHeaderForm>
         <StyledConatinerCalendarAndGuest>
@@ -466,11 +446,11 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                     </h2>
                     <StyledReadCalendar>
                       <div>
-                        <div>{formatDate(selectedDates[0])} </div>
+                        <div>{formatDate(selectedDates[0])} {" "}</div>
                       </div>
                       <p> - </p>
                       <div>
-                        <div> {formatDate(selectedDates[1])}</div>
+                        <div>{{" "}formatDate(selectedDates[1])}</div>
                       </div>
                     </StyledReadCalendar>
                   </div>
@@ -480,20 +460,6 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                   selectedDates={selectedDates}
                   setSelectedDates={setSelectedDates}
                 />
-                <StyledContainerClearClose>
-                  <div
-                    onClick={() => {
-                      setSelectedDates([]);
-                    }}
-                  >
-                    Clear dates
-                  </div>
-                  <div>
-                    <Styledbutton onClick={() => setIsShowCalendar(false)}>
-                      Close
-                    </Styledbutton>
-                  </div>
-                </StyledContainerClearClose>
               </div>
             </StyledPopup>
           )}
@@ -692,6 +658,8 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
 
                     return null;
                   })}
+
+                  {/* Display normal days*/}
 
                   <StyledTotalForManyDate>
                     <div>

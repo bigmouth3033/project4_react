@@ -8,6 +8,7 @@ import {
   faChevronCircleDown,
   faPlus,
   faSubtract,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
@@ -420,8 +421,8 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
       <StyledForm>
         <StyledHeaderForm>
           <div>
-            ${data.basePrice}
-            <span> /night</span>
+            {data.basePrice}
+            <span>$ night</span>
           </div>
         </StyledHeaderForm>
         <StyledConatinerCalendarAndGuest>
@@ -692,6 +693,8 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
 
                     return null;
                   })}
+
+                  {/* Display normal days*/}
 
                   <StyledTotalForManyDate>
                     <div>

@@ -9,7 +9,6 @@ import Avatar from "react-avatar";
 import dchc from "@/shared/data/dchc";
 import CalendarBook from "./CalendarBook";
 import { LuDot } from "react-icons/lu";
-import { capitalizeFirstLetter } from "@/shared/utils/capitalizeFirstLetter";
 const StyledContainer = styled.div`
   display: flex;
   flex-direction: column; /* Sắp xếp các phần tử theo cột (dọc) */
@@ -156,24 +155,16 @@ const StyledContainerInfo = styled.div`
   justify-content: stretch;
   align-items: center;
 `;
-export default function PropertyInfo({
-  data,
-  selectedDates,
-  setSelectedDates,
-}) {
+export default function PropertyInfo({ data, selectedDates, setSelectedDates }) {
   const [clickShowAbout, setClickShowAbout] = useState(false);
   const [showAmenity, setShowAmenity] = useState(false);
   const convertAddressCode = () => {
     var addrressArr = data.addressCode.split("_");
-    const tempProvince = dchc.data.find(
-      (city) => city.level1_id == addrressArr[0]
-    );
+    const tempProvince = dchc.data.find((city) => city.level1_id == addrressArr[0]);
     const tempDistrict = tempProvince.level2s.find(
       (district) => district.level2_id == addrressArr[1]
     );
-    const tempWard = tempDistrict.level3s.find(
-      (ward) => ward.level3_id == addrressArr[2]
-    );
+    const tempWard = tempDistrict.level3s.find((ward) => ward.level3_id == addrressArr[2]);
     return [tempWard.name, tempDistrict.name, tempProvince.name];
   };
 
@@ -188,8 +179,7 @@ export default function PropertyInfo({
     const years = nowTime.getFullYear() - createdAt.getFullYear();
 
     // Calculate months
-    const months =
-      nowTime.getMonth() + 1 - (createdAt.getMonth() + 1) + years * 12;
+    const months = nowTime.getMonth() + 1 - (createdAt.getMonth() + 1) + years * 12;
 
     // Remove whole years and months from the time difference
     timeDifference -= years * 365.25 * 24 * 60 * 60 * 1000;
@@ -203,33 +193,39 @@ export default function PropertyInfo({
     return { years, months, days, hours, minutes };
   };
 
+  // Example usage
   const timeSinceCreated = calculateHostTime();
   const calculateDaysBetween = (start_day, end_day) => {
+    // Chuyển đổi start_day và end_day thành đối tượng Date nếu chúng chưa phải là Date
     const startDate = new Date(start_day);
     const endDate = new Date(end_day);
 
+    // Tính toán sự khác biệt giữa hai ngày theo milliseconds
     const timeDifference = endDate - startDate;
 
+    // Chuyển đổi từ milliseconds sang số ngày
     const daysDifference = timeDifference / (1000 * 3600 * 24);
 
+    // Trả về số ngày (làm tròn xuống nếu cần)
     return Math.floor(daysDifference);
   };
   const address = convertAddressCode();
-
+  // Extract unique types of amenities dynamically
   const getTypeAmenity = () => {
     const listType = new Set();
     data.amenity.forEach((amenity) => {
       listType.add(amenity.type);
     });
-    return [...listType];
+    return [...listType]; // Convert Set back to an array
   };
   const listTypeAmenity = getTypeAmenity();
 
   return (
     <StyledContainer>
+      {/* Block 1 */}
       <StyledContainerTypeAndAddress>
         <StyledTypeAndAdress>
-          {capitalizeFirstLetter(data.propertyType)}
+          {data.propertyType}
           {" " + address[0] + ", " + address[1] + ", " + address[2]}
         </StyledTypeAndAdress>
         <StyledContainerInfo>
@@ -311,10 +307,7 @@ export default function PropertyInfo({
                       .filter((amenity) => amenity.type === type)
                       .map((amenity, index) => (
                         <StyledGroupAmenityAndIcon key={index}>
-                          <StyledImageIcon
-                            src={amenity.image}
-                            alt={amenity.name}
-                          />
+                          <StyledImageIcon src={amenity.image} alt={amenity.name} />
                           <div>{amenity.name}</div>
                         </StyledGroupAmenityAndIcon>
                       ))}
@@ -356,8 +349,8 @@ export default function PropertyInfo({
         {selectedDates[0] != null && selectedDates[1] != null && (
           <StyledContainerShowDatesBook>
             <p>
-              {calculateDaysBetween(selectedDates[0], selectedDates[1])} nights
-              in {address[1]}, {address[2]}
+              {calculateDaysBetween(selectedDates[0], selectedDates[1])} nights in {address[1]},{" "}
+              {address[2]}
             </p>
 
             <StyledDatesChange>

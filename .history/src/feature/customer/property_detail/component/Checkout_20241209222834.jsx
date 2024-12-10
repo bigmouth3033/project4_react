@@ -4,16 +4,11 @@ import { useEffect, useRef, useState } from "react";
 
 import PopUpContainer from "@/shared/components/PopUp/giu/PopUpContainer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronCircleDown,
-  faPlus,
-  faSubtract,
-} from "@fortawesome/free-solid-svg-icons";
+import { faChevronCircleDown, faPlus, faSubtract } from "@fortawesome/free-solid-svg-icons";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { UserRequest } from "@/shared/api/userApi";
 import { capitalizeFirstLetter } from "@/shared/utils/capitalizeFirstLetter";
-import { formatDate } from "@/shared/utils/DateTimeHandle";
 const StyledContainer = styled.div`
   height: auto;
   position: sticky;
@@ -23,8 +18,7 @@ const StyledContainer = styled.div`
 const StyledForm = styled.div`
   position: relative;
   width: 100%;
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px,
-    rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
   border-radius: 8px;
   padding: 1.5rem;
 `;
@@ -244,31 +238,6 @@ const StyledBeforeTaxes = styled.div`
     font-weight: 600;
   }
 `;
-const StyledReadCalendar = styled.div`
-  column-gap: 10px;
-  display: flex;
-  justify-content: stretch;
-  align-items: center;
-`;
-const StyledContainerClearClose = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  cursor: pointer;
-  font-weight: 600;
-  column-gap: 1rem;
-  & > div:first-child {
-    text-decoration: 0.5px underline rgba(0, 0, 0, 0.3);
-  }
-`;
-const Styledbutton = styled.button`
-  right: 0;
-  padding: 5px 15px;
-  border: none;
-  border-radius: 8px;
-  background-color: black;
-  color: white;
-`;
 export default function Checkout({ data, selectedDates, setSelectedDates }) {
   const [isShowCalendar, setIsShowCalendar] = useState(false);
   const [adult, setAdult] = useState(1);
@@ -283,7 +252,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
   const navigate = useNavigate();
   const user = UserRequest();
 
-  const formatDateCheck = (date) => {
+  const formatDate = (date) => {
     var d = new Date(date),
       month = "" + (d.getMonth() + 1),
       day = "" + d.getDate(),
@@ -294,7 +263,6 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
 
     return [month, day, year].join("-");
   };
-
   const getListDateBooked = (dates) => {
     const [start, end] = dates;
     const listDates = [];
@@ -305,9 +273,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
       current.add(1, "day");
     }
 
-    const listDateChosen = listDates.map((date) =>
-      moment(date).format("MM/DD/YYYY")
-    );
+    const listDateChosen = listDates.map((date) => moment(date).format("MM/DD/YYYY"));
 
     return listDateChosen;
   };
@@ -351,17 +317,14 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     };
   }, [selectedDates, user]);
 
-  const totalBasePrice = getListDateBooked(selectedDates).reduce(
-    (total, date) => {
-      const exceptionPrice = data.exceptionDates.find(
-        (exception) => moment(exception.date).format("MM/DD/YYYY") === date
-      )?.basePrice;
+  const totalBasePrice = getListDateBooked(selectedDates).reduce((total, date) => {
+    const exceptionPrice = data.exceptionDates.find(
+      (exception) => moment(exception.date).format("MM/DD/YYYY") === date
+    )?.basePrice;
 
-      const priceForDate = exceptionPrice || data.basePrice;
-      return total + priceForDate;
-    },
-    0
-  );
+    const priceForDate = exceptionPrice || data.basePrice;
+    return total + priceForDate;
+  }, 0);
 
   // tính theo discount
   const bookedDays = getListDateBooked(selectedDates).length;
@@ -382,9 +345,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
 
     localDate.setHours(0, 0, 0, 0);
 
-    const adjustedDate = new Date(
-      localDate.getTime() - localDate.getTimezoneOffset() * 60000
-    );
+    const adjustedDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
 
     return adjustedDate.toISOString();
   };
@@ -405,23 +366,14 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
       },
     });
   };
-  const calculateDaysBetween = (start_day, end_day) => {
-    const startDate = new Date(start_day);
-    const endDate = new Date(end_day);
 
-    const timeDifference = endDate - startDate;
-
-    const daysDifference = timeDifference / (1000 * 3600 * 24);
-
-    return Math.floor(daysDifference);
-  };
   return (
     <StyledContainer>
       <StyledForm>
         <StyledHeaderForm>
           <div>
-            ${data.basePrice}
-            <span> /night</span>
+            {data.basePrice}
+            <span>$ night</span>
           </div>
         </StyledHeaderForm>
         <StyledConatinerCalendarAndGuest>
@@ -432,68 +384,27 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
           >
             <div>
               <div>CHECK-IN</div>
-              <div>
-                {selectedDates?.[0] ? (
-                  formatDateCheck(selectedDates[0])
-                ) : (
-                  <p>mm/dd/yyyy</p>
-                )}
-              </div>
+              <div>{selectedDates?.[0] ? formatDate(selectedDates[0]) : <p>mm/dd/yyyy</p>}</div>
             </div>
             <div>
               <div>CHECK-OUT</div>
               <div>
-                {selectedDates?.[0] == null && selectedDates?.[1] == null && (
-                  <p>mm/dd/yyyy</p>
-                )}
-                {selectedDates?.[0] != null && selectedDates?.[1] == null && (
-                  <p>mm/dd/yyyy</p>
-                )}
+                {selectedDates?.[0] == null && selectedDates?.[1] == null && <p>mm/dd/yyyy</p>}
+                {selectedDates?.[0] != null && selectedDates?.[1] == null && <p>mm/dd/yyyy</p>}
                 {selectedDates?.[0] != null &&
                   selectedDates?.[1] != null &&
-                  formatDateCheck(selectedDates[1])}
+                  formatDate(selectedDates[1])}
               </div>
             </div>
           </StyledContainerCalendar>
           {isShowCalendar && (
             <StyledPopup setShowPopUp={setIsShowCalendar}>
               <div>
-                {selectedDates[0] != null && selectedDates[1] != null && (
-                  <div>
-                    <h2>
-                      {calculateDaysBetween(selectedDates[0], selectedDates[1])}{" "}
-                      nights
-                    </h2>
-                    <StyledReadCalendar>
-                      <div>
-                        <div>{formatDate(selectedDates[0])} </div>
-                      </div>
-                      <p> - </p>
-                      <div>
-                        <div> {formatDate(selectedDates[1])}</div>
-                      </div>
-                    </StyledReadCalendar>
-                  </div>
-                )}
                 <CalendarBook
                   data={data}
                   selectedDates={selectedDates}
                   setSelectedDates={setSelectedDates}
                 />
-                <StyledContainerClearClose>
-                  <div
-                    onClick={() => {
-                      setSelectedDates([]);
-                    }}
-                  >
-                    Clear dates
-                  </div>
-                  <div>
-                    <Styledbutton onClick={() => setIsShowCalendar(false)}>
-                      Close
-                    </Styledbutton>
-                  </div>
-                </StyledContainerClearClose>
               </div>
             </StyledPopup>
           )}
@@ -527,17 +438,13 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                 {adult}
                 <StyledAddSub
                   onClick={() => {
-                    if (
-                      adult < data.maximumGuest &&
-                      children + adult < data.maximumGuest
-                    ) {
+                    if (adult < data.maximumGuest && children + adult < data.maximumGuest) {
                       setAdult(adult + 1);
                     }
                   }}
                   style={{
                     cursor:
-                      adult < data.maximumGuest &&
-                      children + adult < data.maximumGuest
+                      adult < data.maximumGuest && children + adult < data.maximumGuest
                         ? "pointer"
                         : "not-allowed",
                   }}
@@ -589,13 +496,9 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
         )}
         {selectedDates[0] != null && selectedDates[1] != null ? (
           <StyledContainerBooking>
-            <StyledSubmitButton onClick={() => bookingSubmit()}>
-              Booking
-            </StyledSubmitButton>
+            <StyledSubmitButton onClick={() => bookingSubmit()}>Booking</StyledSubmitButton>
             {isErrorLoginBooking && (
-              <StyledError onClick={() => bookingSubmit()}>
-                {showErrorMess}
-              </StyledError>
+              <StyledError onClick={() => bookingSubmit()}>{showErrorMess}</StyledError>
             )}
           </StyledContainerBooking>
         ) : (
@@ -634,10 +537,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                   >
                     Monthly stay discount
                   </span>
-                  <div>
-                    $
-                    {((data.monthlyDiscount * totalBasePrice) / 100).toFixed(2)}
-                  </div>
+                  <div>${((data.monthlyDiscount * totalBasePrice) / 100).toFixed(2)}</div>
                 </div>
               ) : dateBookingQuantiy(selectedDates) >= 7 &&
                 dateBookingQuantiy(selectedDates) < 28 ? (
@@ -658,9 +558,8 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
           {/* Discount Popup */}
           {showDiscount && (
             <StyledPopupDiscount setShowPopUp={setshowDiscount}>
-              {capitalizeFirstLetter(data.user.firstName)} {data.user.lastName}{" "}
-              discounts the price if you stay longer than{" "}
-              {dateBookingQuantiy(selectedDates) >= 30 ? "30" : "7"} nights.
+              {capitalizeFirstLetter(data.user.firstName)} {data.user.lastName} discounts the price
+              if you stay longer than {dateBookingQuantiy(selectedDates) >= 30 ? "30" : "7"} nights.
             </StyledPopupDiscount>
           )}
 
@@ -676,8 +575,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                   {getListDateBooked(selectedDates).map((date) => {
                     // Check if the current date is an exception date
                     const exceptionPrice = data.exceptionDates.find(
-                      (exception) =>
-                        moment(exception.date).format("MM/DD/YYYY") === date
+                      (exception) => moment(exception.date).format("MM/DD/YYYY") === date
                     )?.basePrice;
 
                     // Only render exception dates
@@ -693,6 +591,8 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                     return null;
                   })}
 
+                  {/* Display normal days*/}
+
                   <StyledTotalForManyDate>
                     <div>
                       Normal days:{" "}
@@ -700,9 +600,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                         getListDateBooked(selectedDates).filter(
                           (date) =>
                             !data.exceptionDates.some(
-                              (exception) =>
-                                moment(exception.date).format("MM/DD/YYYY") ===
-                                date
+                              (exception) => moment(exception.date).format("MM/DD/YYYY") === date
                             )
                         ).length
                       }{" "}
@@ -716,8 +614,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                 // Render all dates when total booking days are 15 or less
                 getListDateBooked(selectedDates).map((date) => {
                   const exceptionPrice = data.exceptionDates.find(
-                    (exception) =>
-                      moment(exception.date).format("MM/DD/YYYY") === date
+                    (exception) => moment(exception.date).format("MM/DD/YYYY") === date
                   )?.basePrice;
 
                   const priceForDate = exceptionPrice || data.basePrice;

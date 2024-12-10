@@ -11,6 +11,18 @@ const StyeldContainer = styled.div`
   margin-top: 2rem;
 `;
 
+const StyledContainerBadge = styled.div`
+  width: 100%;
+  height: fit-content;
+  position: sticky;
+  display: flex;
+  align-items: center; /* Căn giữa theo chiều dọc */
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  text-align: center;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+  border-radius: 8px;
+`;
+
 export default function InforAndCheckout({ data }) {
   const [selectedDates, setSelectedDates] = useState([]);
   const [isErrorBadge, setIsErrorBadge] = useState(false);
@@ -26,16 +38,12 @@ export default function InforAndCheckout({ data }) {
         if (!checkBadge) {
           setIsErrorBadge(true);
           if (data.instantBookRequirementID == 1) {
-            setShowErrorBadge(
-              "<h2>You need to stay at least 5 different locations.</h2>"
-            );
+            setShowErrorBadge("<h2>You need to stay at least 5 different locations.</h2>");
           }
           if (data.instantBookRequirementID == 4) {
             setShowErrorBadge(
               <>
-                <h2>
-                  Please verify your identity to earn the 'Verified User' badge.
-                </h2>
+                <h2>Please verify your identity to earn the 'Verified User' badge.</h2>
               </>
             );
           }
@@ -45,19 +53,11 @@ export default function InforAndCheckout({ data }) {
   }, [data, user]);
   return (
     <StyeldContainer>
-      <PropertyInfo
-        data={data}
-        selectedDates={selectedDates}
-        setSelectedDates={setSelectedDates}
-      />
+      <PropertyInfo data={data} selectedDates={selectedDates} setSelectedDates={setSelectedDates} />
       {isErrorBadge ? (
         <>{showErrorBadge} </>
       ) : (
-        <Checkout
-          data={data}
-          selectedDates={selectedDates}
-          setSelectedDates={setSelectedDates}
-        />
+        <Checkout data={data} selectedDates={selectedDates} setSelectedDates={setSelectedDates} />
       )}
     </StyeldContainer>
   );

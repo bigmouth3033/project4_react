@@ -1,9 +1,5 @@
 import PopUpContainer from "@/shared/components/PopUp/giu/PopUpContainer";
-import {
-  faArrowUpFromBracket,
-  faChevronLeft,
-  faHeart,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowUpFromBracket, faChevronLeft, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import styled from "styled-components";
@@ -149,6 +145,7 @@ export default function NameImage({ data }) {
       <div>
         {clickImage && (
           <StyledPopup setShowPopUp={setclickImage}>
+            {/* Truyền StyledPopupContainer vào StyledPopup  bên phái StyledContainer sẽ gọi ra và hiện nội dung lên popup*/}
             <StyledPopupContainer>
               <div>
                 <Styledbutton onClick={() => setclickImage(false)}>

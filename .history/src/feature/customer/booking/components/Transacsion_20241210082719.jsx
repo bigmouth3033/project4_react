@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { PiCalendarCheckFill } from "react-icons/pi";
 import Paymentform from "./Paymentform";
@@ -187,7 +187,6 @@ const Transaction = () => {
   const [transactionSuccess, setTransactionSuccess] = useState(false);
   const [showTransactionSuccess, setShowTransactionSuccess] = useState("");
   const [cancelInfo, setCancelInfo] = useState("");
-
   //Các state và setState
   const paymentState = {
     cardnumber,
@@ -206,23 +205,15 @@ const Transaction = () => {
 
   const { checkInDay, checkOutDay, data, children, adult, finalPrice } =
     location.state || {}; // Extract data from location.state
-  useEffect(() => {
-    if (data?.refundPolicyId == 1) {
-      setCancelInfo("Full refund if canceled at least 7 days before check-in");
-    }
-    if (data?.refundPolicyId == 2) {
-      setCancelInfo(
-        "Full refund if canceled at least 5 days before check-in; 50% refund if canceled at least 2 days before check-in"
-      );
-    }
-    if (data?.refundPolicyId == 2) {
-      setCancelInfo("No refunds under any circumstances.");
-    }
-  }, [data]);
+
   if (!location.state || !checkInDay || !checkOutDay || !data) {
     return <PageNotFound />;
   }
-
+  if (data.refundPolicyId == 1) {
+    // Full refund if canceled at least 7 days before check-in
+    // You can cancel the booking before February 2, 2025.
+    setCancelInfo("You can cancel the booking ");
+  }
   // Format date to MM/DD/YYYY
   const formatDate = (date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -281,7 +272,6 @@ const Transaction = () => {
       });
     }
   };
-
   return (
     <StyledContainerAll>
       {transactionError && (
@@ -338,7 +328,10 @@ const Transaction = () => {
           </StyledFormPay>
           <StyledContainerCancel>
             <div>Cancellation policy</div>
-            <div>{cancelInfo}</div>
+            <div>
+              <strong>Free cancellation before Dec 10</strong>. Cancel before
+              check-in on Dec 15 for a partial refund.
+            </div>
           </StyledContainerCancel>
           <StyledContainerRule>
             <div>Ground rules</div>

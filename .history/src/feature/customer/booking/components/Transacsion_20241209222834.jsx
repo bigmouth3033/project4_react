@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { PiCalendarCheckFill } from "react-icons/pi";
 import Paymentform from "./Paymentform";
@@ -10,8 +10,8 @@ import { UserRequest } from "@/shared/api/userApi";
 import ErrorPopUp from "@/shared/components/PopUp/ErrorPopUp";
 import SuccessPopUp from "@/shared/components/PopUp/SuccessPopUp";
 import PageNotFound from "@/shared/components/Pages/PageNotFound";
-import { capitalizeFirstLetter } from "@/shared/utils/capitalizeFirstLetter";
 
+// Styled components
 const StyledContainerAll = styled.div`
   max-width: 1120px;
   margin: 0 auto;
@@ -42,6 +42,10 @@ const StyledTitle = styled.div`
   font-weight: bold;
   margin-bottom: 1.2rem;
 `;
+
+// const StyledHeader = styled.div`
+//   height: 5rem;
+// `;
 
 const StyledYourTrip = styled.div`
   display: flex;
@@ -186,8 +190,6 @@ const Transaction = () => {
   const [showErrorTransaction, setShowErrorTransaction] = useState("");
   const [transactionSuccess, setTransactionSuccess] = useState(false);
   const [showTransactionSuccess, setShowTransactionSuccess] = useState("");
-  const [cancelInfo, setCancelInfo] = useState("");
-
   //Các state và setState
   const paymentState = {
     cardnumber,
@@ -204,21 +206,17 @@ const Transaction = () => {
     setCvvError,
   };
 
-  const { checkInDay, checkOutDay, data, children, adult, finalPrice } =
-    location.state || {}; // Extract data from location.state
-  useEffect(() => {
-    if (data?.refundPolicyId == 1) {
-      setCancelInfo("Full refund if canceled at least 7 days before check-in");
-    }
-    if (data?.refundPolicyId == 2) {
-      setCancelInfo(
-        "Full refund if canceled at least 5 days before check-in; 50% refund if canceled at least 2 days before check-in"
-      );
-    }
-    if (data?.refundPolicyId == 2) {
-      setCancelInfo("No refunds under any circumstances.");
-    }
-  }, [data]);
+  const { checkInDay, checkOutDay, data, children, adult, finalPrice } = location.state || {}; // Extract data from location.state
+  // if (!location.state) {
+  //   navigate("/", { replace: true }); // Điều hướng đến trang Not Found
+  // }
+  // Redirect if data is missing
+  // useEffect(() => {
+  // if (!checkInDay || !checkOutDay || !data) {
+  //   navigate("/");
+  // }
+  // }, [checkInDay, checkOutDay, data]);
+
   if (!location.state || !checkInDay || !checkOutDay || !data) {
     return <PageNotFound />;
   }
@@ -249,8 +247,9 @@ const Transaction = () => {
     formData.append("customerId", customerId);
     formData.append("hostId", data.user.id);
     formData.append("amount", finalPrice);
-    console.log(data.refundPolicyId);
   }
+
+  // Handle form submission
 
   const handleSubmitPay = () => {
     if (
@@ -281,9 +280,9 @@ const Transaction = () => {
       });
     }
   };
-
   return (
     <StyledContainerAll>
+      {/* <StyledHeader /> */}
       {transactionError && (
         <ErrorPopUp
           action={() => {
@@ -338,7 +337,10 @@ const Transaction = () => {
           </StyledFormPay>
           <StyledContainerCancel>
             <div>Cancellation policy</div>
-            <div>{cancelInfo}</div>
+            <div>
+              <strong>Free cancellation before Dec 10</strong>. Cancel before check-in on Dec 15 for
+              a partial refund.
+            </div>
           </StyledContainerCancel>
           <StyledContainerRule>
             <div>Ground rules</div>
@@ -357,10 +359,7 @@ const Transaction = () => {
           {bookingRequest.isPending ? (
             <p>Processing your payment...</p>
           ) : (
-            <StyledSubmitButton
-              onClick={handleSubmitPay}
-              disabled={bookingRequest.isPending}
-            >
+            <StyledSubmitButton onClick={handleSubmitPay} disabled={bookingRequest.isPending}>
               Confirm and pay
             </StyledSubmitButton>
           )}
@@ -371,9 +370,9 @@ const Transaction = () => {
               <img src={data.propertyImages[0]} alt="" />
             </div>
             <StyledTittle>
-              <div>{capitalizeFirstLetter(data.propertyTitle)}</div>
+              <div>{data.propertyTitle}</div>
               <div>
-                <div>{capitalizeFirstLetter(data.propertyType)}</div>
+                <div>{data.propertyType}</div>
                 <div>4.89 (222 reviews) • Superhost</div>
               </div>
             </StyledTittle>

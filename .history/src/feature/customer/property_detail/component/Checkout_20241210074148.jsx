@@ -13,7 +13,6 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { UserRequest } from "@/shared/api/userApi";
 import { capitalizeFirstLetter } from "@/shared/utils/capitalizeFirstLetter";
-import { formatDate } from "@/shared/utils/DateTimeHandle";
 const StyledContainer = styled.div`
   height: auto;
   position: sticky;
@@ -245,29 +244,9 @@ const StyledBeforeTaxes = styled.div`
   }
 `;
 const StyledReadCalendar = styled.div`
-  column-gap: 10px;
   display: flex;
   justify-content: stretch;
   align-items: center;
-`;
-const StyledContainerClearClose = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  cursor: pointer;
-  font-weight: 600;
-  column-gap: 1rem;
-  & > div:first-child {
-    text-decoration: 0.5px underline rgba(0, 0, 0, 0.3);
-  }
-`;
-const Styledbutton = styled.button`
-  right: 0;
-  padding: 5px 15px;
-  border: none;
-  border-radius: 8px;
-  background-color: black;
-  color: white;
 `;
 export default function Checkout({ data, selectedDates, setSelectedDates }) {
   const [isShowCalendar, setIsShowCalendar] = useState(false);
@@ -283,7 +262,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
   const navigate = useNavigate();
   const user = UserRequest();
 
-  const formatDateCheck = (date) => {
+  const formatDate = (date) => {
     var d = new Date(date),
       month = "" + (d.getMonth() + 1),
       day = "" + d.getDate(),
@@ -294,7 +273,6 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
 
     return [month, day, year].join("-");
   };
-
   const getListDateBooked = (dates) => {
     const [start, end] = dates;
     const listDates = [];
@@ -405,23 +383,14 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
       },
     });
   };
-  const calculateDaysBetween = (start_day, end_day) => {
-    const startDate = new Date(start_day);
-    const endDate = new Date(end_day);
 
-    const timeDifference = endDate - startDate;
-
-    const daysDifference = timeDifference / (1000 * 3600 * 24);
-
-    return Math.floor(daysDifference);
-  };
   return (
     <StyledContainer>
       <StyledForm>
         <StyledHeaderForm>
           <div>
-            ${data.basePrice}
-            <span> /night</span>
+            {data.basePrice}
+            <span>$ night</span>
           </div>
         </StyledHeaderForm>
         <StyledConatinerCalendarAndGuest>
@@ -434,7 +403,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
               <div>CHECK-IN</div>
               <div>
                 {selectedDates?.[0] ? (
-                  formatDateCheck(selectedDates[0])
+                  formatDate(selectedDates[0])
                 ) : (
                   <p>mm/dd/yyyy</p>
                 )}
@@ -451,49 +420,27 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                 )}
                 {selectedDates?.[0] != null &&
                   selectedDates?.[1] != null &&
-                  formatDateCheck(selectedDates[1])}
+                  formatDate(selectedDates[1])}
               </div>
             </div>
           </StyledContainerCalendar>
           {isShowCalendar && (
             <StyledPopup setShowPopUp={setIsShowCalendar}>
               <div>
-                {selectedDates[0] != null && selectedDates[1] != null && (
+                <StyledReadCalendar>
                   <div>
-                    <h2>
-                      {calculateDaysBetween(selectedDates[0], selectedDates[1])}{" "}
-                      nights
-                    </h2>
-                    <StyledReadCalendar>
-                      <div>
-                        <div>{formatDate(selectedDates[0])} </div>
-                      </div>
-                      <p> - </p>
-                      <div>
-                        <div> {formatDate(selectedDates[1])}</div>
-                      </div>
-                    </StyledReadCalendar>
+                    <div>{formatDate(selectedDates[0])}</div>
                   </div>
-                )}
+                  <p>-</p>
+                  <div>
+                    <div>{formatDate(selectedDates[1])}</div>
+                  </div>
+                </StyledReadCalendar>
                 <CalendarBook
                   data={data}
                   selectedDates={selectedDates}
                   setSelectedDates={setSelectedDates}
                 />
-                <StyledContainerClearClose>
-                  <div
-                    onClick={() => {
-                      setSelectedDates([]);
-                    }}
-                  >
-                    Clear dates
-                  </div>
-                  <div>
-                    <Styledbutton onClick={() => setIsShowCalendar(false)}>
-                      Close
-                    </Styledbutton>
-                  </div>
-                </StyledContainerClearClose>
               </div>
             </StyledPopup>
           )}
@@ -692,6 +639,8 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
 
                     return null;
                   })}
+
+                  {/* Display normal days*/}
 
                   <StyledTotalForManyDate>
                     <div>

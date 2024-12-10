@@ -245,29 +245,9 @@ const StyledBeforeTaxes = styled.div`
   }
 `;
 const StyledReadCalendar = styled.div`
-  column-gap: 10px;
   display: flex;
   justify-content: stretch;
   align-items: center;
-`;
-const StyledContainerClearClose = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  cursor: pointer;
-  font-weight: 600;
-  column-gap: 1rem;
-  & > div:first-child {
-    text-decoration: 0.5px underline rgba(0, 0, 0, 0.3);
-  }
-`;
-const Styledbutton = styled.button`
-  right: 0;
-  padding: 5px 15px;
-  border: none;
-  border-radius: 8px;
-  background-color: black;
-  color: white;
 `;
 export default function Checkout({ data, selectedDates, setSelectedDates }) {
   const [isShowCalendar, setIsShowCalendar] = useState(false);
@@ -405,23 +385,14 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
       },
     });
   };
-  const calculateDaysBetween = (start_day, end_day) => {
-    const startDate = new Date(start_day);
-    const endDate = new Date(end_day);
 
-    const timeDifference = endDate - startDate;
-
-    const daysDifference = timeDifference / (1000 * 3600 * 24);
-
-    return Math.floor(daysDifference);
-  };
   return (
     <StyledContainer>
       <StyledForm>
         <StyledHeaderForm>
           <div>
-            ${data.basePrice}
-            <span> /night</span>
+            {data.basePrice}
+            <span>$ night</span>
           </div>
         </StyledHeaderForm>
         <StyledConatinerCalendarAndGuest>
@@ -458,42 +429,22 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
           {isShowCalendar && (
             <StyledPopup setShowPopUp={setIsShowCalendar}>
               <div>
-                {selectedDates[0] != null && selectedDates[1] != null && (
-                  <div>
-                    <h2>
-                      {calculateDaysBetween(selectedDates[0], selectedDates[1])}{" "}
-                      nights
-                    </h2>
-                    <StyledReadCalendar>
-                      <div>
-                        <div>{formatDate(selectedDates[0])} </div>
-                      </div>
-                      <p> - </p>
-                      <div>
-                        <div> {formatDate(selectedDates[1])}</div>
-                      </div>
-                    </StyledReadCalendar>
-                  </div>
+                {selectedDates != null && (
+                  <StyledReadCalendar>
+                    <div>
+                      <div>{formatDate(selectedDates[0])}</div>
+                    </div>
+                    <p>-</p>
+                    <div>
+                      <div>{formatDate(selectedDates[1])}</div>
+                    </div>
+                  </StyledReadCalendar>
                 )}
                 <CalendarBook
                   data={data}
                   selectedDates={selectedDates}
                   setSelectedDates={setSelectedDates}
                 />
-                <StyledContainerClearClose>
-                  <div
-                    onClick={() => {
-                      setSelectedDates([]);
-                    }}
-                  >
-                    Clear dates
-                  </div>
-                  <div>
-                    <Styledbutton onClick={() => setIsShowCalendar(false)}>
-                      Close
-                    </Styledbutton>
-                  </div>
-                </StyledContainerClearClose>
               </div>
             </StyledPopup>
           )}
@@ -692,6 +643,8 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
 
                     return null;
                   })}
+
+                  {/* Display normal days*/}
 
                   <StyledTotalForManyDate>
                     <div>

@@ -9,7 +9,6 @@ import Avatar from "react-avatar";
 import dchc from "@/shared/data/dchc";
 import CalendarBook from "./CalendarBook";
 import { LuDot } from "react-icons/lu";
-import { capitalizeFirstLetter } from "@/shared/utils/capitalizeFirstLetter";
 const StyledContainer = styled.div`
   display: flex;
   flex-direction: column; /* Sắp xếp các phần tử theo cột (dọc) */
@@ -227,9 +226,10 @@ export default function PropertyInfo({
 
   return (
     <StyledContainer>
+      {/* Block 1 */}
       <StyledContainerTypeAndAddress>
         <StyledTypeAndAdress>
-          {capitalizeFirstLetter(data.propertyType)}
+          {data.propertyType}
           {" " + address[0] + ", " + address[1] + ", " + address[2]}
         </StyledTypeAndAdress>
         <StyledContainerInfo>

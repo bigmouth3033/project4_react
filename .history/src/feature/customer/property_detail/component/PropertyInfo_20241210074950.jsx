@@ -9,7 +9,6 @@ import Avatar from "react-avatar";
 import dchc from "@/shared/data/dchc";
 import CalendarBook from "./CalendarBook";
 import { LuDot } from "react-icons/lu";
-import { capitalizeFirstLetter } from "@/shared/utils/capitalizeFirstLetter";
 const StyledContainer = styled.div`
   display: flex;
   flex-direction: column; /* Sắp xếp các phần tử theo cột (dọc) */
@@ -215,21 +214,22 @@ export default function PropertyInfo({
     return Math.floor(daysDifference);
   };
   const address = convertAddressCode();
-
+  // Extract unique types of amenities dynamically
   const getTypeAmenity = () => {
     const listType = new Set();
     data.amenity.forEach((amenity) => {
       listType.add(amenity.type);
     });
-    return [...listType];
+    return [...listType]; // Convert Set back to an array
   };
   const listTypeAmenity = getTypeAmenity();
 
   return (
     <StyledContainer>
+      {/* Block 1 */}
       <StyledContainerTypeAndAddress>
         <StyledTypeAndAdress>
-          {capitalizeFirstLetter(data.propertyType)}
+          {data.propertyType}
           {" " + address[0] + ", " + address[1] + ", " + address[2]}
         </StyledTypeAndAdress>
         <StyledContainerInfo>

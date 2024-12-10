@@ -11,6 +11,18 @@ const StyeldContainer = styled.div`
   margin-top: 2rem;
 `;
 
+// const StyledContainerBadge = styled.div`
+//   width: 100%;
+//   height: fit-content;
+//   position: sticky;
+//   display: flex;
+//   align-items: center; /* Căn giữa theo chiều dọc */
+//   justify-content: center; /* Căn giữa theo chiều ngang */
+//   text-align: center;
+//   box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+//   border-radius: 8px;
+// `;
+
 export default function InforAndCheckout({ data }) {
   const [selectedDates, setSelectedDates] = useState([]);
   const [isErrorBadge, setIsErrorBadge] = useState(false);
