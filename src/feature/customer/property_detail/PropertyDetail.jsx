@@ -1,4 +1,3 @@
-import CustomerHeader from "../custome_header/CustomerHeader";
 import styled from "styled-components";
 import NameImage from "./component/NameImage";
 import InforAndCheckout from "./component/InforAndCheckout";
