@@ -327,7 +327,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     if (user.isSuccess) {
       if (user.status == "success" && user.data.status == 200) {
         setIsErrorLoginBooking(false);
-        if (user.data.data.id == data.userId) {
+        if (user.data.data.id == data.user.id) {
           setIsErrorBooking(true);
           setShowErrorBooking("Host cannot book their own property");
         } else {
@@ -401,9 +401,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     if (isErrorLoginBooking) {
       return;
     }
-    if (data.userId == user.data.data.id) {
-      return;
-    }
+
     navigate("/booking/transaction", {
       state: {
         checkInDay: convertToISO(startDate),
@@ -605,11 +603,6 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
             {isErrorLoginBooking && (
               <StyledError onClick={() => bookingSubmit()}>
                 {showErrorMess}
-              </StyledError>
-            )}
-            {isErrorBooking && (
-              <StyledError onClick={() => bookingSubmit()}>
-                {showErrorBooking}
               </StyledError>
             )}
           </StyledContainerBooking>

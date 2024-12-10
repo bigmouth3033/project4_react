@@ -277,9 +277,8 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
   const [showTotalBasePrice, setShowTotalBasePrice] = useState(false);
   const [showDiscount, setshowDiscount] = useState(false);
   const [isErrorLoginBooking, setIsErrorLoginBooking] = useState(false);
+
   const [showErrorMess, setShowErrorMess] = useState("");
-  const [isErrorBooking, setIsErrorBooking] = useState(false);
-  const [showErrorBooking, setShowErrorBooking] = useState("");
   const containerRef = useRef();
   const navigate = useNavigate();
   const user = UserRequest();
@@ -327,13 +326,6 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     if (user.isSuccess) {
       if (user.status == "success" && user.data.status == 200) {
         setIsErrorLoginBooking(false);
-        if (user.data.data.id == data.userId) {
-          setIsErrorBooking(true);
-          setShowErrorBooking("Host cannot book their own property");
-        } else {
-          setIsErrorBooking(false);
-          setShowErrorBooking("");
-        }
       } else {
         setIsErrorLoginBooking(true);
         setShowErrorMess("Login before booking");
@@ -357,7 +349,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     return () => {
       window.removeEventListener("mousedown", onMouseDown);
     };
-  }, [selectedDates, user, data]);
+  }, [selectedDates, user]);
 
   const totalBasePrice = getListDateBooked(selectedDates).reduce(
     (total, date) => {
@@ -401,7 +393,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     if (isErrorLoginBooking) {
       return;
     }
-    if (data.userId == user.data.data.id) {
+    if (user.data.dataid == data.user.id) {
       return;
     }
     navigate("/booking/transaction", {
@@ -605,11 +597,6 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
             {isErrorLoginBooking && (
               <StyledError onClick={() => bookingSubmit()}>
                 {showErrorMess}
-              </StyledError>
-            )}
-            {isErrorBooking && (
-              <StyledError onClick={() => bookingSubmit()}>
-                {showErrorBooking}
               </StyledError>
             )}
           </StyledContainerBooking>

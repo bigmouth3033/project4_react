@@ -249,6 +249,7 @@ const Transaction = () => {
     formData.append("customerId", customerId);
     formData.append("hostId", data.user.id);
     formData.append("amount", finalPrice);
+    console.log(data.refundPolicyId);
   }
 
   const handleSubmitPay = () => {

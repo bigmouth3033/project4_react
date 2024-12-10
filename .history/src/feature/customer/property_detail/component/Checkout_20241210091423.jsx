@@ -401,9 +401,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     if (isErrorLoginBooking) {
       return;
     }
-    if (data.userId == user.data.data.id) {
-      return;
-    }
+
     navigate("/booking/transaction", {
       state: {
         checkInDay: convertToISO(startDate),
@@ -609,7 +607,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
             )}
             {isErrorBooking && (
               <StyledError onClick={() => bookingSubmit()}>
-                {showErrorBooking}
+                {showErrorMess}
               </StyledError>
             )}
           </StyledContainerBooking>
