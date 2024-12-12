@@ -136,9 +136,7 @@ export default function HomePage() {
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [selectedAmentity, setSelectedAmentity] = useState(
-    searchParams.get("amentity") || []
-  );
+  const [selectedAmenity, setSelectedAmenity] = useState([]);
   const [selectedPropertyType, setSelectedPropertyType] = useState(
     searchParams.get("propertyType") || null
   );
@@ -156,6 +154,7 @@ export default function HomePage() {
   const properties = PropertiesRequest(
     categoryId,
     selectedPropertyType,
+    selectedAmenity,
     isInstant,
     isPetAllow,
     isSelfCheckin,
@@ -173,8 +172,8 @@ export default function HomePage() {
           <FilterBar
             categoryId={categoryId}
             setCategoryId={setCategoryId}
-            selectedAmentity={selectedAmentity}
-            setSelectedAmentity={setSelectedAmentity}
+            selectedAmenity={selectedAmenity}
+            setSelectedAmenity={setSelectedAmenity}
             selectedPropertyType={selectedPropertyType}
             setSelectedPropertyType={setSelectedPropertyType}
             isInstant={isInstant}

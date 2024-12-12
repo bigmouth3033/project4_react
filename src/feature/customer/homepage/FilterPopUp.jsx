@@ -5,9 +5,9 @@ import { Range } from "react-range";
 import RangeSlider from "./RangeSlider";
 import PropertyType from "./PropertyType";
 import { RoomAndBed } from "./RoomAndBed";
-import { Amentity } from "./Amentity";
 import { Options } from "./Options";
 import { PropertiesRequest } from "@/feature/customer/homepage/api/propertyClientApi";
+import { FilterAmenity } from "./FilterAmenity";
 
 //npm add react-range
 
@@ -66,7 +66,7 @@ const StyleClearAll = styled.div`
 `;
 
 export const FilterPopUp = ({
-  selectedAmentity,
+  selectedAmenity,
   selectedPropertyType,
   isInstant,
   isPetAllow,
@@ -75,7 +75,7 @@ export const FilterPopUp = ({
   selectedRoom,
   selectedBed,
   selectedBathRoom,
-  setSelectedAmentity,
+  setSelectedAmenity,
   setSelectedPropertyType,
   setIsInstant,
   setIsPetAllow,
@@ -91,7 +91,7 @@ export const FilterPopUp = ({
 
   //CLEAR ALL
   const HandleClear = () => {
-    setSelectedAmentity([]);
+    setSelectedAmenity([]);
     setSelectedPropertyType(null);
     setIsInstant(null);
     setIsPetAllow(null);
@@ -131,9 +131,9 @@ export const FilterPopUp = ({
           setSelectedBed={setSelectedBed}
           setSelectedBathRoom={setSelectedBathRoom}
         />
-        <Amentity
-          selectedAmentity={selectedAmentity}
-          setSelectedAmentity={setSelectedAmentity}
+        <FilterAmenity
+          selectedAmenity={selectedAmenity}
+          setSelectedAmenity={setSelectedAmenity}
         />
         <Options
           isInstant={isInstant}

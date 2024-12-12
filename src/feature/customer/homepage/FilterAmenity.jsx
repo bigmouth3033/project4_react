@@ -49,18 +49,18 @@ const StyleItem = styled.div`
   }
 `;
 
-export const Amentity = ({ selectedAmentity, setSelectedAmentity }) => {
+export const FilterAmenity = ({ selectedAmenity, setSelectedAmenity }) => {
   const amenities = AmenityRequest();
 
-  const handleClick = (amenity) => {
-    setSelectedAmentity((prevSelectedItems) => {
+  const handleClick = (amenityID) => {
+    setSelectedAmenity((prevSelectedItems) => {
       // Kiểm tra xem amenity đã được chọn chưa
-      if (prevSelectedItems.includes(amenity)) {
+      if (prevSelectedItems.includes(amenityID)) {
         // Nếu đã chọn, loại bỏ nó
-        return prevSelectedItems.filter((item) => item !== amenity);
+        return prevSelectedItems.filter((item) => item !== amenityID);
       } else {
         // Nếu chưa chọn, thêm nó vào danh sách đã chọn
-        return [...prevSelectedItems, amenity];
+        return [...prevSelectedItems, amenityID];
       }
     });
   };
@@ -80,7 +80,7 @@ export const Amentity = ({ selectedAmentity, setSelectedAmentity }) => {
 
   return (
     <div>
-      <StyleTitle>Amentity</StyleTitle>
+      <StyleTitle>Amenity</StyleTitle>
       <div>
         {amenities.isSuccess &&
           amenities.data.data
@@ -99,8 +99,8 @@ export const Amentity = ({ selectedAmentity, setSelectedAmentity }) => {
                     .map((amenity, index) => {
                       return (
                         <StyleItem
-                          onClick={() => handleClick(amenity)}
-                          selected={selectedAmentity.includes(amenity)} // Kiểm tra nếu amenity có trong selectedItems
+                          onClick={() => handleClick(amenity.id)}
+                          selected={selectedAmenity.includes(amenity.id)} // Kiểm tra nếu amenity có trong selectedItems
                           key={index}
                         >
                           <div>

@@ -102,7 +102,7 @@ const StyleFilterButton = styled.button`
 export const FilterBar = ({
   categoryId,
   setCategoryId,
-  selectedAmentity,
+  selectedAmenity,
   selectedPropertyType,
   isInstant,
   isPetAllow,
@@ -111,7 +111,7 @@ export const FilterBar = ({
   selectedRoom,
   selectedBed,
   selectedBathRoom,
-  setSelectedAmentity,
+  setSelectedAmenity,
   setSelectedPropertyType,
   setIsInstant,
   setIsSelfCheckin,
@@ -213,8 +213,8 @@ export const FilterBar = ({
       {isPopUp && (
         <FilterPopUp
           {...{
-            selectedAmentity,
-            setSelectedAmentity,
+            selectedAmenity,
+            setSelectedAmenity,
             selectedPropertyType,
             setSelectedPropertyType,
             isInstant,

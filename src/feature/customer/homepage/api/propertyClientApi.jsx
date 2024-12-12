@@ -5,6 +5,7 @@ import qs from "qs";
 export const PropertiesRequest = (
   categoryId,
   propertyType,
+  amenities,
   isInstant,
   isSelfCheckin,
   isPetAllow,
@@ -16,6 +17,7 @@ export const PropertiesRequest = (
   const request = async (
     categoryId,
     propertyType,
+    amenities,
     isInstant,
     isSelfCheckin,
     isPetAllow,
@@ -28,6 +30,7 @@ export const PropertiesRequest = (
       params: {
         categoryId,
         propertyType,
+        amenities,
         isInstant,
         isSelfCheckin,
         isPetAllow,
@@ -47,6 +50,7 @@ export const PropertiesRequest = (
       "properties",
       categoryId,
       propertyType,
+      amenities,
       isInstant,
       isSelfCheckin,
       isPetAllow,
@@ -59,6 +63,7 @@ export const PropertiesRequest = (
       request(
         categoryId,
         propertyType,
+        amenities,
         isInstant,
         isSelfCheckin,
         isPetAllow,
