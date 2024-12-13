@@ -411,24 +411,11 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     formData.append("checkOutDay", convertToISO(endDate));
     formData.append("adult", adult);
     formData.append("children", children);
-    formData.append("propertyId", data.id);
     formData.append("data", JSON.stringify(data)); // Gán đối tượng data dưới dạng JSON
     formData.append("finalPrice", finalPrice);
     formData.append("customerId", user.data.data.id);
     formData.append("hostId", data.userId);
-    bookingRequest.mutate(formData, {
-      onSuccess: (response) => {
-        if (response.status == 200) {
-          alert("Booking success");
-        } else if (response.status == 410) {
-          alert(response.message);
-          // setTransactionError(true);
-        } else if (response.status == 400) {
-          alert(response.message);
-          // setTransactionError(true);
-        }
-      },
-    });
+
     // navigate("/booking/transaction", {
     //   state: {
     //     checkInDay: convertToISO(startDate),

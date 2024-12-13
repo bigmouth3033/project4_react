@@ -411,7 +411,6 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     formData.append("checkOutDay", convertToISO(endDate));
     formData.append("adult", adult);
     formData.append("children", children);
-    formData.append("propertyId", data.id);
     formData.append("data", JSON.stringify(data)); // Gán đối tượng data dưới dạng JSON
     formData.append("finalPrice", finalPrice);
     formData.append("customerId", user.data.data.id);

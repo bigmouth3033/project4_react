@@ -8,24 +8,20 @@ import moment from "moment";
 const StyledContainerCalendar = styled.div`
   max-width: 100%;
 `;
-export default function CalendarBook({
-  data,
-  setSelectedDates,
-  selectedDates,
-}) {
+export default function CalendarBook({ data, setSelectedDates, selectedDates }) {
+  // Lấy số tháng có thể đặt trước từ data.maximumMonthPreBook
   const maxSelectableDate = moment()
-    .add(data.maximumMonthPreBook, "months")
-    .date(moment().date());
+    .add(data.maximumMonthPreBook, "months") // Thêm số tháng vào ngày hiện tại
+    .date(moment().date()); // Kết thúc ngày này
 
+  // const exceptionDates = data.exceptionDates;
   const bookDateDetails = data.bookDateDetails;
+  console.log(bookDateDetails);
   const notAvailableDates = data.notAvailableDates;
+  console.log(notAvailableDates);
   const unavailableDates = [
-    ...bookDateDetails.map(
-      (date) => new Date(moment(date.night).format("YYYY-MM-DD"))
-    ),
-    ...notAvailableDates.map(
-      (date) => new Date(moment(date.date).format("YYYY-MM-DD"))
-    ),
+    ...bookDateDetails.map((date) => new Date(moment(date.night).format("YYYY-MM-DD"))),
+    ...notAvailableDates.map((date) => new Date(moment(date.date).format("YYYY-MM-DD"))),
   ];
 
   // Kiểm tra nếu một ô (tile) bị vô hiệu hóa
@@ -73,9 +69,7 @@ export default function CalendarBook({
     // Lấy danh sách các ngày trong khoảng đã chọn
     const list = listDate(dates);
     if (list != null) {
-      const listDateChosen = list.map(
-        (date) => new Date(moment(date).format("YYYY-MM-DD"))
-      );
+      const listDateChosen = list.map((date) => new Date(moment(date).format("YYYY-MM-DD")));
 
       // Kiểm tra nếu bất kỳ ngày nào bị trùng với ngày không khả dụng
       const isConflict = listDateChosen.some((chosenDate) =>
@@ -117,8 +111,7 @@ export default function CalendarBook({
     if (
       data.minimumStay != null &&
       data.maximumStay != null &&
-      (selectedDuration < data.minimumStay ||
-        selectedDuration > data.maximumStay)
+      (selectedDuration < data.minimumStay || selectedDuration > data.maximumStay)
     ) {
       setSelectedDates([dates[0], null]);
       return;

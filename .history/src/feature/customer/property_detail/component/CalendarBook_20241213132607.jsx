@@ -13,10 +13,12 @@ export default function CalendarBook({
   setSelectedDates,
   selectedDates,
 }) {
+  // Lấy số tháng có thể đặt trước từ data.maximumMonthPreBook
   const maxSelectableDate = moment()
-    .add(data.maximumMonthPreBook, "months")
-    .date(moment().date());
+    .add(data.maximumMonthPreBook, "months") // Thêm số tháng vào ngày hiện tại
+    .date(moment().date()); // Kết thúc ngày này
 
+  // const exceptionDates = data.exceptionDates;
   const bookDateDetails = data.bookDateDetails;
   const notAvailableDates = data.notAvailableDates;
   const unavailableDates = [

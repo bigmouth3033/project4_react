@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 import { UserRequest } from "@/shared/api/userApi";
 import { capitalizeFirstLetter } from "@/shared/utils/capitalizeFirstLetter";
 import { formatDate } from "@/shared/utils/DateTimeHandle";
-import { BookingRequest } from "../api/api";
 const StyledContainer = styled.div`
   height: auto;
   position: sticky;
@@ -371,6 +370,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     },
     0
   );
+
   // tính theo discount
   const bookedDays = getListDateBooked(selectedDates).length;
 
@@ -398,8 +398,6 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
   };
   const formData = new FormData();
 
-  const bookingRequest = BookingRequest();
-  // console.log(user.data.id);
   const bookingSubmit = () => {
     if (isErrorLoginBooking) {
       return;
@@ -411,34 +409,19 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     formData.append("checkOutDay", convertToISO(endDate));
     formData.append("adult", adult);
     formData.append("children", children);
-    formData.append("propertyId", data.id);
     formData.append("data", JSON.stringify(data)); // Gán đối tượng data dưới dạng JSON
     formData.append("finalPrice", finalPrice);
-    formData.append("customerId", user.data.data.id);
-    formData.append("hostId", data.userId);
-    bookingRequest.mutate(formData, {
-      onSuccess: (response) => {
-        if (response.status == 200) {
-          alert("Booking success");
-        } else if (response.status == 410) {
-          alert(response.message);
-          // setTransactionError(true);
-        } else if (response.status == 400) {
-          alert(response.message);
-          // setTransactionError(true);
-        }
+
+    navigate("/booking/transaction", {
+      state: {
+        checkInDay: convertToISO(startDate),
+        checkOutDay: convertToISO(endDate),
+        adult: adult,
+        children: children,
+        data: data,
+        finalPrice: finalPrice,
       },
     });
-    // navigate("/booking/transaction", {
-    //   state: {
-    //     checkInDay: convertToISO(startDate),
-    //     checkOutDay: convertToISO(endDate),
-    //     adult: adult,
-    //     children: children,
-    //     data: data,
-    //     finalPrice: finalPrice,
-    //   },
-    // });
   };
   const calculateDaysBetween = (start_day, end_day) => {
     const startDate = new Date(start_day);
