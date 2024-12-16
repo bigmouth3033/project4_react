@@ -38,6 +38,7 @@ import ListingList from "@/feature/admin/listing_list/ListingList";
 import AdminPropertyDetail from "@/feature/admin/admin_property_detail/AdminPropertyDetail";
 import AmenityChart from "@/feature/admin/amenity_chart/AmenityChart";
 import Transaction from "@/feature/customer/booking/components/Transacsion";
+import Favourite from "@/feature/customer/favourite/Favourite";
 
 const router = createBrowserRouter(
   [
@@ -48,7 +49,9 @@ const router = createBrowserRouter(
         { path: "", element: <HomePage /> },
         { path: "/property_detail", element: <PropertyDetail /> },
         { path: "/property_detail/:property_id", element: <PropertyDetail /> },
-        { path: "/booking/transaction", element: <Transaction /> },
+        { path: "/booking/transaction/:booking_id", element: <Transaction /> },
+        { path: "/wishlists", element: <Favourite /> },
+
         {
           path: "/hosting",
           element: <HostLayout />,

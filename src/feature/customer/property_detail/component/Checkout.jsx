@@ -15,6 +15,8 @@ import { UserRequest } from "@/shared/api/userApi";
 import { capitalizeFirstLetter } from "@/shared/utils/capitalizeFirstLetter";
 import { formatDate } from "@/shared/utils/DateTimeHandle";
 import { BookingRequest } from "../api/api";
+import SuccessPopUp from "@/shared/components/PopUp/SuccessPopUp";
+import ErrorPopUp from "@/shared/components/PopUp/ErrorPopUp";
 const StyledContainer = styled.div`
   height: auto;
   position: sticky;
@@ -270,6 +272,7 @@ const Styledbutton = styled.button`
   background-color: black;
   color: white;
 `;
+
 export default function Checkout({ data, selectedDates, setSelectedDates }) {
   const [isShowCalendar, setIsShowCalendar] = useState(false);
   const [adult, setAdult] = useState(1);
@@ -281,6 +284,10 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
   const [showErrorMess, setShowErrorMess] = useState("");
   const [isErrorBooking, setIsErrorBooking] = useState(false);
   const [showErrorBooking, setShowErrorBooking] = useState("");
+  const [bookingResponse, setBookingResponse] = useState(false);
+  const [showBookingResponse, setShowBookingResponse] = useState("");
+  const [transactionError, setTransactionError] = useState(false);
+  const [showErrorTransaction, setShowErrorTransaction] = useState("");
   const containerRef = useRef();
   const navigate = useNavigate();
   const user = UserRequest();
@@ -413,19 +420,22 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     formData.append("children", children);
     formData.append("propertyId", data.id);
     formData.append("data", JSON.stringify(data)); // Gán đối tượng data dưới dạng JSON
-    formData.append("finalPrice", finalPrice);
+    formData.append("amount", finalPrice);
     formData.append("customerId", user.data.data.id);
     formData.append("hostId", data.userId);
     bookingRequest.mutate(formData, {
       onSuccess: (response) => {
         if (response.status == 200) {
-          alert("Booking success");
+          setShowBookingResponse(response.message);
+          setBookingResponse(true);
+          navigate(`/booking/transaction/${response.data.id}`);
         } else if (response.status == 410) {
-          alert(response.message);
-          // setTransactionError(true);
+          setShowErrorTransaction(response.message);
+          setTransactionError(true);
         } else if (response.status == 400) {
           alert(response.message);
-          // setTransactionError(true);
+          setShowErrorTransaction(response.message);
+          setTransactionError(true);
         }
       },
     });
@@ -637,6 +647,22 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                 {showErrorBooking}
               </StyledError>
             )}
+            {transactionError && (
+              <ErrorPopUp
+                action={() => {
+                  setTransactionError(false);
+                }}
+                header={showErrorTransaction}
+              />
+            )}
+            {bookingResponse && (
+              <SuccessPopUp
+                header={showBookingResponse}
+                action={() => {
+                  setBookingResponse(false);
+                }}
+              />
+            )}
           </StyledContainerBooking>
         ) : (
           <StyledContainerBooking>
@@ -665,7 +691,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
               </div>
 
               {/* Discount */}
-              {dateBookingQuantiy(selectedDates) >= 28 ? (
+              {dateBookingQuantiy(selectedDates) >= 30 ? (
                 <div>
                   <span
                     onClick={() => {
@@ -680,7 +706,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                   </div>
                 </div>
               ) : dateBookingQuantiy(selectedDates) >= 7 &&
-                dateBookingQuantiy(selectedDates) < 28 ? (
+                dateBookingQuantiy(selectedDates) < 30 ? (
                 <div>
                   <span
                     onClick={() => {

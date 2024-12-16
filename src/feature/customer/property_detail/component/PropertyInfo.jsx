@@ -13,7 +13,7 @@ import { capitalizeFirstLetter } from "@/shared/utils/capitalizeFirstLetter";
 const StyledContainer = styled.div`
   display: flex;
   flex-direction: column; /* Sắp xếp các phần tử theo cột (dọc) */
-  row-gap: 3rem; /* Khoảng cách giữa các phần tử theo chiều dọc */
+  row-gap: 2.5rem; /* Khoảng cách giữa các phần tử theo chiều dọc */
 `;
 const StyledContainerTypeAndAddress = styled.div`
   /* margin-top: 0.3rem;s */
@@ -156,6 +156,14 @@ const StyledContainerInfo = styled.div`
   justify-content: stretch;
   align-items: center;
 `;
+const StyledBookingType = styled.div`
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  color: rgba(0, 0, 0, 0.8);
+  background-color: #f7f7f7;
+`;
 export default function PropertyInfo({
   data,
   selectedDates,
@@ -244,6 +252,7 @@ export default function PropertyInfo({
           {data.numberOfBathRoom + " bath "}
         </StyledContainerInfo>
       </StyledContainerTypeAndAddress>
+
       {/* Block3 */}
       <StyledContainerUser>
         <div>
@@ -266,7 +275,9 @@ export default function PropertyInfo({
           </p>
         </div>
       </StyledContainerUser>
-
+      <StyledBookingType>
+        {capitalizeFirstLetter(data.bookingType)} booking
+      </StyledBookingType>
       {
         <StyledContainerAmenity>
           <h3>What this place offers</h3>

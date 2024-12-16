@@ -13,9 +13,15 @@ export default function CalendarBook({
   setSelectedDates,
   selectedDates,
 }) {
-  const maxSelectableDate = moment()
+  let maxSelectableDate = moment()
     .add(data.maximumMonthPreBook, "months")
     .date(moment().date());
+
+  let minDate = new Date();
+
+  if (data.bookingType === "reserved") {
+    minDate = moment().add(3, "days").toDate();
+  }
 
   const bookDateDetails = data.bookDateDetails;
   const notAvailableDates = data.notAvailableDates;
@@ -140,7 +146,7 @@ export default function CalendarBook({
           prev2Label={null}
           nextLabel={<FontAwesomeIcon icon={faAngleRight} />}
           prevLabel={<FontAwesomeIcon icon={faAngleLeft} />}
-          minDate={new Date()} // Vô hiệu hóa các ngày trước hôm nay
+          minDate={minDate} // Vô hiệu hóa các ngày trước hôm nay
           maxDate={maxSelectableDate.toDate()}
           onChange={handleDateChange}
           value={selectedDates}
