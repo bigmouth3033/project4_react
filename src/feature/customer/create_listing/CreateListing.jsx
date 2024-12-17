@@ -139,6 +139,10 @@ export default function CreateListing() {
       dispatch({ type: ACTIONS.CHANGE_SELF_CHECK_IN_TYPE, next: data.selfCheckInType });
       dispatch({ type: ACTIONS.CHANGE_MINIMUM_STAY, next: data.minimumStay });
       dispatch({ type: ACTIONS.CHANGE_MAXIMUM_STAY, next: data.maximumStay });
+      dispatch({
+        type: ACTIONS.CHANGE_SELF_CHECK_IN_INSTRUCTION,
+        next: data.selfCheckInInstruction,
+      });
       setIsLoadAllDataDone(true);
     }
   }, [getHostListingById.isSuccess]);
@@ -225,7 +229,13 @@ export default function CreateListing() {
       formData.append("propertyType", state.propertyType);
       formData.append("propertyTitle", state.propertyTitle);
       formData.append("maximumMonthPreBook", state.maximumMonthPreBook);
+
       formData.append("bookingType", state.bookingType);
+
+      if (state.bookingType == "instant" && state.instantBookRequirementID) {
+        formData.append("instantBookRequirementID", state.instantBookRequirementID);
+      }
+
       formData.append("basePrice", state.basePrice);
       formData.append("weeklyDiscount", state.weeklyDiscount);
       formData.append("monthlyDiscount", state.monthlyDiscount);
@@ -253,6 +263,10 @@ export default function CreateListing() {
       formData.append("petAllowed", state.petAllowed);
       formData.append("smokingAllowed", state.smokingAllowed);
       formData.append("additionalRules", state.additionalRules);
+
+      if (state.selfCheckIn && state.selfCheckInInstruction) {
+        formData.append("selfCheckInInstruction", state.selfCheckInInstruction);
+      }
 
       if (state.maximumStay) {
         formData.append("maximumStay", state.maximumStay);
@@ -294,10 +308,6 @@ export default function CreateListing() {
 
       formData.append("userId", user.data.data.id);
       formData.append("propertyCategoryID", state.propertyCategoryID);
-
-      if (state.instantBookRequirementID) {
-        formData.append("instantBookRequirementID", state.instantBookRequirementID);
-      }
 
       state.propertyImages.forEach((image) => {
         if (typeof image == "string") {

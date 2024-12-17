@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { useParams } from "react-router";
 import { GetListingByIdRequest } from "./api/adminPropertyDetailApi";
 import { HiMiniArrowSmallRight } from "react-icons/hi2";
@@ -130,6 +130,17 @@ const ImageContainerStyled = styled.div`
     height: 100%;
     object-fit: contain;
   }
+
+  ${(props) => {
+    if (props.$length % 2 == 0) {
+      return css`
+        > div:nth-of-type(${props.$length}) {
+          grid-column: 1 / 3;
+          grid-row: ${2 + props.$length / 2} / ${2 + props.$length / 2 + 2};
+        }
+      `;
+    }
+  }}
 `;
 
 const AvailabilityStyled = styled.div`
@@ -568,7 +579,7 @@ export default function AdminPropertyDetail() {
           </ViewMoreStyled>
           {photo && (
             <ItemStyled>
-              <ImageContainerStyled>
+              <ImageContainerStyled $length={getListingById.data.data.propertyImages.length}>
                 {getListingById.data.data.propertyImages.map((image, index) => (
                   <div key={index}>
                     <img src={image} />

@@ -40,23 +40,23 @@ export default function Footer() {
         </div>
         <div>
           <h4>Hosting</h4>
-          <p>Airbnb your home</p>
+          <p>UrbanNest your home</p>
           <p>AirCover for Hosts</p>
           <p>Hosting resources</p>
           <p>Community forum</p>
           <p>Hosting responsibly</p>
-          <p>Airbnb-friendly apartments</p>
+          <p>UrbanNest-friendly apartments</p>
           <p>Join a free Hosting class</p>
           <p>Find a co‑host</p>
         </div>
         <div>
-          <h4>Airbnb</h4>
+          <h4>UrbanNest</h4>
           <p>Newsroom</p>
           <p>New features</p>
           <p>Careers</p>
           <p>Investors</p>
           <p>Gift cards</p>
-          <p>Airbnb.org emergency stays</p>
+          <p>UrbanNest.org emergency stays</p>
         </div>
       </TopStyled>
       <BottomStyled>

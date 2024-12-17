@@ -13,6 +13,7 @@ const Container = styled.div`
   background-color: white;
   margin: 2rem;
   padding: 2rem;
+  border-radius: 15px;
 `;
 
 const Footer = styled.div`

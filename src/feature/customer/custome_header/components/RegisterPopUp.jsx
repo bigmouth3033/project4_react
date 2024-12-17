@@ -6,7 +6,7 @@ import TextInput from "@/shared/components/Input/TextInput";
 import RedButton from "@/shared/components/Button/RedButton1";
 import WhiteButton from "@/shared/components/Button/WhiteButton";
 import { MdKeyboardArrowLeft } from "react-icons/md";
-import { LoginOrSignUpRequest } from "../api/loginSignUpApi";
+import { GoogleLoginRequest, LoginOrSignUpRequest } from "../api/loginSignUpApi";
 import { CreateAuthenticationCodeRequest } from "../api/loginSignUpApi";
 import ConfirmEmailPopUp from "./ConfirmEmailPopUp";
 import ErrorPopUp from "@/shared/components/PopUp/ErrorPopUp";
@@ -16,7 +16,10 @@ import { UserRequest } from "@/shared/api/userApi";
 import SuccessPopUp from "@/shared/components/PopUp/SuccessPopUp";
 import google_logo from "@/feature/customer/custome_header/assets/icons8-google-48.png";
 import { IoQrCodeOutline } from "react-icons/io5";
+import { useGoogleLogin } from "@react-oauth/google";
+import { RegisterGoogleRequest } from "../api/loginSignUpApi";
 
+/* #region   */
 const PopUpContainer = styled(PopUp)`
   width: 33rem;
   padding: 0;
@@ -153,6 +156,7 @@ const WhiteButtonStyled = styled(WhiteButton)`
     font-size: 18px;
   }
 `;
+/* #endregion */
 
 const EmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -165,9 +169,10 @@ export default function RegisterPopUp({ action }) {
       {step == "INIT" && (
         <Init email={email} setEmail={setEmail} action={action} setStep={setStep} />
       )}
-      {step == "SIGNUP" && (
-        <SignUp email={email} action={() => setStep("INIT")} offPopUp={action} />
-      )}
+      {step == "SIGNUP" ||
+        (step == "GOOGLE_SIGNUP" && (
+          <SignUp step={step} email={email} action={() => setStep("INIT")} offPopUp={action} />
+        ))}
       {step == "LOGIN" && <Login email={email} action={() => setStep("INIT")} offPopUp={action} />}
     </PopUpContainer>
   );
@@ -176,6 +181,8 @@ export default function RegisterPopUp({ action }) {
 function Init({ action, email, setEmail, setStep }) {
   const [emailError, setEmailError] = useState("");
   const loginOrSignUp = LoginOrSignUpRequest();
+  const googleLogin = GoogleLoginRequest();
+  const user = UserRequest();
 
   const onLoginOrSignUp = (ev) => {
     ev.preventDefault();
@@ -209,6 +216,36 @@ function Init({ action, email, setEmail, setStep }) {
     }
   };
 
+  const login = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      fetch("https://www.googleapis.com/oauth2/v1/userinfo?alt=json", {
+        headers: {
+          Authorization: `Bearer ${tokenResponse.access_token}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const formData = new FormData();
+          formData.append("email", data.email);
+          googleLogin.mutate(formData, {
+            onSuccess: (response) => {
+              if (response.status == 202) {
+                Cookies.set("CLIENT_ACCESS_TOKEN", response.data);
+                user.refetch();
+                action();
+              }
+
+              if (response.status == 201) {
+                setEmail(data.email);
+                setStep("GOOGLE_SIGNUP");
+              }
+            },
+          });
+        })
+        .catch((err) => console.error("Error fetching user info:", err));
+    },
+  });
+
   return (
     <>
       <Header>
@@ -232,7 +269,7 @@ function Init({ action, email, setEmail, setStep }) {
         <span></span>
       </Hr>
       <Footer>
-        <WhiteButtonStyled>
+        <WhiteButtonStyled onClick={() => login()}>
           <LogonStyled>
             <img src={google_logo} />
           </LogonStyled>{" "}
@@ -240,7 +277,7 @@ function Init({ action, email, setEmail, setStep }) {
         </WhiteButtonStyled>
         <WhiteButtonStyled>
           <IoQrCodeOutline />
-          Continue with Qr
+          Continue with QR
         </WhiteButtonStyled>
       </Footer>
     </>
@@ -330,7 +367,7 @@ function Login({ action, email, offPopUp }) {
   );
 }
 
-function SignUp({ action, email, offPopUp }) {
+function SignUp({ action, email, offPopUp, step }) {
   const createAuthenticationCode = CreateAuthenticationCodeRequest();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -339,6 +376,8 @@ function SignUp({ action, email, offPopUp }) {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [errors, setErrors] = useState({});
   const [isVerification, setIsVerification] = useState();
+  const registerGoogle = RegisterGoogleRequest();
+  const [success, setSuccess] = useState(false);
 
   const [emailExist, setEmailExist] = useState(false);
 
@@ -425,20 +464,41 @@ function SignUp({ action, email, offPopUp }) {
     }
 
     if (isOk) {
-      const formData = new FormData();
-      formData.append("email", email);
+      if (step == "SIGNUP") {
+        const formData = new FormData();
+        formData.append("email", email);
 
-      createAuthenticationCode.mutate(formData, {
-        onSuccess: (response) => {
-          if (response.status == 200) {
-            setIsVerification(true);
-          }
+        createAuthenticationCode.mutate(formData, {
+          onSuccess: (response) => {
+            if (response.status == 200) {
+              setIsVerification(true);
+            }
 
-          if (response.status == 403) {
-            setEmailExist(true);
-          }
-        },
-      });
+            if (response.status == 403) {
+              setEmailExist(true);
+            }
+          },
+        });
+      } else {
+        const formData = new FormData();
+        const dobDate = new Date(dob);
+
+        formData.append("email", email);
+        formData.append("firstName", firstName);
+        formData.append("lastName", lastName);
+        formData.append("password", password);
+        formData.append(
+          "dob",
+          `${dobDate.getFullYear()}-${dobDate.getMonth() + 1}-${dobDate.getDate()}`
+        );
+        registerGoogle.mutate(formData, {
+          onSuccess: (response) => {
+            if (response.status == 200) {
+              setSuccess(true);
+            }
+          },
+        });
+      }
     }
   };
 
@@ -517,6 +577,16 @@ function SignUp({ action, email, offPopUp }) {
       )}
       {emailExist && (
         <ErrorPopUp action={() => setEmailExist(false)} message={"This email already exist"} />
+      )}
+      {success && (
+        <SuccessPopUp
+          action={() => {
+            setSuccess(false);
+            action();
+            offPopUp();
+          }}
+          message={"Successfully register, please login to your account"}
+        />
       )}
     </>
   );

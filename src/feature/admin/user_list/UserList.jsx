@@ -15,11 +15,13 @@ import { VscSettings } from "react-icons/vsc";
 import { formatDate } from "@/shared/utils/DateTimeHandle";
 import { IoMailOpen } from "react-icons/io5";
 import { AdminBadgeRequest } from "@/shared/api/badgeAdminApi";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   background-color: white;
   margin: 2rem;
   padding: 2rem;
+  border-radius: 15px;
 `;
 
 const Footer = styled.div`
@@ -301,6 +303,7 @@ const optionsUser = [
 ];
 
 export default function UserList() {
+  const navigate = useNavigate();
   const adminBadge = AdminBadgeRequest();
   const [checkList, setCheckList] = useState([]);
   const [badges, setBadges] = useState([]);
@@ -362,7 +365,6 @@ export default function UserList() {
         <button>
           <span>Export</span> <FaDownload />
         </button>
-        <button onClick={() => console.log(badges)}>click</button>
       </ExportStyled>
       <Filter>
         <div>
@@ -487,7 +489,9 @@ export default function UserList() {
                       <Link to={"/admin/listing_list?host=" + user.email}>View property</Link>
                       <Link>View booking</Link>
                       <Link>Mail</Link>
-                      <Link>Message</Link>
+                      <Link to="/admin/messages" state={{ userId: user.id }}>
+                        Message
+                      </Link>
                     </ActionStyled>
                   </td>
                 </tr>

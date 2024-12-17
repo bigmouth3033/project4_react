@@ -10,7 +10,8 @@ import LocationProperty from "./component/LocationProperty";
 import LoadingPage from "@/shared/components/Pages/LoadingPage";
 import PageNotFound from "@/shared/components/Pages/PageNotFound";
 import PropertyHeader from "../custome_header/PropertyHeader";
-import Footer from "../footer/Footer";
+import FooterPropertyDetail from "../footer/FooterPropertyDetail";
+import { CategoriesRequest } from "@/shared/api/categoryClientApi";
 
 const StyledContainer = styled.div`
   max-width: 1120px;
@@ -184,8 +185,9 @@ const StyledContainer = styled.div`
 export default function PropertyDetail() {
   const { property_id } = useParams();
   const getPropertyRequest = GetPropertyRequest(property_id);
+  const categories = CategoriesRequest();
 
-  if (getPropertyRequest.isLoading) {
+  if (getPropertyRequest.isLoading || categories.isLoading) {
     return <LoadingPage />;
   }
 
@@ -205,7 +207,7 @@ export default function PropertyDetail() {
           <RulePolicy data={getPropertyRequest.data.data} />
         </StyledContainer>
       )}
-      <Footer />
+      <FooterPropertyDetail />
     </div>
   );
 }

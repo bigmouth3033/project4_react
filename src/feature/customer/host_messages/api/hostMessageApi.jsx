@@ -92,3 +92,14 @@ export const AddNewGroupRequest = () => {
     mutationFn: request,
   });
 };
+
+export const UploadImageRequest = () => {
+  const request = async (payload) => {
+    const response = await axiosClient.post("test", payload);
+    return response.data;
+  };
+
+  return useMutation({
+    mutationFn: request,
+  });
+};

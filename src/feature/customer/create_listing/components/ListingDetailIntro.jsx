@@ -10,6 +10,8 @@ import { PublicListingRequest } from "../api/createListingApi";
 import { UpdatePropertyRequest } from "../api/createListingApi";
 import WaitingPopUp from "@/shared/components/PopUp/WaitingPopUp";
 import { useQueryClient } from "@tanstack/react-query";
+import InputCheckBox from "@/shared/components/Input/InputCheckBox";
+import TextEditor from "@/shared/components/editor/TextEditor";
 
 const Container = styled.div``;
 
@@ -91,7 +93,9 @@ export default function ListingDetailIntro() {
 
           {(state.status == "PUBLIC" ||
             state.status == "DISABLED" ||
-            state.status == "ADMIN_DISABLED") && <PublicState />}
+            state.status == "ADMIN_DISABLED") && (
+            <PublicState dispatch={dispatch} ACTIONS={ACTIONS} state={state} />
+          )}
         </Left>
         <Right></Right>
       </Body>
@@ -109,7 +113,9 @@ const ViewDetailStyled = styled.div`
   font-size: 16px;
 `;
 
-function PublicState() {
+function PublicState({ state, dispatch, ACTIONS }) {
+  const [isInstruction, setIsInstruction] = useState(state.selfCheckInInstruction ? true : false);
+
   return (
     <>
       <ViewDetailStyled>
@@ -120,6 +126,35 @@ function PublicState() {
         <h4>View property rating</h4>
         <Link>View</Link>
       </ViewDetailStyled>
+      {state.selfCheckIn && (
+        <ViewDetailStyled>
+          <>
+            <InputCheckBox
+              checked={isInstruction}
+              onChange={() =>
+                setIsInstruction((prev) => {
+                  if (prev == true) {
+                    dispatch({ type: ACTIONS.CHANGE_SELF_CHECK_IN_INSTRUCTION, next: null });
+                  }
+
+                  return !prev;
+                })
+              }
+            />
+            <h4>Self check-in instruction</h4>
+          </>
+        </ViewDetailStyled>
+      )}
+      {isInstruction && (
+        <div>
+          <TextEditor
+            setState={(value) => {
+              dispatch({ type: ACTIONS.CHANGE_SELF_CHECK_IN_INSTRUCTION, next: value });
+            }}
+            state={state.selfCheckInInstruction}
+          />
+        </div>
+      )}
     </>
   );
 }
@@ -515,6 +550,10 @@ function ProgressState({ state, dispatch, ACTIONS }) {
 
       if (state.instantBookRequirementID) {
         formData.append("instantBookRequirementID", state.instantBookRequirementID);
+      }
+
+      if (state.selfCheckIn && state.selfCheckInInstruction) {
+        formData.append("selfCheckInInstruction", state.selfCheckInInstruction);
       }
 
       state.propertyImages.forEach((image) => {

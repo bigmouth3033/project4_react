@@ -3,20 +3,27 @@ import SockJS from "sockjs-client";
 import { over } from "stompjs";
 import styled, { css } from "styled-components";
 import { UserRequest } from "@/shared/api/userApi";
-import { GetUserChatRoomRequest } from "./api/hostMessageApi";
+import { AddNewFriendRequest, GetUserChatRoomRequest } from "./api/hostMessageApi";
 import Avatar from "react-avatar";
 import TextInput from "@/shared/components/Input/TextInput";
 import { AiOutlineSend } from "react-icons/ai";
 import { GetRoomMessageRequest } from "./api/hostMessageApi";
 import { showDate } from "@/shared/utils/showFullDateTime";
-import { FaRegImage } from "react-icons/fa";
+import { FaImages, FaRegImage } from "react-icons/fa";
 import { FiUserPlus } from "react-icons/fi";
 import { useInView } from "react-intersection-observer";
 import { MdOutlineGroups2 } from "react-icons/md";
-import AddFriendPopUp from "../host_listing/components/AddFriendPopUp";
-import AddGroupPopUp from "../host_listing/components/AddGroupPopUp";
+import AddFriendPopUp from "./components/AddFriendPopUp";
+import AddGroupPopUp from "./components/AddGroupPopUp";
 import { v4 as uuidv4 } from "uuid";
+import { UploadImageRequest } from "./api/hostMessageApi";
+import AlertPopUp from "@/shared/components/PopUp/AlertPopUp";
+import AddImagePopUp from "./components/AddImagePopUp";
+import WaitingPopUp from "@/shared/components/PopUp/WaitingPopUp";
+import { useLocation } from "react-router-dom";
+import intro from "@/shared/assets/images/chat_intro.png";
 
+/* #region styled  */
 const Container = styled.div`
   display: grid;
   grid-template-columns: 1fr 3fr;
@@ -28,6 +35,9 @@ const SidebarStyled = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+
+  overflow: auto;
+
   /* padding: 1rem; */
 
   & hr {
@@ -36,6 +46,20 @@ const SidebarStyled = styled.div`
 
   > div:nth-of-type(2) {
     padding: 0 1rem;
+  }
+
+  overflow-y: auto;
+  &::-webkit-scrollbar-track {
+    background-color: none;
+  }
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    background-color: none;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgb(205, 205, 207);
   }
 `;
 
@@ -251,6 +275,55 @@ const GroupHeaderStyled = styled.div`
   }
 `;
 
+const ImageMessageSideBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const ImageContainerStyled = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 10rem;
+  gap: 10px;
+
+  > div:nth-of-type(1) {
+    grid-column: 1/3;
+    grid-row: 1/3;
+  }
+
+  > div {
+    border: 1px dotted rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  & img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  ${(props) => {
+    if (props.$length % 2 == 0) {
+      return css`
+        > div:nth-of-type(${props.$length}) {
+          grid-column: 1 / 3;
+          grid-row: ${2 + props.$length / 2} / ${2 + props.$length / 2 + 2};
+        }
+      `;
+    }
+  }}
+`;
+const IntroContainerStyled = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+`;
+/* #endregion */
+
 export default function HostMessages() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -265,7 +338,16 @@ export default function HostMessages() {
   const [isAddFriend, setIsAddFriend] = useState(false);
   const [isAddGroup, setIsAddGroup] = useState(false);
   const lastMessageIdRef = useRef(null);
+  const inputRef = useRef();
+  const uploadImage = UploadImageRequest();
+  const [imageError, setImageError] = useState(false);
+  const [imagePopUp, setImagePopUp] = useState([]);
+  const location = useLocation();
+  const { userId } = location.state || {};
+  const [waiting, setWaiting] = useState([]);
+  const addNewFriend = AddNewFriendRequest();
 
+  /* #region proccess  */
   const { ref, inView, entry } = useInView({
     threshold: 0,
   });
@@ -291,10 +373,17 @@ export default function HostMessages() {
         lastMessageIdRef.current = body.messageId;
       }
 
+      var checkExist = chatRoomsRef.current.find((room) => room.roomId == body.roomId);
+
+      if (!checkExist) {
+        getUserChatRoom.refetch();
+        return;
+      }
+
       setChatRooms((prev) => {
         var changeRoom = prev.find((room) => room.roomId == body.roomId);
-        changeRoom.lastMessage = body.message;
 
+        changeRoom.lastMessage = body.message;
         return [changeRoom, ...prev.filter((room) => room.roomId != body.roomId)];
       });
 
@@ -357,6 +446,33 @@ export default function HostMessages() {
     if (getUserChatRoom.isSuccess) {
       setChatRooms(getUserChatRoom.data.data);
       chatRoomsRef.current = getUserChatRoom.data.data;
+
+      if (waiting.length != 0) {
+        var room = getUserChatRoom.data.data.find(
+          (room) => room.name == null && room.users.find((user) => user.id == waiting[0])
+        );
+
+        if (room != null) {
+          setChosenRoom(room.roomId);
+          chosenRoomRef.current = room.roomId;
+          setWaiting([]);
+        } else {
+          const formData = new FormData();
+          formData.append("userId", user.data.data.id);
+          formData.append("friendId", waiting[0]);
+
+          addNewFriend.mutate(formData, {
+            onSuccess: (response) => {
+              if (response.status == 200) {
+                setChosenRoom(response.data);
+                chosenRoomRef.current = response.data;
+                getUserChatRoom.refetch();
+                setWaiting([]);
+              }
+            },
+          });
+        }
+      }
     }
   }, [getUserChatRoom.fetchStatus]);
 
@@ -445,22 +561,109 @@ export default function HostMessages() {
     }
   };
 
+  const sendImageMessage = (message) => {
+    const messageId = uuidv4();
+
+    lastMessageIdRef.current = messageId;
+
+    if (stompClient.current) {
+      var chatMessage = {
+        messageId,
+        senderId: user.data.data.id,
+        senderAvatar: user.data.data.avatar,
+        message: message,
+        date: new Date(),
+        roomId: chosenRoom,
+      };
+
+      setMessages((prev) => [
+        {
+          id: user.data.data.id,
+          name: `${user.data.data.firstName} ${user.data.data.lastName}`,
+          avatar: user.data.data.avatar,
+          message: message,
+          createdAt: new Date(),
+        },
+        ...prev,
+      ]);
+
+      setChatRooms((prev) => {
+        var changeRoom = prev.find((room) => room.roomId == chosenRoom);
+        changeRoom.lastMessage = message;
+
+        return [changeRoom, ...prev.filter((room) => room.roomId != chosenRoom)];
+      });
+
+      stompClient.current.send("/chatApp/private-message", {}, JSON.stringify(chatMessage));
+      chatMessageRef.current.scrollTo(0, chatMessageRef.scrollHeight);
+      setMessage("");
+    }
+  };
+
   const getGroup = () => {
     const room = chatRooms.find((room) => room.roomId == chosenRoom);
 
-    if (room.name != null) {
+    if (room?.name != null) {
       return room;
     }
 
     return null;
   };
 
+  const handleImageChange = (ev) => {
+    const allowedFileTypes = ["image/jpeg", "image/png", "image/gif", "image/jpg"];
+    const maxFileSize = 1 * 1024 * 1024;
+
+    if (ev.target.files.length > 0) {
+      const isValidFileType = Array.from(ev.target.files).every((file) =>
+        allowedFileTypes.includes(file.type)
+      );
+
+      const isValidFileSize = Array.from(ev.target.files).every((file) => file.size <= maxFileSize);
+
+      if (!isValidFileType) {
+        setImageError("Invalid file type. Please upload an image of type JPEG, PNG, GIF or JPG.");
+        return;
+      }
+
+      if (!isValidFileSize) {
+        setImageError("File size too large. Please upload an image smaller than 1 MB.");
+        return;
+      }
+
+      const formData = new FormData();
+
+      [...ev.target.files].forEach((image) => formData.append("files", image));
+
+      uploadImage.mutate(formData, {
+        onSuccess: (response) => {
+          setImagePopUp(response);
+        },
+      });
+
+      setImageError(null);
+      ev.target.value = null;
+    }
+  };
+
+  useEffect(() => {
+    if (userId != null) {
+      setWaiting([userId]);
+    }
+  }, [userId]);
+
+  if (uploadImage.isPending) {
+    return <WaitingPopUp />;
+  }
+
+  /* #endregion */
+
   return (
     <>
       <Container>
         <SidebarStyled>
           <SideBarHeaderStyled>
-            <h2>Messages</h2>
+            <h2></h2>
             <div>
               <div onClick={() => setIsAddFriend(true)}>
                 <FiUserPlus />
@@ -493,12 +696,20 @@ export default function HostMessages() {
                       <span>
                         {roomUser.firstName} {roomUser.lastName}
                       </span>
-                      <span>{chatRoom.lastMessage}</span>
+                      <span>
+                        {!chatRoom.lastMessage?.includes("#image") ? (
+                          chatRoom.lastMessage
+                        ) : (
+                          <ImageMessageSideBar>
+                            <FaImages />
+                            Images
+                          </ImageMessageSideBar>
+                        )}
+                      </span>
                     </div>
                   </RoomStyled>
                 );
               }
-
               if (chatRoom.name != null) {
                 const roomUsers = chatRoom.users.filter(
                   (roomUser) => roomUser.id != user.data.data.id
@@ -532,7 +743,17 @@ export default function HostMessages() {
                     </div>
                     <div>
                       <span>{chatRoom.name}</span>
-                      <span>{chatRoom.lastMessage}</span>
+                      <span>
+                        {" "}
+                        {!chatRoom.lastMessage?.includes("#image") ? (
+                          chatRoom.lastMessage
+                        ) : (
+                          <ImageMessageSideBar>
+                            <FaImages />
+                            Images
+                          </ImageMessageSideBar>
+                        )}
+                      </span>
                     </div>
                   </GroupStyled>
                 );
@@ -541,7 +762,7 @@ export default function HostMessages() {
           </div>
         </SidebarStyled>
         <ChatBarStyled>
-          {chosenRoom && (
+          {chosenRoom ? (
             <>
               <HeaderStyled>
                 {!getGroup() ? (
@@ -589,23 +810,58 @@ export default function HostMessages() {
                         <Avatar size={50} src={message.avatar} round name={message.name} />
                       </div>
                       <div>
-                        <span>{message.message}</span>
+                        <span>
+                          {!message.message?.includes("#image") ? (
+                            message.message
+                          ) : (
+                            <ImageContainerStyled
+                              $length={
+                                message.message.substring(7, message.message.length - 1).split(",")
+                                  .length
+                              }
+                            >
+                              {message.message
+                                .substring(7, message.message.length - 1)
+                                .split(",")
+                                .map((image, index) => (
+                                  <div key={index}>
+                                    <img src={image} />
+                                  </div>
+                                ))}
+                            </ImageContainerStyled>
+                          )}
+                        </span>
                         <span>{showDate(message.createdAt)}</span>
                       </div>
                     </MessageStyled>
                   );
                 })}
-                <div ref={ref}></div>
+                <div ref={ref} style={{ color: "white" }}>
+                  _____
+                </div>
               </BodyStyled>
               <FooterStyled onSubmit={sendPrivateMessage}>
-                <span>
+                <span onClick={() => inputRef.current.click()}>
                   <FaRegImage />
+                  <input
+                    ref={inputRef}
+                    onChange={handleImageChange}
+                    style={{ display: "none" }}
+                    type="file"
+                    multiple
+                  />
                 </span>
                 <CustomTextInput state={message} setState={setMessage} />
-                <span>
+                <span onClick={sendPrivateMessage}>
                   <AiOutlineSend />
                 </span>
               </FooterStyled>
+            </>
+          ) : (
+            <>
+              <IntroContainerStyled>
+                <img src={intro} />
+              </IntroContainerStyled>
             </>
           )}
         </ChatBarStyled>
@@ -626,6 +882,14 @@ export default function HostMessages() {
           setChosenRoom={setChosenRoom}
           chosenRoomRef={chosenRoomRef}
           action={() => setIsAddGroup(false)}
+        />
+      )}
+      {imageError && <AlertPopUp message={imageError} action={() => setImageError("")} />}
+      {imagePopUp.length != 0 && (
+        <AddImagePopUp
+          sendImageMessage={sendImageMessage}
+          images={imagePopUp}
+          action={() => setImagePopUp([])}
         />
       )}
     </>

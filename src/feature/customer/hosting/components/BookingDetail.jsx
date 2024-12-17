@@ -183,7 +183,15 @@ export default function BookingDetail({ action, booking }) {
                 <p>{booking.customer.email}</p>
               </div>
             </div>
-            <SendMessageButtonStyled>Send message</SendMessageButtonStyled>
+            <SendMessageButtonStyled
+              onClick={() =>
+                navigate("/hosting/host_messages", {
+                  state: { userId: booking.customer.id },
+                })
+              }
+            >
+              Send message
+            </SendMessageButtonStyled>
           </UserStyled>
           <hr />
           <PropertyStyled>
@@ -235,7 +243,11 @@ export default function BookingDetail({ action, booking }) {
             </Tooltip>
           </RefundStyled>
           <PersonStyled>
-            <p>{booking.totalPerson} guests</p>
+            <p>
+              {" "}
+              {booking.adult} adults
+              {booking.children ? ", " + booking.children + " children." : "."}
+            </p>
           </PersonStyled>
           <TypeStyled>
             <p>{booking.bookingType == "instant" ? "Instant" : "Reserved"} book</p>

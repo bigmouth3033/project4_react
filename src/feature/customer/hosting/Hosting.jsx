@@ -10,6 +10,7 @@ import { CiSquareInfo } from "react-icons/ci";
 import { GetHostBookingCountRequest } from "./api/hostingApi";
 import BookingDetail from "./components/BookingDetail";
 import ReviewPopUp from "./components/ReviewPopUp";
+import { useNavigate } from "react-router-dom";
 
 const ContainerStyled = styled.div`
   padding: 3rem 0;
@@ -137,6 +138,7 @@ export default function Hosting() {
   const getHostBookingCount = GetHostBookingCountRequest();
   const [showBookingDetail, setShowBookingDetail] = useState();
   const [review, setReview] = useState();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -230,7 +232,15 @@ export default function Hosting() {
                       {active == "pending" ? (
                         <button onClick={() => setReview(booking)}>Review</button>
                       ) : (
-                        <button>Message</button>
+                        <button
+                          onClick={() =>
+                            navigate("/hosting/host_messages", {
+                              state: { userId: booking.customer.id },
+                            })
+                          }
+                        >
+                          Message
+                        </button>
                       )}
 
                       <button onClick={() => setShowBookingDetail(booking)}>Detail</button>

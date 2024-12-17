@@ -5,11 +5,9 @@ import RedButton from "@/shared/components/Button/RedButton1";
 import TextInput from "@/shared/components/Input/TextInput";
 import { useState } from "react";
 import InputCheckBox from "@/shared/components/Input/InputCheckBox";
-import { SearchGroupChatFriendRequest } from "../../host_messages/api/hostMessageApi";
-import { UserRequest } from "@/shared/api/userApi";
+import { SearchAdminGroupChatFriendRequest } from "../api/adminMessagesApi";
 import Avatar from "react-avatar";
-import { AddNewGroupRequest } from "../../host_messages/api/hostMessageApi";
-
+import { AddAdminNewGroupRequest } from "../api/adminMessagesApi";
 const PopUpStyled = styled(PopUp)`
   padding: 0;
 
@@ -122,13 +120,18 @@ const ChosenStyled = styled.div`
   }
 `;
 
-export default function AddGroupPopUp({ action, getUserChatRoom, setChosenRoom, chosenRoomRef }) {
-  const addNewGroup = AddNewGroupRequest();
-  const user = UserRequest();
+export default function AdminAddGroupPopUp({
+  action,
+  getUserChatRoom,
+  setChosenRoom,
+  chosenRoomRef,
+}) {
+  const addNewGroup = AddAdminNewGroupRequest();
+
   const [groupName, setGroupName] = useState("");
   const [search, setSearch] = useState();
   const [chosen, setChosen] = useState([]);
-  const searchGroupChatFriend = SearchGroupChatFriendRequest(user.data.data.id, search);
+  const searchGroupChatFriend = SearchAdminGroupChatFriendRequest(0, search);
 
   const onAddOrRemoveFriend = (friend) => {
     const isExist = chosen.find((item) => item.id == friend.id);
@@ -149,7 +152,7 @@ export default function AddGroupPopUp({ action, getUserChatRoom, setChosenRoom, 
       const formData = new FormData();
       formData.append("groupName", groupName);
       chosen.forEach((item) => formData.append("members", item.id));
-      formData.append("members", user.data.data.id);
+      formData.append("members", 0);
 
       addNewGroup.mutate(formData, {
         onSuccess: (response) => {

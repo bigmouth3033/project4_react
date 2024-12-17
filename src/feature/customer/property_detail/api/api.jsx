@@ -11,6 +11,7 @@ export const BookingRequest = () => {
     mutationFn: request,
   });
 };
+
 export const GetPropertyRequest = (id) => {
   const request = async (id) => {
     const response = await axiosClient.get(`listingCM?id=${id}`, {

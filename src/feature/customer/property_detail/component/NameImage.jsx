@@ -145,7 +145,6 @@ export default function NameImage({ data }) {
       <div>
         {clickImage && (
           <StyledPopup setShowPopUp={setclickImage}>
-            {/* Truyền StyledPopupContainer vào StyledPopup  bên phái StyledContainer sẽ gọi ra và hiện nội dung lên popup*/}
             <StyledPopupContainer>
               <div>
                 <Styledbutton onClick={() => setclickImage(false)}>

@@ -9,6 +9,10 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { UserRequest } from "@/shared/api/userApi";
 import { capitalizeFirstLetter } from "@/shared/utils/capitalizeFirstLetter";
+import { formatDate } from "@/shared/utils/DateTimeHandle";
+import { BookingRequest } from "../api/api";
+import SuccessPopUp from "@/shared/components/PopUp/SuccessPopUp";
+import ErrorPopUp from "@/shared/components/PopUp/ErrorPopUp";
 const StyledContainer = styled.div`
   height: auto;
   position: sticky;
@@ -238,6 +242,32 @@ const StyledBeforeTaxes = styled.div`
     font-weight: 600;
   }
 `;
+const StyledReadCalendar = styled.div`
+  column-gap: 10px;
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+`;
+const StyledContainerClearClose = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  column-gap: 1rem;
+  & > div:first-child {
+    text-decoration: 0.5px underline rgba(0, 0, 0, 0.3);
+  }
+`;
+const Styledbutton = styled.button`
+  right: 0;
+  padding: 5px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: black;
+  color: white;
+`;
+
 export default function Checkout({ data, selectedDates, setSelectedDates }) {
   const [isShowCalendar, setIsShowCalendar] = useState(false);
   const [adult, setAdult] = useState(1);
@@ -246,13 +276,18 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
   const [showTotalBasePrice, setShowTotalBasePrice] = useState(false);
   const [showDiscount, setshowDiscount] = useState(false);
   const [isErrorLoginBooking, setIsErrorLoginBooking] = useState(false);
-
   const [showErrorMess, setShowErrorMess] = useState("");
+  const [isErrorBooking, setIsErrorBooking] = useState(false);
+  const [showErrorBooking, setShowErrorBooking] = useState("");
+  const [bookingResponse, setBookingResponse] = useState(false);
+  const [showBookingResponse, setShowBookingResponse] = useState("");
+  const [transactionError, setTransactionError] = useState(false);
+  const [showErrorTransaction, setShowErrorTransaction] = useState("");
   const containerRef = useRef();
   const navigate = useNavigate();
   const user = UserRequest();
 
-  const formatDate = (date) => {
+  const formatDateCheck = (date) => {
     var d = new Date(date),
       month = "" + (d.getMonth() + 1),
       day = "" + d.getDate(),
@@ -263,6 +298,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
 
     return [month, day, year].join("-");
   };
+
   const getListDateBooked = (dates) => {
     const [start, end] = dates;
     const listDates = [];
@@ -292,6 +328,13 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     if (user.isSuccess) {
       if (user.status == "success" && user.data.status == 200) {
         setIsErrorLoginBooking(false);
+        if (user.data.data.id == data.userId) {
+          setIsErrorBooking(true);
+          setShowErrorBooking("Host cannot book their own property");
+        } else {
+          setIsErrorBooking(false);
+          setShowErrorBooking("");
+        }
       } else {
         setIsErrorLoginBooking(true);
         setShowErrorMess("Login before booking");
@@ -315,7 +358,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     return () => {
       window.removeEventListener("mousedown", onMouseDown);
     };
-  }, [selectedDates, user]);
+  }, [selectedDates, user, data]);
 
   const totalBasePrice = getListDateBooked(selectedDates).reduce((total, date) => {
     const exceptionPrice = data.exceptionDates.find(
@@ -325,7 +368,6 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
     const priceForDate = exceptionPrice || data.basePrice;
     return total + priceForDate;
   }, 0);
-
   // tính theo discount
   const bookedDays = getListDateBooked(selectedDates).length;
 
@@ -349,31 +391,69 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
 
     return adjustedDate.toISOString();
   };
+  const formData = new FormData();
 
+  const bookingRequest = BookingRequest();
+  // console.log(user.data.id);
   const bookingSubmit = () => {
     if (isErrorLoginBooking) {
       return;
     }
-
-    navigate("/booking/transaction", {
-      state: {
-        checkInDay: convertToISO(startDate),
-        checkOutDay: convertToISO(endDate),
-        adult: adult,
-        children: children,
-        data: data,
-        finalPrice: finalPrice,
+    if (data.userId == user.data.data.id) {
+      return;
+    }
+    formData.append("checkInDay", convertToISO(startDate));
+    formData.append("checkOutDay", convertToISO(endDate));
+    formData.append("adult", adult);
+    formData.append("children", children);
+    formData.append("propertyId", data.id); // Gán đối tượng data dưới dạng JSON
+    formData.append("amount", finalPrice);
+    formData.append("customerId", user.data.data.id);
+    formData.append("hostId", data.userId);
+    bookingRequest.mutate(formData, {
+      onSuccess: (response) => {
+        if (response.status == 200) {
+          setShowBookingResponse(response.message);
+          setBookingResponse(true);
+          navigate(`/booking/transaction/${response.data.id}`);
+        } else if (response.status == 410) {
+          setShowErrorTransaction(response.message);
+          setTransactionError(true);
+        } else if (response.status == 400) {
+          alert(response.message);
+          setShowErrorTransaction(response.message);
+          setTransactionError(true);
+        }
       },
     });
+    // navigate("/booking/transaction", {
+    //   state: {
+    //     checkInDay: convertToISO(startDate),
+    //     checkOutDay: convertToISO(endDate),
+    //     adult: adult,
+    //     children: children,
+    //     data: data,
+    //     finalPrice: finalPrice,
+    //   },
+    // });
   };
+  const calculateDaysBetween = (start_day, end_day) => {
+    const startDate = new Date(start_day);
+    const endDate = new Date(end_day);
 
+    const timeDifference = endDate - startDate;
+
+    const daysDifference = timeDifference / (1000 * 3600 * 24);
+
+    return Math.floor(daysDifference);
+  };
   return (
     <StyledContainer>
       <StyledForm>
         <StyledHeaderForm>
           <div>
-            {data.basePrice}
-            <span>$ night</span>
+            ${data.basePrice}
+            <span> /night</span>
           </div>
         </StyledHeaderForm>
         <StyledConatinerCalendarAndGuest>
@@ -384,7 +464,9 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
           >
             <div>
               <div>CHECK-IN</div>
-              <div>{selectedDates?.[0] ? formatDate(selectedDates[0]) : <p>mm/dd/yyyy</p>}</div>
+              <div>
+                {selectedDates?.[0] ? formatDateCheck(selectedDates[0]) : <p>mm/dd/yyyy</p>}
+              </div>
             </div>
             <div>
               <div>CHECK-OUT</div>
@@ -393,18 +475,44 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                 {selectedDates?.[0] != null && selectedDates?.[1] == null && <p>mm/dd/yyyy</p>}
                 {selectedDates?.[0] != null &&
                   selectedDates?.[1] != null &&
-                  formatDate(selectedDates[1])}
+                  formatDateCheck(selectedDates[1])}
               </div>
             </div>
           </StyledContainerCalendar>
           {isShowCalendar && (
             <StyledPopup setShowPopUp={setIsShowCalendar}>
               <div>
+                {selectedDates[0] != null && selectedDates[1] != null && (
+                  <div>
+                    <h2>{calculateDaysBetween(selectedDates[0], selectedDates[1])} nights</h2>
+                    <StyledReadCalendar>
+                      <div>
+                        <div>{formatDate(selectedDates[0])} </div>
+                      </div>
+                      <p> - </p>
+                      <div>
+                        <div> {formatDate(selectedDates[1])}</div>
+                      </div>
+                    </StyledReadCalendar>
+                  </div>
+                )}
                 <CalendarBook
                   data={data}
                   selectedDates={selectedDates}
                   setSelectedDates={setSelectedDates}
                 />
+                <StyledContainerClearClose>
+                  <div
+                    onClick={() => {
+                      setSelectedDates([]);
+                    }}
+                  >
+                    Clear dates
+                  </div>
+                  <div>
+                    <Styledbutton onClick={() => setIsShowCalendar(false)}>Accept</Styledbutton>
+                  </div>
+                </StyledContainerClearClose>
               </div>
             </StyledPopup>
           )}
@@ -500,6 +608,25 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
             {isErrorLoginBooking && (
               <StyledError onClick={() => bookingSubmit()}>{showErrorMess}</StyledError>
             )}
+            {isErrorBooking && (
+              <StyledError onClick={() => bookingSubmit()}>{showErrorBooking}</StyledError>
+            )}
+            {transactionError && (
+              <ErrorPopUp
+                action={() => {
+                  setTransactionError(false);
+                }}
+                header={showErrorTransaction}
+              />
+            )}
+            {bookingResponse && (
+              <SuccessPopUp
+                header={showBookingResponse}
+                action={() => {
+                  setBookingResponse(false);
+                }}
+              />
+            )}
           </StyledContainerBooking>
         ) : (
           <StyledContainerBooking>
@@ -528,7 +655,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
               </div>
 
               {/* Discount */}
-              {dateBookingQuantiy(selectedDates) >= 28 ? (
+              {dateBookingQuantiy(selectedDates) >= 30 ? (
                 <div>
                   <span
                     onClick={() => {
@@ -540,7 +667,7 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
                   <div>${((data.monthlyDiscount * totalBasePrice) / 100).toFixed(2)}</div>
                 </div>
               ) : dateBookingQuantiy(selectedDates) >= 7 &&
-                dateBookingQuantiy(selectedDates) < 28 ? (
+                dateBookingQuantiy(selectedDates) < 30 ? (
                 <div>
                   <span
                     onClick={() => {
@@ -590,8 +717,6 @@ export default function Checkout({ data, selectedDates, setSelectedDates }) {
 
                     return null;
                   })}
-
-                  {/* Display normal days*/}
 
                   <StyledTotalForManyDate>
                     <div>

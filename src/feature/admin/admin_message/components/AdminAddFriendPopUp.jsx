@@ -3,11 +3,10 @@ import PopUp from "@/shared/components/PopUp/PopUp";
 import XButton from "@/shared/components/Button/XButton";
 import TextInput from "@/shared/components/Input/TextInput";
 import RedButton from "@/shared/components/Button/RedButton1";
-import { SearchFriendRequest } from "../../host_messages/api/hostMessageApi";
-import { UserRequest } from "@/shared/api/userApi";
+import { SearchAdminFriendRequest } from "../api/adminMessagesApi";
 import { useState } from "react";
 import Avatar from "react-avatar";
-import { AddNewFriendRequest } from "../../host_messages/api/hostMessageApi";
+import { AddAdminNewFriendRequest } from "../api/adminMessagesApi";
 
 const PopUpStyled = styled(PopUp)`
   padding: 0;
@@ -78,18 +77,23 @@ const FriendStyled = styled.div`
   }}
 `;
 
-export default function AddFriendPopUp({ action, getUserChatRoom, setChosenRoom, chosenRoomRef }) {
+export default function AdminAddFriendPopUp({
+  action,
+  getUserChatRoom,
+  setChosenRoom,
+  chosenRoomRef,
+}) {
   const [search, setSearch] = useState("");
-  const user = UserRequest();
-  const searchFriend = SearchFriendRequest(user.data.data.id, search);
+
+  const searchFriend = SearchAdminFriendRequest(0, search);
   const [chosen, setChosen] = useState();
 
-  const addNewFriend = AddNewFriendRequest();
+  const addNewFriend = AddAdminNewFriendRequest();
 
   const onAddNewFriend = () => {
     if (chosen) {
       const formData = new FormData();
-      formData.append("userId", user.data.data.id);
+      formData.append("userId", 0);
       formData.append("friendId", chosen);
 
       addNewFriend.mutate(formData, {

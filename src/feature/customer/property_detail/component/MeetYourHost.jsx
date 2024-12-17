@@ -5,6 +5,8 @@ import { FaUserCheck } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { PiShieldWarningBold } from "react-icons/pi";
 import { capitalizeFirstLetter } from "@/shared/utils/capitalizeFirstLetter";
+import { useNavigate } from "react-router-dom";
+import { UserRequest } from "@/shared/api/userApi";
 
 const StyledContainer = styled.div`
   display: grid;
@@ -101,7 +103,10 @@ const StyledHostMessage = styled.button`
 `;
 
 export default function MeetYourHost({ data }) {
+  const user = UserRequest();
+  const navigate = useNavigate();
   const [badgeHost, setBadgeHost] = useState([]);
+
   useEffect(() => {
     let badges = [];
     // alert(data.user.id);
@@ -184,7 +189,19 @@ export default function MeetYourHost({ data }) {
             <div>Responds within an hour</div>
           </StyledHostDetail>
 
-          <StyledHostMessage>Host message</StyledHostMessage>
+          {user.isSuccess && user.data.status == 200 && user.data.data.id != data.user.id && (
+            <StyledHostMessage
+              onClick={() =>
+                navigate("/messages", {
+                  state: {
+                    userId: data.user.id,
+                  },
+                })
+              }
+            >
+              Host message
+            </StyledHostMessage>
+          )}
           <StyledWarning>
             <PiShieldWarningBold style={{ fontSize: "20px", color: "red" }} />
             To protect your payment, never transfer money or communicate outside of the Airbnb

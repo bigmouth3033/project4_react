@@ -29,7 +29,7 @@ const StyledEditorContent = styled(EditorContent)`
     border: none;
     outline: none;
     padding: 10px;
-    height: 15rem;
+    height: ${(props) => (props.$isMail ? "20rem" : "15rem")};
     overflow-y: scroll;
 
     &::-webkit-scrollbar-track {
@@ -47,7 +47,7 @@ const StyledEditorContent = styled(EditorContent)`
   }
 `;
 
-export default function TextEditor({ state, setState }) {
+export default function TextEditor({ state, setState, isMail }) {
   const editor = useEditor({
     extensions: [
       Document,
@@ -87,7 +87,7 @@ export default function TextEditor({ state, setState }) {
   return (
     <EditorContainer>
       <ToolBar editor={editor} />
-      <StyledEditorContent className="editor-content" editor={editor} />
+      <StyledEditorContent $isMail={isMail} className="editor-content" editor={editor} />
     </EditorContainer>
   );
 }

@@ -9,16 +9,16 @@ const StyledContainerCalendar = styled.div`
   max-width: 100%;
 `;
 export default function CalendarBook({ data, setSelectedDates, selectedDates }) {
-  // Lấy số tháng có thể đặt trước từ data.maximumMonthPreBook
-  const maxSelectableDate = moment()
-    .add(data.maximumMonthPreBook, "months") // Thêm số tháng vào ngày hiện tại
-    .date(moment().date()); // Kết thúc ngày này
+  let maxSelectableDate = moment().add(data.maximumMonthPreBook, "months").date(moment().date());
 
-  // const exceptionDates = data.exceptionDates;
+  let minDate = new Date();
+
+  if (data.bookingType === "reserved") {
+    minDate = moment().add(3, "days").toDate();
+  }
+
   const bookDateDetails = data.bookDateDetails;
-  console.log(bookDateDetails);
   const notAvailableDates = data.notAvailableDates;
-  console.log(notAvailableDates);
   const unavailableDates = [
     ...bookDateDetails.map((date) => new Date(moment(date.night).format("YYYY-MM-DD"))),
     ...notAvailableDates.map((date) => new Date(moment(date.date).format("YYYY-MM-DD"))),
@@ -133,7 +133,7 @@ export default function CalendarBook({ data, setSelectedDates, selectedDates }) 
           prev2Label={null}
           nextLabel={<FontAwesomeIcon icon={faAngleRight} />}
           prevLabel={<FontAwesomeIcon icon={faAngleLeft} />}
-          minDate={new Date()} // Vô hiệu hóa các ngày trước hôm nay
+          minDate={minDate} // Vô hiệu hóa các ngày trước hôm nay
           maxDate={maxSelectableDate.toDate()}
           onChange={handleDateChange}
           value={selectedDates}

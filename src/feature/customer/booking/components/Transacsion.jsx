@@ -1,20 +1,24 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { PiCalendarCheckFill } from "react-icons/pi";
 import Paymentform from "./Paymentform";
 import { LuDot } from "react-icons/lu";
 import { IoWarningSharp } from "react-icons/io5";
-import { BookingRequest } from "../../property_detail/api/api";
-import { UserRequest } from "@/shared/api/userApi";
+import { addMinutes, addSeconds, format, parseISO } from "date-fns";
 import ErrorPopUp from "@/shared/components/PopUp/ErrorPopUp";
 import SuccessPopUp from "@/shared/components/PopUp/SuccessPopUp";
 import PageNotFound from "@/shared/components/Pages/PageNotFound";
+import { capitalizeFirstLetter } from "@/shared/utils/capitalizeFirstLetter";
+import { GetBooking, TransactionRequest } from "../api/bookingApi";
+import LoadingPage from "@/shared/components/Pages/LoadingPage";
+import moment from "moment";
+import PropertyHeader from "../../custome_header/PropertyHeader";
+import FooterPropertyDetail from "../../footer/FooterPropertyDetail";
 
-// Styled components
 const StyledContainerAll = styled.div`
   max-width: 1120px;
-  margin: 0 auto;
+  margin: 1rem auto;
   color: rgba(0, 0, 0, 0.8);
 `;
 
@@ -42,10 +46,6 @@ const StyledTitle = styled.div`
   font-weight: bold;
   margin-bottom: 1.2rem;
 `;
-
-// const StyledHeader = styled.div`
-//   height: 5rem;
-// `;
 
 const StyledYourTrip = styled.div`
   display: flex;
@@ -114,7 +114,6 @@ const StyledContainerRule = styled.div`
 `;
 
 const StyledSubmitButton = styled.button`
-  margin-top: 1rem;
   background-color: #ea5e66;
   border-radius: 8px;
   border: none;
@@ -172,12 +171,25 @@ const StyledTotal = styled.div`
     font-weight: 600;
   }
 `;
+const StyledContainerRemaining = styled.div`
+  margin-top: 1rem;
+  display: flex;
+  justify-content: stretch;
+  column-gap: 1rem;
+  align-items: center;
+`;
+const CountdownBox = styled.div`
+  background-color: rgba(0, 0, 0, 0.1);
+  color: red;
+  padding: 0.6rem 2rem;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+`;
 const Transaction = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const user = UserRequest();
 
-  const bookingRequest = BookingRequest();
+  const transactionRequest = TransactionRequest();
   // States for payment form
   const [cardnumber, setCardnumber] = useState("");
   const [expiration, setExpiration] = useState("");
@@ -190,6 +202,10 @@ const Transaction = () => {
   const [showErrorTransaction, setShowErrorTransaction] = useState("");
   const [transactionSuccess, setTransactionSuccess] = useState(false);
   const [showTransactionSuccess, setShowTransactionSuccess] = useState("");
+  const [cancelInfo, setCancelInfo] = useState("");
+
+  const { booking_id } = useParams();
+  const getBooking = GetBooking(booking_id);
   //Các state và setState
   const paymentState = {
     cardnumber,
@@ -206,19 +222,68 @@ const Transaction = () => {
     setCvvError,
   };
 
-  const { checkInDay, checkOutDay, data, children, adult, finalPrice } = location.state || {}; // Extract data from location.state
-  // if (!location.state) {
-  //   navigate("/", { replace: true }); // Điều hướng đến trang Not Found
-  // }
-  // Redirect if data is missing
-  // useEffect(() => {
-  // if (!checkInDay || !checkOutDay || !data) {
-  //   navigate("/");
-  // }
-  // }, [checkInDay, checkOutDay, data]);
+  useEffect(() => {
+    if (getBooking.status == "success" && getBooking.data.status == 200) {
+      if (getBooking.data.data.refundPolicy.id == 1) {
+        setCancelInfo("Full refund if canceled at least 7 days before check-in");
+      }
+      if (getBooking.data.data.refundPolicy.id == 2) {
+        setCancelInfo(
+          "Full refund if canceled at least 5 days before check-in; 50% refund if canceled at least 2 days before check-in"
+        );
+      }
 
-  if (!location.state || !checkInDay || !checkOutDay || !data) {
+      if (getBooking.data.data.refundPolicy.id == 4) {
+        setCancelInfo("No refunds under any circumstances.");
+      }
+    }
+  }, [getBooking]);
+
+  const [countdown, setCountdown] = useState();
+  useEffect(() => {
+    let intervalId;
+    if (getBooking.isSuccess) {
+      const isoDateString = getBooking.data.data.createdAt;
+      const date = parseISO(isoDateString);
+      const datePlus = addSeconds(date, 60);
+
+      setCountdown(datePlus - new Date());
+      intervalId = setInterval(() => {
+        const timeLeft = datePlus - new Date();
+        setCountdown(timeLeft);
+      }, 1000);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [getBooking.isSuccess]);
+
+  useEffect(() => {
+    console.log(countdown);
+    if (countdown <= 0) {
+      navigate(`/property_detail/${getBooking.data.data.property.id}`);
+    }
+  }, [countdown]);
+  if (getBooking.isPending) {
+    return <LoadingPage />;
+  }
+  if (getBooking.isError) {
     return <PageNotFound />;
+  }
+
+  if (getBooking.isSuccess) {
+    if (getBooking.status == "success" && getBooking.data.status == 404) {
+      return <PageNotFound />;
+    }
+    if (getBooking.status == "success" && getBooking.data.status == 200) {
+      if (
+        getBooking.data.data.status != "TRANSACTIONPENDDING" &&
+        getBooking.data.data.status != "PENDING"
+      ) {
+        return <PageNotFound />;
+      }
+    }
   }
 
   // Format date to MM/DD/YYYY
@@ -235,41 +300,22 @@ const Transaction = () => {
     const daysDifference = timeDifference / (1000 * 3600 * 24); // Convert ms to days
     return Math.ceil(daysDifference); // No need to subtract 1
   };
-  let customerId;
-  const formData = new FormData();
-  if (user.isSuccess) {
-    customerId = user.data.data.id;
-    formData.append("checkInDay", checkInDay);
-    formData.append("checkOutDay", checkOutDay);
-    formData.append("adult", adult);
-    formData.append("children", children);
-    formData.append("propertyId", data.id);
-    formData.append("customerId", customerId);
-    formData.append("hostId", data.user.id);
-    formData.append("amount", finalPrice);
-  }
 
-  // Handle form submission
+  const formData = new FormData();
 
   const handleSubmitPay = () => {
-    if (
-      cardnumberError ||
-      expirationError ||
-      cvvError ||
-      !cardnumber ||
-      !expiration ||
-      !cvv ||
-      !customerId
-    ) {
+    if (cardnumberError || expirationError || cvvError || !cardnumber || !expiration || !cvv) {
       setErrorSubmit(true);
     } else {
-      bookingRequest.mutate(formData, {
+      formData.append("bookingId", getBooking.data.data.id);
+      formData.append("amount", getBooking.data.data.amount);
+      transactionRequest.mutate(formData, {
         onSuccess: (response) => {
           if (response.status == 200) {
             setErrorSubmit(false);
             setShowTransactionSuccess(response.message);
             setTransactionSuccess(true);
-          } else if (response.status == 410) {
+          } else if (response.status == 404) {
             setShowErrorTransaction(response.message);
             setTransactionError(true);
           } else if (response.status == 400) {
@@ -280,123 +326,144 @@ const Transaction = () => {
       });
     }
   };
-  return (
-    <StyledContainerAll>
-      {/* <StyledHeader /> */}
-      {transactionError && (
-        <ErrorPopUp
-          action={() => {
-            navigate(`/property_detail/${data.id}`, { replace: true });
-          }}
-          header={showErrorTransaction}
-        />
-      )}
-      {transactionSuccess && (
-        <SuccessPopUp
-          header={showTransactionSuccess}
-          action={() => {
-            navigate(`/property_detail/${data.id}`, { replace: true });
-          }}
-        />
-      )}
-      <StyledTitle>Confirm and pay</StyledTitle>
-      <StyledContainer>
-        <div>
-          {errorSubmit && (
-            <StyledContainerError>
-              <IoWarningSharp style={{ fontSize: "4rem", color: "red" }} />
 
-              <div>
-                <div>Let’s try that again</div>
-                <div>Please check your payment details.</div>
-              </div>
-            </StyledContainerError>
-          )}
-          <StyledYourTrip>
-            <div>Your trip</div>
-            <div>
-              <div>
-                <div>Dates</div>
-                <p>
-                  {formatDate(checkInDay)} - {formatDate(checkOutDay)}
-                </p>
-              </div>
-              <PiCalendarCheckFill style={{ fontSize: "1.6rem" }} />
-            </div>
-            <div>
-              <div>
-                <div>Guests</div>
-                <p>{children + adult}</p>
-              </div>
-              <PiCalendarCheckFill style={{ fontSize: "1.6rem" }} />
-            </div>
-          </StyledYourTrip>
-          <StyledFormPay>
-            <div>Pay</div>
-            <Paymentform {...paymentState} />
-          </StyledFormPay>
-          <StyledContainerCancel>
-            <div>Cancellation policy</div>
-            <div>
-              <strong>Free cancellation before Dec 10</strong>. Cancel before check-in on Dec 15 for
-              a partial refund.
-            </div>
-          </StyledContainerCancel>
-          <StyledContainerRule>
-            <div>Ground rules</div>
-            <div>We ask every guest to remember a few simple things.</div>
-            <div>
-              <div>
-                <LuDot />
-                <p>Follow the house rules</p>
-              </div>
-              <div>
-                <LuDot />
-                <p>Treat your Host’s home like your own</p>
-              </div>
-            </div>
-          </StyledContainerRule>
-          {bookingRequest.isPending ? (
-            <p>Processing your payment...</p>
-          ) : (
-            <StyledSubmitButton onClick={handleSubmitPay} disabled={bookingRequest.isPending}>
-              Confirm and pay
-            </StyledSubmitButton>
-          )}
-        </div>
-        <StyledContainerDetails>
+  // Update countdown every second
+
+  // Format the remaining time
+  const formatTime = (timeInMs) => {
+    const minutes = Math.floor(timeInMs / 60000);
+    const seconds = Math.floor((timeInMs % 60000) / 1000);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+  return (
+    <>
+      <PropertyHeader />
+      <StyledContainerAll>
+        {transactionError && (
+          <ErrorPopUp
+            action={() => {
+              navigate(`/property_detail/${getBooking.data.data.property.id}`, {
+                replace: true,
+              });
+            }}
+            header={showErrorTransaction}
+          />
+        )}
+        {transactionSuccess && (
+          <SuccessPopUp
+            header={showTransactionSuccess}
+            action={() => {
+              navigate(`/property_detail/${getBooking.data.data.property.id}`, {
+                replace: true,
+              });
+            }}
+          />
+        )}
+
+        <StyledTitle>Confirm and pay</StyledTitle>
+        <StyledContainer>
           <div>
-            <div>
-              <img src={data.propertyImages[0]} alt="" />
-            </div>
-            <StyledTittle>
-              <div>{data.propertyTitle}</div>
+            {errorSubmit && (
+              <StyledContainerError>
+                <IoWarningSharp style={{ fontSize: "4rem", color: "red" }} />
+
+                <div>
+                  <div>Let’s try that again</div>
+                  <div>Please check your payment details.</div>
+                </div>
+              </StyledContainerError>
+            )}
+            <StyledYourTrip>
+              <div>Your trip</div>
               <div>
-                <div>{data.propertyType}</div>
-                <div>4.89 (222 reviews) • Superhost</div>
+                <div>
+                  <div>Dates</div>
+                  <p>
+                    {formatDate(getBooking.data.data.checkInDay)} -{" "}
+                    {formatDate(getBooking.data.data.checkOutDay)}
+                  </p>
+                </div>
+                <PiCalendarCheckFill style={{ fontSize: "1.6rem" }} />
               </div>
-            </StyledTittle>
+              <div>
+                <div>
+                  <div>Guests</div>
+                  <p>{getBooking.data.data.children + getBooking.data.data.adult}</p>
+                </div>
+                <PiCalendarCheckFill style={{ fontSize: "1.6rem" }} />
+              </div>
+            </StyledYourTrip>
+            <StyledFormPay>
+              <div>Pay</div>
+              <Paymentform {...paymentState} />
+            </StyledFormPay>
+            <StyledContainerCancel>
+              <div>Cancellation policy</div>
+              <div>{cancelInfo}</div>
+            </StyledContainerCancel>
+            <StyledContainerRule>
+              <div>Ground rules</div>
+              <div>We ask every guest to remember a few simple things.</div>
+              <div>
+                <div>
+                  <LuDot />
+                  <p>Follow the house rules</p>
+                </div>
+                <div>
+                  <LuDot />
+                  <p>Treat your Host’s home like your own</p>
+                </div>
+              </div>
+            </StyledContainerRule>
+            <StyledContainerRemaining>
+              <StyledSubmitButton onClick={handleSubmitPay} disabled={transactionRequest.isPending}>
+                Confirm and pay
+              </StyledSubmitButton>
+              {countdown > 0 && (
+                <CountdownBox>Time remaining: {formatTime(countdown)}</CountdownBox>
+              )}
+            </StyledContainerRemaining>
           </div>
-          <StyledContainerDetail>
-            <div>Details</div>
-            <StyledContainerNightGuest>
+          <StyledContainerDetails>
+            <div>
               <div>
-                <div>Nights : </div>
-                <div>{dateBookingQuantity(checkInDay, checkOutDay)}</div>
+                <img src={getBooking.data.data.property.propertyImages[0].imageName} alt="" />
               </div>
-              <div>
-                <div>Guests : </div>
-                <div>{children + adult}</div>
-              </div>
-            </StyledContainerNightGuest>
-          </StyledContainerDetail>
-          <StyledTotal>
-            <div>Total:</div>
-            <div>${finalPrice}</div>
-          </StyledTotal>
-        </StyledContainerDetails>
-      </StyledContainer>
-    </StyledContainerAll>
+              <StyledTittle>
+                <div>{capitalizeFirstLetter(getBooking.data.data.property.propertyTitle)}</div>
+                <div>
+                  <div>{capitalizeFirstLetter(getBooking.data.data.property.propertyType)}</div>
+                  <div>4.89 (222 reviews) • Superhost</div>
+                </div>
+              </StyledTittle>
+            </div>
+            <StyledContainerDetail>
+              <div>Details</div>
+              <StyledContainerNightGuest>
+                <div>
+                  <div>Nights : </div>
+                  <div>
+                    {dateBookingQuantity(
+                      getBooking.data.data.checkInDay,
+                      getBooking.data.data.checkOutDay
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <div>Guests : </div>
+                  <div>{getBooking.data.data.children + getBooking.data.data.adult}</div>
+                </div>
+              </StyledContainerNightGuest>
+            </StyledContainerDetail>
+            <StyledTotal>
+              <div>Total:</div>
+              <div>${getBooking.data.data.amount}</div>
+            </StyledTotal>
+          </StyledContainerDetails>
+        </StyledContainer>
+      </StyledContainerAll>
+      <FooterPropertyDetail />
+    </>
   );
 };
 

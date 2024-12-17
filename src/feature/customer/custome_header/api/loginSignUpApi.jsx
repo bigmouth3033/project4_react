@@ -33,9 +33,29 @@ export const RegisterRequest = () => {
   });
 };
 
+export const RegisterGoogleRequest = () => {
+  const request = async (payload) => {
+    const response = await axiosClient.post("authCM/register_by_google", payload);
+    return response.data;
+  };
+  return useMutation({
+    mutationFn: request,
+  });
+};
+
 export const LoginRequest = () => {
   const request = async (payload) => {
     const response = await axiosClient.post("authCM/login", payload);
+    return response.data;
+  };
+  return useMutation({
+    mutationFn: request,
+  });
+};
+
+export const GoogleLoginRequest = () => {
+  const request = async (payload) => {
+    const response = await axiosClient.post("authCM/login_sign_up_google", payload);
     return response.data;
   };
   return useMutation({

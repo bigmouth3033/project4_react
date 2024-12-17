@@ -13,6 +13,8 @@ import { FaExclamationCircle } from "react-icons/fa";
 import { IoMailOpen } from "react-icons/io5";
 import { BsFillHousesFill } from "react-icons/bs";
 import { FaChartBar } from "react-icons/fa";
+import { FaCalendar } from "react-icons/fa";
+import { TbTransactionDollar } from "react-icons/tb";
 
 const sidebar_content = [
   {
@@ -129,10 +131,30 @@ const sidebar_content = [
     role: ["ADMIN", "PROPERTY_MANAGEMENT"],
   },
   {
+    name: "Booking",
+    type: "group",
+    icon: <FaCalendar />,
+    role: ["ADMIN", "BOOKING_MANAGEMENT"],
+    children: [
+      {
+        name: "Booking list",
+        icon: <FaListUl />,
+        link: "/admin/booking_list",
+        role: ["BOOKING_MANAGEMENT", "ADMIN"],
+      },
+      {
+        name: "Transaction",
+        icon: <TbTransactionDollar />,
+        link: "/admin/transaction_list",
+        role: ["BOOKING_MANAGEMENT", "ADMIN"],
+      },
+    ],
+  },
+  {
     name: "Message",
     type: "button",
     icon: <FaRegMessage />,
-    link: "/admin/message",
+    link: "/admin/messages",
     role: ["ADMIN", "MESSAGE_MANAGEMENT"],
   },
   {
@@ -146,19 +168,18 @@ const sidebar_content = [
     name: "Mail",
     type: "group",
     icon: <IoMailOpen />,
-    link: "/admin/message",
     role: ["ADMIN", "MAIL_MANAGEMENT"],
     children: [
       {
         name: "Mail list",
         icon: <FaListUl />,
-        link: "/admin/xcb",
+        link: "/admin/mail_list",
         role: ["CATEGORY_MANAGEMENT", "ADMIN"],
       },
       {
         name: "Create new mail",
         icon: <FaPlus />,
-        link: "/admin/new_arstarscategory",
+        link: "/admin/create_mail",
         role: ["CATEGORY_MANAGEMENT", "ADMIN"],
       },
     ],

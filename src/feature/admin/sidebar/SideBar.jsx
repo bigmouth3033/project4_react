@@ -27,10 +27,17 @@ const Container = styled.div`
   padding-top: 2rem;
   padding-right: 0;
   height: 100vh;
-  overflow-y: scroll;
+  overflow-y: hidden;
+`;
 
-  /* border-top-right-radius: 30px;
-  border-bottom-right-radius: 30px; */
+const SideBarContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: #ea5e66;
+  gap: 15px;
+  padding-right: 0;
+  height: calc(100vh - 50px);
+  overflow-y: scroll;
 
   &::-webkit-scrollbar-track {
     background-color: none;
@@ -336,82 +343,88 @@ export default function SideBar({ isSideBarSmall }) {
         </>
       )}
 
-      {sidebar_content.map((item, index) => {
-        if (item.type == "button" && !isSideBarSmall) {
-          return (
-            <SingleButton
-              key={index}
-              to={!isLock(item.role) && item.link}
-              $active={currentPage.includes(item.name)}
-              $lock={isLock(item.role)}
-            >
-              <span>{item.icon}</span> {item.name} {isLock(item.role) && <IoLockClosedOutline />}
-            </SingleButton>
-          );
-        }
-        if (item.type == "button" && isSideBarSmall) {
-          return (
-            <SingleButtonSmall key={index} to={item.link} $active={currentPage.includes(item.name)}>
-              {item.icon}
-            </SingleButtonSmall>
-          );
-        }
-        if (item.type == "group" && !isSideBarSmall) {
-          return (
-            <Group key={index}>
-              <GroupButton
-                $focus={currentPage.includes(item.name)}
-                $active={buttonGroupState[item.name]}
-                onClick={() => {
-                  if (!isLock(item.role))
-                    setButtonGroupState((prev) => {
-                      return { ...prev, [item.name]: !prev[item.name] };
-                    });
-                }}
+      <SideBarContent>
+        {sidebar_content.map((item, index) => {
+          if (item.type == "button" && !isSideBarSmall) {
+            return (
+              <SingleButton
+                key={index}
+                to={!isLock(item.role) && item.link}
+                $active={currentPage.includes(item.name)}
                 $lock={isLock(item.role)}
               >
-                <div>
-                  <span>{item.icon}</span> {item.name}{" "}
-                  {isLock(item.role) && <IoLockClosedOutline />}
-                </div>
-                {!buttonGroupState[item.name] ? <IoIosArrowForward /> : <IoIosArrowDown />}
-              </GroupButton>
-              <GroupChildrens $active={buttonGroupState[item.name]}>
-                {item.children.map((child, index) => {
-                  return (
-                    <ChildrenButton
-                      key={index}
-                      to={!isLock(child.role) && child.link}
-                      $focus={currentPage.includes(child.name)}
-                      $lock={isLock(child.role)}
-                    >
-                      {child.icon} {child.name} {isLock(child.role) && <IoLockClosedOutline />}
-                    </ChildrenButton>
-                  );
-                })}
-              </GroupChildrens>
-            </Group>
-          );
-        }
-        if (item.type == "group" && isSideBarSmall) {
-          return (
-            <GroupSmall key={index}>
-              <GroupButtonSmall data-tooltip-id={item.name}>{item.icon}</GroupButtonSmall>
-              <TooltipContainer>
-                <Tooltip style={{ backgroundColor: "#2c3e50" }} id={item.name} clickable>
+                <span>{item.icon}</span> {item.name} {isLock(item.role) && <IoLockClosedOutline />}
+              </SingleButton>
+            );
+          }
+          if (item.type == "button" && isSideBarSmall) {
+            return (
+              <SingleButtonSmall
+                key={index}
+                to={item.link}
+                $active={currentPage.includes(item.name)}
+              >
+                {item.icon}
+              </SingleButtonSmall>
+            );
+          }
+          if (item.type == "group" && !isSideBarSmall) {
+            return (
+              <Group key={index}>
+                <GroupButton
+                  $focus={currentPage.includes(item.name)}
+                  $active={buttonGroupState[item.name]}
+                  onClick={() => {
+                    if (!isLock(item.role))
+                      setButtonGroupState((prev) => {
+                        return { ...prev, [item.name]: !prev[item.name] };
+                      });
+                  }}
+                  $lock={isLock(item.role)}
+                >
+                  <div>
+                    <span>{item.icon}</span> {item.name}{" "}
+                    {isLock(item.role) && <IoLockClosedOutline />}
+                  </div>
+                  {!buttonGroupState[item.name] ? <IoIosArrowForward /> : <IoIosArrowDown />}
+                </GroupButton>
+                <GroupChildrens $active={buttonGroupState[item.name]}>
                   {item.children.map((child, index) => {
                     return (
-                      <ChildrenButton key={index} to={child.link}>
-                        <span>{child.icon}</span> {child.name}
+                      <ChildrenButton
+                        key={index}
+                        to={!isLock(child.role) && child.link}
+                        $focus={currentPage.includes(child.name)}
+                        $lock={isLock(child.role)}
+                      >
+                        {child.icon} {child.name} {isLock(child.role) && <IoLockClosedOutline />}
                       </ChildrenButton>
                     );
                   })}
-                </Tooltip>
-              </TooltipContainer>
-            </GroupSmall>
-          );
-        }
-      })}
+                </GroupChildrens>
+              </Group>
+            );
+          }
+          if (item.type == "group" && isSideBarSmall) {
+            return (
+              <GroupSmall key={index}>
+                <GroupButtonSmall data-tooltip-id={item.name}>{item.icon}</GroupButtonSmall>
+                <TooltipContainer>
+                  <Tooltip style={{ backgroundColor: "#2c3e50" }} id={item.name} clickable>
+                    {item.children.map((child, index) => {
+                      return (
+                        <ChildrenButton key={index} to={child.link}>
+                          <span>{child.icon}</span> {child.name}
+                        </ChildrenButton>
+                      );
+                    })}
+                  </Tooltip>
+                </TooltipContainer>
+              </GroupSmall>
+            );
+          }
+        })}
+      </SideBarContent>
     </Container>
   );
 }

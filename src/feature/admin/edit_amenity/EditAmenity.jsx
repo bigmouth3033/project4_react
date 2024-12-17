@@ -208,7 +208,7 @@ export default function EditAmenity() {
       updateAmenity.mutate(formData, {
         onSuccess: (response) => {
           if (response.status == 200) {
-            alert("ss");
+            getAmenityType.refetch();
           }
         },
       });

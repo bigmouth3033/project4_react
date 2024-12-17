@@ -410,7 +410,9 @@ export default function CustomerHeader() {
               )}
               {user.isSuccess && user.data.status == 200 && (
                 <DropDownContainer ref={dropDownRef}>
-                  <button className="focus">Message</button>
+                  <button className="focus" onClick={() => navigate("/messages")}>
+                    Message
+                  </button>
                   <button className="focus">Notification</button>
                   <button className="focus">Trips</button>
                   <button className="focus">Wishlists</button>
@@ -419,6 +421,9 @@ export default function CustomerHeader() {
                   <button>Account</button>
                   <button>Create Listing</button>
                   <hr />
+                  <button onClick={() => navigate("/messages", { state: { userId: 0 } })}>
+                    Get help
+                  </button>
                   <button
                     onClick={() => {
                       Cookies.remove("CLIENT_ACCESS_TOKEN");

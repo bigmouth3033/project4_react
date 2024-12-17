@@ -31,6 +31,7 @@ const Container = styled.div`
   padding: 2rem;
   min-height: 160vh;
   background-color: white;
+  border-radius: 15px;
 `;
 
 const CalendarStyled = styled(Calendar)`

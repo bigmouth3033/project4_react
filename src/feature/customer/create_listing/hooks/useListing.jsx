@@ -38,6 +38,7 @@ export default function useListing() {
     CHANGE_SMOKING_ALLOWED: "CHANGE_SMOKING_ALLOWED",
     CHANGE_SELF_CHECK_IN: "CHANGE_SELF_CHECK_IN",
     CHANGE_SELF_CHECK_IN_TYPE: "CHANGE_SELF_CHECK_IN_TYPE",
+    CHANGE_SELF_CHECK_IN_INSTRUCTION: "CHANGE_SELF_CHECK_IN_INSTRUCTION",
   };
 
   function reducer(state, action) {
@@ -114,6 +115,8 @@ export default function useListing() {
         return { ...state, selfCheckIn: action.next };
       case ACTIONS.CHANGE_SELF_CHECK_IN_TYPE:
         return { ...state, selfCheckInType: action.next };
+      case ACTIONS.CHANGE_SELF_CHECK_IN_INSTRUCTION:
+        return { ...state, selfCheckInInstruction: action.next };
       default:
         return state;
     }
@@ -156,6 +159,7 @@ export default function useListing() {
     smokingAllowed: null,
     selfCheckIn: null,
     selfCheckInType: null,
+    selfCheckInInstruction: null,
   });
 
   return [state, dispatch, ACTIONS];

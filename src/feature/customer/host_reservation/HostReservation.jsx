@@ -474,7 +474,15 @@ export default function HostReservation() {
                                   Change or cancel
                                 </button>
                               )}
-                              <button>Send message</button>
+                              <button
+                                onClick={() =>
+                                  navigate("/hosting/host_messages", {
+                                    state: { userId: reservation.customer.id },
+                                  })
+                                }
+                              >
+                                Send message
+                              </button>
                               <button
                                 onClick={() =>
                                   navigate("/become_a_host/" + reservation.property.id)

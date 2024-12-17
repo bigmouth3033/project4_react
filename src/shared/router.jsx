@@ -38,6 +38,13 @@ import ListingList from "@/feature/admin/listing_list/ListingList";
 import AdminPropertyDetail from "@/feature/admin/admin_property_detail/AdminPropertyDetail";
 import AmenityChart from "@/feature/admin/amenity_chart/AmenityChart";
 import Transaction from "@/feature/customer/booking/components/Transacsion";
+import AdminBookingList from "@/feature/admin/admin_booking_list/AdminBookingList";
+import CustomerMessages from "@/feature/customer/customer_messages/CustomerMessages";
+import AdminMessage from "@/feature/admin/admin_message/AdminMessage";
+import AdminCreateMail from "@/feature/admin/admin_mail/AdminCreateMail";
+import MailList from "@/feature/admin/mail_list/MailList";
+import { GetMailByIdRequest } from "@/feature/admin/edit_mail/api/editMailApi";
+import EditMail from "@/feature/admin/edit_mail/EditMail";
 
 const router = createBrowserRouter(
   [
@@ -48,7 +55,9 @@ const router = createBrowserRouter(
         { path: "", element: <HomePage /> },
         { path: "/property_detail", element: <PropertyDetail /> },
         { path: "/property_detail/:property_id", element: <PropertyDetail /> },
-        { path: "/booking/transaction", element: <Transaction /> },
+
+        { path: "/messages", element: <CustomerMessages /> },
+        { path: "/booking/transaction/:booking_id", element: <Transaction /> },
         {
           path: "/hosting",
           element: <HostLayout />,
@@ -175,6 +184,26 @@ const router = createBrowserRouter(
         {
           path: "amenity_chart",
           element: <AmenityChart />,
+        },
+        {
+          path: "booking_list",
+          element: <AdminBookingList />,
+        },
+        {
+          path: "messages",
+          element: <AdminMessage />,
+        },
+        {
+          path: "create_mail",
+          element: <AdminCreateMail />,
+        },
+        {
+          path: "mail_list",
+          element: <MailList />,
+        },
+        {
+          path: "edit_mail/:id",
+          element: <EditMail />,
         },
       ],
     },
