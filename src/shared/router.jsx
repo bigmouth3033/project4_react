@@ -47,12 +47,20 @@ import EditMail from "@/feature/admin/edit_mail/EditMail";
 import CustomerTrips from "@/feature/customer/customer_trips/CustomerTrips";
 import HostDiscount from "@/feature/customer/host_discount/HostDiscount";
 
+import AccountSetting from "@/feature/customer/account_settings/AccountSetting";
+import PersonalInfo from "@/feature/customer/account_settings/components/PersonalInfo";
+import GovernmentID from "@/feature/customer/account_settings/components/GovernmentID";
+import LoginAndSecurity from "@/feature/customer/account_settings/pages/LoginAndSecurity";
 const router = createBrowserRouter(
   [
     {
       path: "/",
       element: <UserLayout />,
       children: [
+        { path: "account-settings", element: <AccountSetting /> },
+        { path: "account-settings/login-and-sercurity", element: <LoginAndSecurity /> },
+        { path: "account-settings/personal-info", element: <PersonalInfo /> },
+        { path: "account-settings/personal-info/govermentSetting", element: <GovernmentID /> },
         { path: "", element: <HomePage /> },
         { path: "/property_detail", element: <PropertyDetail /> },
         { path: "/property_detail/:property_id", element: <PropertyDetail /> },
