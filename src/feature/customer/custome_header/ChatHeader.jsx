@@ -22,6 +22,16 @@ const Container = styled.div`
     max-width: 99%;
     margin: auto;
   }
+
+  ${(props) => {
+    if (props.$padding) {
+      return css`
+        > div {
+          padding: 1.3rem ${props.$padding};
+        }
+      `;
+    }
+  }}
 `;
 
 const LogoContainer = styled.div`
@@ -143,7 +153,7 @@ const NotSignUpDropDownContainer = styled.div`
   }
 `;
 
-export default function ChatHeader() {
+export default function ChatHeader({ padding }) {
   const [isClickDropDown, setIsCLickDropDown] = useState(false);
   const dropDownRef = useRef();
   const dropDownButtonRef = useRef();
@@ -172,7 +182,7 @@ export default function ChatHeader() {
 
   return (
     <>
-      <Container ref={containerRef}>
+      <Container $padding={padding} ref={containerRef}>
         <div>
           <LogoContainer>
             <img src={logo} />

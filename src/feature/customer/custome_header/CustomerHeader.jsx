@@ -414,7 +414,9 @@ export default function CustomerHeader() {
                     Message
                   </button>
                   <button className="focus">Notification</button>
-                  <button className="focus">Trips</button>
+                  <button className="focus" onClick={() => navigate("/trips")}>
+                    Trips
+                  </button>
                   <button className="focus">Wishlists</button>
                   <hr />
                   <button>Manage Listings</button>

@@ -72,6 +72,7 @@ const HeaderButtonStyled = styled.button`
     }
   }}
 `;
+
 const TableContentStyled = styled.table`
   margin: 1rem 0;
   border-collapse: collapse;

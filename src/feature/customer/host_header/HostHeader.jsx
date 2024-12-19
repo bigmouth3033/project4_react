@@ -377,6 +377,13 @@ export default function HostHeader() {
               </button>
               <button
                 onClick={() => {
+                  navigate("/hosting/host_discount");
+                }}
+              >
+                Discount
+              </button>
+              <button
+                onClick={() => {
                   navigate("/");
                   setIsMenuDropDown(false);
                 }}

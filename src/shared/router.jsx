@@ -43,8 +43,9 @@ import CustomerMessages from "@/feature/customer/customer_messages/CustomerMessa
 import AdminMessage from "@/feature/admin/admin_message/AdminMessage";
 import AdminCreateMail from "@/feature/admin/admin_mail/AdminCreateMail";
 import MailList from "@/feature/admin/mail_list/MailList";
-import { GetMailByIdRequest } from "@/feature/admin/edit_mail/api/editMailApi";
 import EditMail from "@/feature/admin/edit_mail/EditMail";
+import CustomerTrips from "@/feature/customer/customer_trips/CustomerTrips";
+import HostDiscount from "@/feature/customer/host_discount/HostDiscount";
 
 const router = createBrowserRouter(
   [
@@ -58,6 +59,7 @@ const router = createBrowserRouter(
 
         { path: "/messages", element: <CustomerMessages /> },
         { path: "/booking/transaction/:booking_id", element: <Transaction /> },
+        { path: "/trips", element: <CustomerTrips /> },
         {
           path: "/hosting",
           element: <HostLayout />,
@@ -67,6 +69,7 @@ const router = createBrowserRouter(
             { path: "calendar", element: <HostCalendar /> },
             { path: "host_messages", element: <HostMessages /> },
             { path: "host_reservation", element: <HostReservation /> },
+            { path: "host_discount", element: <HostDiscount /> },
           ],
         },
         {
