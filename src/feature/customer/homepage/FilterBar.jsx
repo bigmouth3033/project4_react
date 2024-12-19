@@ -100,6 +100,7 @@ const StyleFilterButton = styled.button`
 `;
 
 export const FilterBar = ({
+  properties,
   categoryId,
   setCategoryId,
   selectedAmenity,
@@ -213,6 +214,7 @@ export const FilterBar = ({
       {isPopUp && (
         <FilterPopUp
           {...{
+            properties,
             selectedAmenity,
             setSelectedAmenity,
             selectedPropertyType,

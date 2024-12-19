@@ -8,6 +8,7 @@ import { RoomAndBed } from "./RoomAndBed";
 import { Options } from "./Options";
 import { PropertiesRequest } from "@/feature/customer/homepage/api/propertyClientApi";
 import { FilterAmenity } from "./FilterAmenity";
+import WaitingIcon from "@/shared/components/AnimationIcon/WaitingIcon";
 
 //npm add react-range
 
@@ -37,7 +38,6 @@ const StyleSubmit = styled.div`
   bottom: 0; /* Dính vào cuối */
   display: flex;
   justify-content: space-between;
-
   font-size: 1.1rem;
   font-weight: 600;
   text-align: center;
@@ -66,6 +66,7 @@ const StyleClearAll = styled.div`
 `;
 
 export const FilterPopUp = ({
+  properties,
   selectedAmenity,
   selectedPropertyType,
   isInstant,
@@ -87,7 +88,6 @@ export const FilterPopUp = ({
   action,
 }) => {
   // const [priceRange, setPriceRange] = useState(selectedPrice);
-  const properties = PropertiesRequest();
 
   //CLEAR ALL
   const HandleClear = () => {
@@ -147,7 +147,8 @@ export const FilterPopUp = ({
       <StyleSubmit>
         <StyleClearAll onClick={() => HandleClear()}>Clear all</StyleClearAll>
         <StyleShowButton onClick={() => HandleSubmit()}>
-          Show places
+          Show {properties.isSuccess && properties.data.data.length}
+          places
         </StyleShowButton>
       </StyleSubmit>
     </StylePopUp>
