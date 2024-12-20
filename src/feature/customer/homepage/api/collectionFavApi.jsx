@@ -1,6 +1,5 @@
 import axiosClient from "../../../../shared/api/axiosClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import qs from "qs";
 
 export const FavouriteRequest = (userId) => {
   const request = async (userId) => {
@@ -11,8 +10,24 @@ export const FavouriteRequest = (userId) => {
   };
 
   return useQuery({
-    queryKey: ["favourites"],
+    queryKey: ["favourites", userId],
     queryFn: () => request(userId),
+  });
+};
+export const PropertyFavouriteRequest = (collectionName) => {
+  const request = async (collectionName) => {
+    const response = await axiosClient.get(
+      "favouriteCM/getPropertiesInWishList",
+      {
+        params: { collectionName },
+      }
+    );
+    return response.data;
+  };
+
+  return useQuery({
+    queryKey: ["propertiesFavourites", collectionName],
+    queryFn: () => request(collectionName),
   });
 };
 

@@ -10,6 +10,7 @@ import { useRef } from "react";
 import RegisterPopUp from "./components/RegisterPopUp";
 import { UserRequest } from "@/shared/api/userApi";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   padding: 1.4rem 1rem;
@@ -222,6 +223,7 @@ export default function CustomerHeader() {
   const containerRef = useRef();
   const [isRegisterPopUp, setIsRegisterPopUp] = useState("");
   const user = UserRequest();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const event = function () {
@@ -380,7 +382,12 @@ export default function CustomerHeader() {
                   <button className="focus">Message</button>
                   <button className="focus">Notification</button>
                   <button className="focus">Trips</button>
-                  <button className="focus">Wishlists</button>
+                  <button
+                    className="focus"
+                    onClick={() => navigate("/wishlist")}
+                  >
+                    Wishlists
+                  </button>
                   <hr />
                   <button>Manage Listings</button>
                   <button>Account</button>

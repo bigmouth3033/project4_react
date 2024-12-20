@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import PopUp from "@/shared/components/PopUp/PopUp";
 import styled from "styled-components";
 import {
@@ -9,7 +9,6 @@ import { useState } from "react";
 import { NewCollectionPopup } from "./NewCollectionPopup";
 import { UserRequest } from "@/shared/api/userApi";
 import { useSearchParams } from "react-router-dom";
-import { set } from "lodash";
 
 const StylePopUp = styled(PopUp)`
   width: 35rem;
@@ -39,9 +38,18 @@ const StyleBody = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 `;
+const StyleNotFound = styled.div`
+  position: absolute;
+  font-size: 2rem;
+  transform: translate(-50%, -50%);
+  top: 50%; /* Đặt vị trí từ trên xuống 50% */
+  left: 50%; /* Đặt vị trí từ trái sang 50% */
+  color: lightgray;
+  z-index: 1; /* Đảm bảo nó nằm trên các phần tử khác nếu cần */
+`;
 const StyleCard = styled.div`
   cursor: pointer;
-  width: 80%;
+  /* width: 80%; */
   margin: 0 auto;
   aspect-ratio: 1/1.25;
   font-size: 0.85rem;
@@ -114,11 +122,9 @@ export const CollectionPopUp = ({ properties, propertyId, action }) => {
         <StyleTitle>Save to wishlist</StyleTitle>
         <StyleBody>
           {favouriteRequest.isSuccess &&
+          favouriteRequest.data.data.length > 0 ? (
             favouriteRequest.data.data
               .reduce((arr, item) => {
-                // Group by collectionName
-                //Check if existing this collection, if not => create new coll => push into Collection array
-                //find return an object Collection
                 const existingColl = arr.find(
                   (coll) => coll.collectionName === item.collectionName
                 );
@@ -131,22 +137,23 @@ export const CollectionPopUp = ({ properties, propertyId, action }) => {
                     firstImage: item.propertyImage, // Store the first image
                   });
                 }
-                return arr; //return collection arr
+                return arr; // return collection arr
               }, [])
-              .map((collection, index) => {
-                return (
-                  <StyleCard
-                    key={index}
-                    onClick={() => HandleOnClick(collection.collectionName)}
-                  >
-                    <img src={collection.firstImage} alt="" />
-                    <p>
-                      <b>{collection.collectionName}</b>
-                    </p>
-                    <p>{collection.count} saved</p>
-                  </StyleCard>
-                );
-              })}
+              .map((collection, index) => (
+                <StyleCard
+                  key={index}
+                  onClick={() => HandleOnClick(collection.collectionName)}
+                >
+                  <img src={collection.firstImage} alt="" />
+                  <p>
+                    <b>{collection.collectionName}</b>
+                  </p>
+                  <p>{collection.count} saved</p>
+                </StyleCard>
+              ))
+          ) : (
+            <StyleNotFound>You have no wishlist</StyleNotFound>
+          )}
         </StyleBody>
         <StyleSubmit>
           {createFavouriteMutation.isSuccess && (

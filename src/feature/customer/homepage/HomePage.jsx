@@ -6,11 +6,9 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { IoMdStar } from "react-icons/io";
 import { IoMdHeart } from "react-icons/io";
-import { Image } from "semantic-ui-react";
 import { GrFormNext } from "react-icons/gr";
 import { GrFormPrevious } from "react-icons/gr";
 import { useState } from "react";
-import RangeSlider from "./RangeSlider";
 import { useSearchParams } from "react-router-dom";
 import { CategoriesRequest } from "../../../shared/api/categoryClientApi";
 import dchc from "@/shared/data/dchc";
@@ -18,13 +16,9 @@ import { CollectionPopUp } from "./CollectionPopUp";
 import getWords from "@/shared/utils/getWords";
 import { UserRequest } from "@/shared/api/userApi";
 import RegisterPopUp from "../custome_header/components/RegisterPopUp";
-import {
-  DeleteFavouriteMutation,
-  FavouriteRequest,
-} from "./api/collectionFavApi";
+import { DeleteFavouriteMutation } from "./api/collectionFavApi";
 
 //npm install react-multi-carousel --save
-//npm install semantic-ui-react semantic-ui-css --save
 
 const responsive = {
   desktop: {
@@ -243,7 +237,7 @@ export default function HomePage() {
   return (
     <StyleContainer>
       <StyleHeaderContainer>
-        <CustomerHeader />
+        <CustomerHeader {...{ properties }} />
         <div>
           <FilterBar
             properties={properties}

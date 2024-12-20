@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import UserLayout from "./layout/UserLayout";
 import HomePage from "@/feature/customer/homepage/HomePage";
+import WishList from "@/feature/customer/wishlist/WishList";
 import DashBoard from "@/feature/admin/dashboard/DashBoard";
 import AdminLayout from "./layout/AdminLayout";
 import AdminLogin from "@/feature/admin/admin_login/AdminLogin";
@@ -25,6 +26,7 @@ import DetailListing from "@/feature/customer/create_listing/components/DetailLi
 import PricingListing from "@/feature/customer/create_listing/components/PricingListing";
 import PolicyListing from "@/feature/customer/create_listing/components/PolicyListing";
 import PropertyDetail from "@/feature/customer/property_detail/PropertyDetail";
+import WishListDetail from "@/feature/customer/wishlist/WishListDetail";
 
 const router = createBrowserRouter(
   [
@@ -34,6 +36,14 @@ const router = createBrowserRouter(
       children: [
         { path: "", element: <HomePage /> },
         { path: "/property_detail", element: <PropertyDetail /> },
+        {
+          path: "/wishlist",
+          element: <WishList />,
+        },
+        {
+          path: "/wishlist/wishlist-detail/:collectionName",
+          element: <WishListDetail />,
+        },
         {
           path: "/hosting",
           element: <HostLayout />,
