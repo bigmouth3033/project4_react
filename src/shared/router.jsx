@@ -51,6 +51,9 @@ import AccountSetting from "@/feature/customer/account_settings/AccountSetting";
 import PersonalInfo from "@/feature/customer/account_settings/components/PersonalInfo";
 import GovernmentID from "@/feature/customer/account_settings/components/GovernmentID";
 import LoginAndSecurity from "@/feature/customer/account_settings/pages/LoginAndSecurity";
+import WishListDetail from "@/feature/customer/wishlist/WishListDetail";
+import WishList from "@/feature/customer/wishlist/WishList";
+
 const router = createBrowserRouter(
   [
     {
@@ -59,6 +62,14 @@ const router = createBrowserRouter(
       children: [
         { path: "account-settings", element: <AccountSetting /> },
         { path: "account-settings/login-and-sercurity", element: <LoginAndSecurity /> },
+        {
+          path: "/wishlist",
+          element: <WishList />,
+        },
+        {
+          path: "/wishlist/wishlist-detail/:collectionName",
+          element: <WishListDetail />,
+        },
         { path: "account-settings/personal-info", element: <PersonalInfo /> },
         { path: "account-settings/personal-info/govermentSetting", element: <GovernmentID /> },
         { path: "", element: <HomePage /> },

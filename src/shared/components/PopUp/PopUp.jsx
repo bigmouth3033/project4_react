@@ -1,11 +1,10 @@
-import React from "react";
 import styled, { keyframes } from "styled-components";
 import { useRef } from "react";
 import { useEffect } from "react";
 
 const initBox = keyframes`
   from {
-    transform: scale(110%);
+    transform: scale(100%);
   }
 
   to {
@@ -33,7 +32,6 @@ const Layout = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: ${initLayout} 0.15s linear;
   z-index: 99999;
 `;
 
@@ -67,7 +65,6 @@ const Container = styled.div`
   flex-direction: column;
   border-radius: 3px;
   padding: 2rem 2rem;
-  animation: ${initBox} 0.15s linear;
 `;
 
 const PopUpBox = ({ className, children, useRef }) => {

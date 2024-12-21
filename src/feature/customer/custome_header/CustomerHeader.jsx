@@ -17,6 +17,7 @@ const Container = styled.div`
   display: flex;
   justify-content: space-between;
   background-color: white;
+  z-index: 1;
 `;
 
 const LogoContainer = styled.div`
@@ -28,6 +29,7 @@ const Center = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  z-index: 1;
 
   transition: all 0.4s ease-in-out;
   transform: ${(props) => (props.$event === "SCROLL" ? "scale(0.9)" : "scale(1)")};
@@ -135,15 +137,6 @@ const PlaceToStay = styled.div`
   }
 `;
 
-const LocationDropDownContainer = styled.div`
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-  background-color: white;
-  position: absolute;
-  transform: translate(20px, 80px);
-  padding: 2rem;
-  border-radius: 10px;
-`;
-
 const ScrollButton = styled.button`
   background-color: white;
   border: none;
@@ -172,6 +165,7 @@ const ScrollButton = styled.button`
 `;
 
 const DropDownContainer = styled.div`
+  z-index: 1;
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -245,7 +239,57 @@ const NotSignUpDropDownContainer = styled.div`
   }
 `;
 
+const LocationDropDown = styled.div`
+  position: absolute;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  z-index: 1;
+  width: 20rem;
+  height: 20rem;
+  background-color: white;
+  transform: translate(0, 5rem);
+  border-radius: 15px;
+  background-color: white;
+`;
+
+const DateDropDown = styled.div`
+  position: absolute;
+
+  position: absolute;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  z-index: 1;
+  width: 50rem;
+  height: 30rem;
+  background-color: white;
+  transform: translate(-17rem, 5rem);
+  border-radius: 15px;
+  background-color: white;
+`;
+
+const GuestDropDown = styled.div`
+  position: absolute;
+
+  position: absolute;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  z-index: 1;
+  width: 20rem;
+  height: 20rem;
+  background-color: white;
+  transform: translate(-8rem, 5rem);
+  border-radius: 15px;
+  background-color: white;
+`;
+
 export default function CustomerHeader() {
+  const [locationDropDown, setLocationDropDown] = useState(false);
+  const locationButtonRef = useRef();
+  const locationDropDownRef = useRef();
+  const [dateDropDown, setDateDropDown] = useState(false);
+  const dateCheckInButtonRef = useRef();
+  const dateCheckOutButtonRef = useRef();
+  const dateDropDownRef = useRef();
+  const [guessDropDown, setGuestDropDown] = useState(false);
+  const guessButtonRef = useRef();
+  const guessDropDownRef = useRef();
   const [scrollEvent, setScrollEvent] = useState("SCROLL"); // BEGIN, SCROLL, SCROLL_CLICK
   const scrollRef = useRef("BEGIN");
   const [isClickDropDown, setIsCLickDropDown] = useState(false);
@@ -258,6 +302,18 @@ export default function CustomerHeader() {
 
   useEffect(() => {
     const event = function () {
+      if (locationDropDownRef.current) {
+        setLocationDropDown(false);
+      }
+
+      if (dateDropDownRef.current) {
+        setDateDropDown(false);
+      }
+
+      if (guessDropDownRef.current) {
+        setGuestDropDown(false);
+      }
+
       if (window.scrollY > 20) {
         if (containerRef.current) {
           containerRef.current.style.position = "fixed";
@@ -297,6 +353,31 @@ export default function CustomerHeader() {
       ) {
         setIsCLickDropDown(false);
       }
+
+      if (
+        locationDropDownRef.current &&
+        !locationButtonRef.current.contains(ev.target) &&
+        !locationDropDownRef.current.contains(ev.target)
+      ) {
+        setLocationDropDown(false);
+      }
+
+      if (
+        guessDropDownRef.current &&
+        !guessDropDownRef.current.contains(ev.target) &&
+        !guessButtonRef.current.contains(ev.target)
+      ) {
+        setGuestDropDown(false);
+      }
+
+      if (
+        dateDropDownRef.current &&
+        !dateDropDownRef.current.contains(ev.target) &&
+        !dateCheckInButtonRef.current.contains(ev.target) &&
+        !dateCheckOutButtonRef.current.contains(ev.target)
+      ) {
+        setDateDropDown(false);
+      }
     };
 
     document.addEventListener("mousedown", event);
@@ -322,32 +403,34 @@ export default function CustomerHeader() {
             {(scrollEvent == "BEGIN" || scrollEvent == "SCROLL_CLICK") && (
               <>
                 <div>
-                  <button>
+                  <button ref={locationButtonRef} onClick={() => setLocationDropDown(true)}>
                     <h5>Location</h5>
                     <p>Where are you going?</p>
                   </button>
-                  {/* <LocationDropDownContainer>
-                  <h5>Suggested destinations</h5>
-                  <button>{"I'm flexible"}</button>
-                </LocationDropDownContainer> */}
+                  {locationDropDown && (
+                    <LocationDropDown ref={locationDropDownRef}></LocationDropDown>
+                  )}
                 </div>
                 <div>
-                  <button>
+                  <button ref={dateCheckInButtonRef} onClick={() => setDateDropDown(true)}>
                     <h5>Check in</h5>
                     <p>Add dates</p>
                   </button>
+                  {dateDropDown && <DateDropDown ref={dateDropDownRef}></DateDropDown>}
                 </div>
                 <div>
-                  <button>
+                  <button ref={dateCheckOutButtonRef} onClick={() => setDateDropDown(true)}>
                     <h5>Check out</h5>
                     <p>Add dates</p>
                   </button>
                 </div>
                 <div>
-                  <button>
+                  <button ref={guessButtonRef} onClick={() => setGuestDropDown(true)}>
                     <h5>Guests</h5>
                     <p>Add guests</p>
                   </button>
+
+                  {guessDropDown && <GuestDropDown ref={guessDropDownRef}></GuestDropDown>}
                 </div>
               </>
             )}
@@ -417,7 +500,9 @@ export default function CustomerHeader() {
                   <button className="focus" onClick={() => navigate("/trips")}>
                     Trips
                   </button>
-                  <button className="focus">Wishlists</button>
+                  <button className="focus" onClick={() => navigate("/wishlist")}>
+                    Wishlists
+                  </button>
                   <hr />
                   <button>Manage Listings</button>
                   <button>Account</button>
