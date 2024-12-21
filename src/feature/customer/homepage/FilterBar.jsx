@@ -63,16 +63,25 @@ const StyleCategoryItem = styled.div`
 `;
 
 const StyleButtonLeft = styled.button`
-  background: none;
-  border: 0.5px gray solid;
+  background-color: white;
+  border: 0.5px solid gray;
   border-radius: 50%;
   padding: 8px;
   cursor: pointer;
   color: #333;
-  display: ${(props) => (props.hidden ? "none" : "block")};
-
+  display: ${(props) => (props.hidden ? "none" : "flex")};
+  align-items: center;
+  justify-content: center;
+  min-width: 35px !important; /* Đặt kích thước cụ thể */
+  min-height: 35px !important;
+  box-sizing: border-box;
+  z-index: 10;
   &:hover {
     box-shadow: 0px 10px 20px #dadada;
+  }
+
+  svg {
+    font-size: 15px !important; /* Kích thước icon */
   }
 `;
 
@@ -92,7 +101,7 @@ const StyleFilterButton = styled.button`
   border-radius: 10px;
   cursor: pointer;
   margin-left: 10px;
-
+  min-width: max-content;
   &:hover {
     background-color: #f8f8f8;
     border: 1px solid #6f6e6e;
@@ -182,18 +191,23 @@ export const FilterBar = ({
 
         <StyleCategoryBar ref={scrollRef}>
           {categoriesRequest.isSuccess ? (
-            categoriesRequest.data.data.map((category) => (
-              <StyleCategoryItem
-                key={category.id}
-                selected={categoryId === category.id}
-                onClick={() => setCategoryId(category.id)}
-              >
-                <div>
-                  <img src={category.categoryImage} alt={category.categoryName} />
-                </div>
-                <div>{category.categoryName}</div>
-              </StyleCategoryItem>
-            ))
+            categoriesRequest.data.data
+              .filter((item) => item.status == true)
+              .map((category) => (
+                <StyleCategoryItem
+                  key={category.id}
+                  selected={categoryId === category.id}
+                  onClick={() => setCategoryId(category.id)}
+                >
+                  <div>
+                    <img
+                      src={category.categoryImage}
+                      alt={category.categoryName}
+                    />
+                  </div>
+                  <div>{category.categoryName}</div>
+                </StyleCategoryItem>
+              ))
           ) : (
             <Skeleton count={6} />
           )}

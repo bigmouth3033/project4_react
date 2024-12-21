@@ -88,7 +88,7 @@ const CarouselStyled = styled(Carousel)`
 const StyleContent = styled.div`
   display: grid;
   grid-template-columns: 6fr 1fr;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   overflow: hidden; /* Ẩn phần thừa */
   white-space: nowrap; /* Không cho dòng xuống */
   text-overflow: ellipsis; /* Thêm dấu "..." */
@@ -117,11 +117,15 @@ const StyleContent = styled.div`
 
 const convertAddressCode = (addressCode) => {
   var addrressArr = addressCode.split("_");
-  const tempProvince = dchc.data.find((city) => city.level1_id == addrressArr[0]);
+  const tempProvince = dchc.data.find(
+    (city) => city.level1_id == addrressArr[0]
+  );
   const tempDistrict = tempProvince.level2s.find(
     (district) => district.level2_id == addrressArr[1]
   );
-  const tempWard = tempDistrict.level3s.find((ward) => ward.level3_id == addrressArr[2]);
+  const tempWard = tempDistrict.level3s.find(
+    (ward) => ward.level3_id == addrressArr[2]
+  );
   return [tempDistrict.name + ", " + tempProvince.name];
 };
 
@@ -171,7 +175,9 @@ export default function HomePage() {
   const user = UserRequest();
   const deleteFavouriteMutation = DeleteFavouriteMutation();
   const [categoryId, setCategoryId] = useState(
-    categoriesRequest.isSuccess == true ? categoriesRequest.data.data[0].id : null
+    categoriesRequest.isSuccess == true
+      ? categoriesRequest.data.data[0].id
+      : null
   );
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -273,7 +279,11 @@ export default function HomePage() {
                 >
                   {item.propertyImages.slice(0, 5).map((image) => {
                     return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
+                      <div
+                        className="box"
+                        key={image.id}
+                        style={{ position: "relative" }}
+                      >
                         <img src={image.imageName} />
                         <IoMdHeart
                           style={{
@@ -283,7 +293,9 @@ export default function HomePage() {
                             top: "10px",
                             color:
                               user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
+                              item.favourites.find(
+                                (fav) => fav.id.userId == user.data.data.id
+                              )
                                 ? "red"
                                 : "gray",
                             cursor: "pointer",
@@ -331,7 +343,11 @@ export default function HomePage() {
                 >
                   {item.propertyImages.slice(0, 5).map((image) => {
                     return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
+                      <div
+                        className="box"
+                        key={image.id}
+                        style={{ position: "relative" }}
+                      >
                         <img src={image.imageName} />
                         <IoMdHeart
                           style={{
@@ -341,7 +357,9 @@ export default function HomePage() {
                             top: "10px",
                             color:
                               user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
+                              item.favourites.find(
+                                (fav) => fav.id.userId == user.data.data.id
+                              )
                                 ? "red"
                                 : "gray",
                             cursor: "pointer",
@@ -389,7 +407,11 @@ export default function HomePage() {
                 >
                   {item.propertyImages.slice(0, 5).map((image) => {
                     return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
+                      <div
+                        className="box"
+                        key={image.id}
+                        style={{ position: "relative" }}
+                      >
                         <img src={image.imageName} />
                         <IoMdHeart
                           style={{
@@ -399,7 +421,9 @@ export default function HomePage() {
                             top: "10px",
                             color:
                               user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
+                              item.favourites.find(
+                                (fav) => fav.id.userId == user.data.data.id
+                              )
                                 ? "red"
                                 : "gray",
                             cursor: "pointer",
@@ -447,7 +471,11 @@ export default function HomePage() {
                 >
                   {item.propertyImages.slice(0, 5).map((image) => {
                     return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
+                      <div
+                        className="box"
+                        key={image.id}
+                        style={{ position: "relative" }}
+                      >
                         <img src={image.imageName} />
                         <IoMdHeart
                           style={{
@@ -457,7 +485,9 @@ export default function HomePage() {
                             top: "10px",
                             color:
                               user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
+                              item.favourites.find(
+                                (fav) => fav.id.userId == user.data.data.id
+                              )
                                 ? "red"
                                 : "gray",
                             cursor: "pointer",
@@ -505,7 +535,11 @@ export default function HomePage() {
                 >
                   {item.propertyImages.slice(0, 5).map((image) => {
                     return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
+                      <div
+                        className="box"
+                        key={image.id}
+                        style={{ position: "relative" }}
+                      >
                         <img src={image.imageName} />
                         <IoMdHeart
                           style={{
@@ -515,7 +549,9 @@ export default function HomePage() {
                             top: "10px",
                             color:
                               user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
+                              item.favourites.find(
+                                (fav) => fav.id.userId == user.data.data.id
+                              )
                                 ? "red"
                                 : "gray",
                             cursor: "pointer",
@@ -563,7 +599,11 @@ export default function HomePage() {
                 >
                   {item.propertyImages.slice(0, 5).map((image) => {
                     return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
+                      <div
+                        className="box"
+                        key={image.id}
+                        style={{ position: "relative" }}
+                      >
                         <img src={image.imageName} />
                         <IoMdHeart
                           style={{
@@ -573,7 +613,9 @@ export default function HomePage() {
                             top: "10px",
                             color:
                               user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
+                              item.favourites.find(
+                                (fav) => fav.id.userId == user.data.data.id
+                              )
                                 ? "red"
                                 : "gray",
                             cursor: "pointer",
@@ -621,7 +663,11 @@ export default function HomePage() {
                 >
                   {item.propertyImages.slice(0, 5).map((image) => {
                     return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
+                      <div
+                        className="box"
+                        key={image.id}
+                        style={{ position: "relative" }}
+                      >
                         <img src={image.imageName} />
                         <IoMdHeart
                           style={{
@@ -631,7 +677,9 @@ export default function HomePage() {
                             top: "10px",
                             color:
                               user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
+                              item.favourites.find(
+                                (fav) => fav.id.userId == user.data.data.id
+                              )
                                 ? "red"
                                 : "gray",
                             cursor: "pointer",
@@ -666,9 +714,13 @@ export default function HomePage() {
           })}
       </StyleBody>
       {isPopUp && (
-        <CollectionPopUp {...{ properties, propertyId, action: () => setIsPopUp(false) }} />
+        <CollectionPopUp
+          {...{ properties, propertyId, action: () => setIsPopUp(false) }}
+        />
       )}
-      {isLoginPopUp && <RegisterPopUp {...{ action: () => setIsLoginPopUp(false) }} />}
+      {isLoginPopUp && (
+        <RegisterPopUp {...{ action: () => setIsLoginPopUp(false) }} />
+      )}
     </StyleContainer>
   );
 }

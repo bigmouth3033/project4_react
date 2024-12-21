@@ -1,6 +1,9 @@
 import PopUp from "@/shared/components/PopUp/PopUp";
 import styled from "styled-components";
-import { FavouriteRequest, CreateFavouriteMutation } from "./api/collectionFavApi";
+import {
+  FavouriteRequest,
+  CreateFavouriteMutation,
+} from "./api/collectionFavApi";
 import { useState } from "react";
 import { NewCollectionPopup } from "./NewCollectionPopup";
 import { UserRequest } from "@/shared/api/userApi";
@@ -32,7 +35,7 @@ const StyleBody = styled.div`
   flex-grow: 1; //Allow body to take up remaining space
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 2rem;
 `;
 const StyleNotFound = styled.div`
   position: absolute;
@@ -45,9 +48,7 @@ const StyleNotFound = styled.div`
 `;
 const StyleCard = styled.div`
   cursor: pointer;
-  /* width: 80%; */
-  margin: 0 auto;
-  aspect-ratio: 1/1.25;
+  width: 100%;
   font-size: 0.85rem;
   > img {
     aspect-ratio: 1/1;
@@ -117,7 +118,8 @@ export const CollectionPopUp = ({ properties, propertyId, action }) => {
       <StylePopUp action={action}>
         <StyleTitle>Save to wishlist</StyleTitle>
         <StyleBody>
-          {favouriteRequest.isSuccess && favouriteRequest.data.data.length > 0 ? (
+          {favouriteRequest.isSuccess &&
+          favouriteRequest.data.data.length > 0 ? (
             favouriteRequest.data.data
               .reduce((arr, item) => {
                 const existingColl = arr.find(
@@ -135,7 +137,10 @@ export const CollectionPopUp = ({ properties, propertyId, action }) => {
                 return arr; // return collection arr
               }, [])
               .map((collection, index) => (
-                <StyleCard key={index} onClick={() => HandleOnClick(collection.collectionName)}>
+                <StyleCard
+                  key={index}
+                  onClick={() => HandleOnClick(collection.collectionName)}
+                >
                   <img src={collection.firstImage} alt="" />
                   <p>
                     <b>{collection.collectionName}</b>
@@ -148,8 +153,12 @@ export const CollectionPopUp = ({ properties, propertyId, action }) => {
           )}
         </StyleBody>
         <StyleSubmit>
-          {createFavouriteMutation.isSuccess && <p style={{ color: "green" }}>Added success</p>}
-          <StyleCreateButton onClick={() => HandleCreate()}>Create new wishlist</StyleCreateButton>
+          {createFavouriteMutation.isSuccess && (
+            <p style={{ color: "green" }}>Added success</p>
+          )}
+          <StyleCreateButton onClick={() => HandleCreate()}>
+            Create new wishlist
+          </StyleCreateButton>
         </StyleSubmit>
       </StylePopUp>
       {isPopUp && (

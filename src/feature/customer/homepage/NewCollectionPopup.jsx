@@ -12,8 +12,6 @@ const StylePopUp = styled(PopUp)`
   height: 55vh;
   overflow-y: auto;
   padding: 0;
-  display: flex;
-  flex-direction: column;
 `;
 
 const StyleTitle = styled.div`
@@ -22,7 +20,6 @@ const StyleTitle = styled.div`
   font-weight: 600;
   text-align: center;
   padding: 1.5rem 0;
-  margin-bottom: 1rem;
   border-bottom: 1px solid lightgray;
   position: sticky;
   top: 0;
@@ -31,20 +28,25 @@ const StyleTitle = styled.div`
 `;
 
 const StyleBody = styled.div`
-  padding: 0 2rem;
+  width: 100%;
+  padding: 0;
   flex-grow: 1;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyleWrapper = styled.div`
+  width: 100%;
   position: relative;
-  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyleLabel = styled.label`
   position: absolute;
-  left: 10px;
+  left: 14%;
   top: 50%;
   transform: translateY(-50%);
   transition: 0.2s ease all;
@@ -54,8 +56,8 @@ const StyleLabel = styled.label`
 `;
 
 const StyleInput = styled.input`
-  width: 100%;
-  padding: 1rem 0.5rem;
+  width: 80%;
+  padding: 1.3rem 0.5rem;
   border: 1px solid lightgray;
   border-radius: 5px;
   font-size: 1rem;
@@ -75,8 +77,6 @@ const StyleInput = styled.input`
 const StyleSubmit = styled.div`
   position: sticky;
   bottom: 0;
-  min-height: 2rem;
-  margin-top: 1rem;
   font-size: 1.1rem;
   font-weight: 600;
   text-align: center;
