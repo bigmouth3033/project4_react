@@ -9,7 +9,7 @@ import { IoMdHeart } from "react-icons/io";
 import { GrFormNext } from "react-icons/gr";
 import { GrFormPrevious } from "react-icons/gr";
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { CategoriesRequest } from "../../../shared/api/categoryClientApi";
 import dchc from "@/shared/data/dchc";
 import { CollectionPopUp } from "./CollectionPopUp";
@@ -54,9 +54,9 @@ const StyleBody = styled.div`
 `;
 
 const StyleBodyItem = styled.div`
+  cursor: pointer;
   aspect-ratio: 1/1.25;
-  display: grid; //important
-
+  display: grid; //important => delete => BROKENNNNNN
   border-radius: 10px;
 
   & .box {
@@ -180,6 +180,7 @@ export default function HomePage() {
       : null
   );
 
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [propertyId, setPropertyId] = useState(null);
   const [isPopUp, setIsPopUp] = useState(false);
@@ -193,6 +194,8 @@ export default function HomePage() {
   const [selectedRoom, setSelectedRoom] = useState(1);
   const [selectedBed, setSelectedBed] = useState(1);
   const [selectedBathRoom, setSelectedBathRoom] = useState(1);
+  const [location, setLocation] = useState(null);
+  const [guest, setGuest] = useState(null);
 
   //Call main API
   const properties = PropertiesRequest(
@@ -205,7 +208,9 @@ export default function HomePage() {
     selectedPrice,
     selectedRoom,
     selectedBed,
-    selectedBathRoom
+    selectedBathRoom,
+    location,
+    guest
   );
 
   const HandleLove = (propertyID) => {
@@ -284,7 +289,10 @@ export default function HomePage() {
                         key={image.id}
                         style={{ position: "relative" }}
                       >
-                        <img src={image.imageName} />
+                        <img
+                          onClick={() => navigate(`/product-detail/${item.id}`)}
+                          src={image.imageName}
+                        />
                         <IoMdHeart
                           style={{
                             position: "absolute",
@@ -308,7 +316,9 @@ export default function HomePage() {
                     );
                   })}
                 </CarouselStyled>
-                <StyleContent>
+                <StyleContent
+                  onClick={() => navigate(`/product-detail/${item.id}`)}
+                >
                   <div>
                     <div>
                       <b>{getWords(item.propertyTitle, 7)}</b>

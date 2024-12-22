@@ -131,7 +131,10 @@ export const FilterPopUp = ({
           setSelectedBed={setSelectedBed}
           setSelectedBathRoom={setSelectedBathRoom}
         />
-        <FilterAmenity selectedAmenity={selectedAmenity} setSelectedAmenity={setSelectedAmenity} />
+        <FilterAmenity
+          selectedAmenity={selectedAmenity}
+          setSelectedAmenity={setSelectedAmenity}
+        />
         <Options
           isInstant={isInstant}
           isPetAllow={isPetAllow}
@@ -144,8 +147,7 @@ export const FilterPopUp = ({
       <StyleSubmit>
         <StyleClearAll onClick={() => HandleClear()}>Clear all</StyleClearAll>
         <StyleShowButton onClick={() => HandleSubmit()}>
-          Show {properties.isSuccess && properties.data.data.length}
-          places
+          Show {properties.isSuccess && properties.data.data.length} places
         </StyleShowButton>
       </StyleSubmit>
     </StylePopUp>

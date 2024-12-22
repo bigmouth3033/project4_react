@@ -61,7 +61,10 @@ const router = createBrowserRouter(
       element: <UserLayout />,
       children: [
         { path: "account-settings", element: <AccountSetting /> },
-        { path: "account-settings/login-and-sercurity", element: <LoginAndSecurity /> },
+        {
+          path: "account-settings/login-and-sercurity",
+          element: <LoginAndSecurity />,
+        },
         {
           path: "/wishlist",
           element: <WishList />,
@@ -71,11 +74,13 @@ const router = createBrowserRouter(
           element: <WishListDetail />,
         },
         { path: "account-settings/personal-info", element: <PersonalInfo /> },
-        { path: "account-settings/personal-info/govermentSetting", element: <GovernmentID /> },
+        {
+          path: "account-settings/personal-info/govermentSetting",
+          element: <GovernmentID />,
+        },
         { path: "", element: <HomePage /> },
         { path: "/property_detail", element: <PropertyDetail /> },
         { path: "/property_detail/:property_id", element: <PropertyDetail /> },
-
         { path: "/messages", element: <CustomerMessages /> },
         { path: "/booking/transaction/:booking_id", element: <Transaction /> },
         { path: "/trips", element: <CustomerTrips /> },

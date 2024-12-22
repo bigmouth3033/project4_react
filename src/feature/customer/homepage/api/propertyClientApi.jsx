@@ -12,7 +12,9 @@ export const PropertiesRequest = (
   priceRange,
   room,
   bed,
-  bathRoom
+  bathRoom,
+  locationId,
+  guest
 ) => {
   const request = async (
     categoryId,
@@ -24,7 +26,9 @@ export const PropertiesRequest = (
     priceRange,
     room,
     bed,
-    bathRoom
+    bathRoom,
+    locationId,
+    guest
   ) => {
     const response = await axiosClient.get("listingCM/propertyCM", {
       params: {
@@ -38,9 +42,11 @@ export const PropertiesRequest = (
         room,
         bed,
         bathRoom,
+        locationId,
+        guest,
       },
       paramsSerializer: (params) =>
-        qs.stringify(params, { arrayFormat: "repeat" }),
+        qs.stringify(params, { arrayFormat: "repeat" }), //với param dạng String: qs nhận null nhưng gửi đi chuỗi "" => Sprinh nhận về "" => phải chuyển lại thành null
     });
     return response.data;
   };
@@ -58,6 +64,8 @@ export const PropertiesRequest = (
       room,
       bed,
       bathRoom,
+      locationId,
+      guest,
     ],
     queryFn: () =>
       request(
@@ -70,7 +78,9 @@ export const PropertiesRequest = (
         priceRange,
         room,
         bed,
-        bathRoom
+        bathRoom,
+        locationId,
+        guest
       ),
   });
 };

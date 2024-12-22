@@ -75,7 +75,6 @@ const StyleButtonLeft = styled.button`
   min-width: 35px !important; /* Đặt kích thước cụ thể */
   min-height: 35px !important;
   box-sizing: border-box;
-  z-index: 10;
   &:hover {
     box-shadow: 0px 10px 20px #dadada;
   }
