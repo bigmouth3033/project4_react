@@ -144,8 +144,7 @@ export const FilterPopUp = ({
       <StyleSubmit>
         <StyleClearAll onClick={() => HandleClear()}>Clear all</StyleClearAll>
         <StyleShowButton onClick={() => HandleSubmit()}>
-          Show {properties.isSuccess && properties.data.data.length}
-          places
+          Show {properties.isSuccess && properties.data.pages[0].totalCount} places
         </StyleShowButton>
       </StyleSubmit>
     </StylePopUp>

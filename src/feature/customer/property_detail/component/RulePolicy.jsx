@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { GetPolicies } from "../api/api";
-import { FaChevronRight } from "react-icons/fa";
+import { FaChevronRight, FaSmoking, FaSmokingBan } from "react-icons/fa";
 import PopUpContainer from "@/shared/components/PopUp/giu/PopUpContainer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -150,7 +150,7 @@ export default function RulePolicy({ data }) {
                     ) : (
                       <StyledFlex>
                         <RiDoorOpenLine style={{ fontSize: "24px" }} />
-                        <div>Self check-in with building staff</div>
+                        <div>Check-in with Host</div>
                       </StyledFlex>
                     )}
                   </StyledCheckDuring>
@@ -161,6 +161,19 @@ export default function RulePolicy({ data }) {
                       <div> {data.maximumGuest} guests maximum</div>
                     </StyledFlex>
                     <div>
+                      <div>
+                        {data.smokingAllowed ? (
+                          <StyledFlex>
+                            <FaSmoking style={{ fontSize: "24px" }} />
+                            <div> Smoking allowed</div>
+                          </StyledFlex>
+                        ) : (
+                          <StyledFlex>
+                            <FaSmokingBan style={{ fontSize: "24px" }} />
+                            <div>Smoking not allowed</div>
+                          </StyledFlex>
+                        )}
+                      </div>
                       <div>
                         {data.petAllowed ? (
                           <StyledFlex>

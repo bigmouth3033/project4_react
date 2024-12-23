@@ -11,6 +11,13 @@ import RegisterPopUp from "./components/RegisterPopUp";
 import { UserRequest } from "@/shared/api/userApi";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import SelectInput from "@/shared/components/Input/SelectInput";
+import dchc from "@/shared/data/dchc";
+import { ManagedCityRequest } from "@/shared/api/managedCityClientApi";
+import { formatDate } from "@/shared/utils/DateTimeHandle";
+import CalendarHeader from "./components/CalendarHeader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronCircleDown, faPlus, faSubtract } from "@fortawesome/free-solid-svg-icons";
 
 const Container = styled.div`
   padding: 1.4rem 1rem;
@@ -77,6 +84,8 @@ const DropDownButton = styled.button`
 const FilterBar = styled.div`
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr 1.3fr;
+
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 
   ${(props) => {
     if (props.$event == "SCROLL") {
@@ -243,12 +252,28 @@ const LocationDropDown = styled.div`
   position: absolute;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
   z-index: 1;
-  width: 20rem;
+  width: 25rem;
   height: 20rem;
   background-color: white;
   transform: translate(0, 5rem);
-  border-radius: 15px;
+  border-radius: 25px;
   background-color: white;
+
+  padding: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  & p {
+    font-weight: 600;
+  }
 `;
 
 const DateDropDown = styled.div`
@@ -261,8 +286,12 @@ const DateDropDown = styled.div`
   height: 30rem;
   background-color: white;
   transform: translate(-17rem, 5rem);
-  border-radius: 15px;
+  border-radius: 25px;
   background-color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const GuestDropDown = styled.div`
@@ -272,14 +301,68 @@ const GuestDropDown = styled.div`
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
   z-index: 1;
   width: 20rem;
-  height: 20rem;
+  height: fit-content;
   background-color: white;
   transform: translate(-8rem, 5rem);
   border-radius: 15px;
   background-color: white;
+
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 `;
 
-export default function CustomerHeader() {
+const StyledReadCalendar = styled.div`
+  column-gap: 10px;
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+`;
+
+const StyledContainerClearClose = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  column-gap: 1rem;
+  margin-right: 1rem;
+  & > div:first-child {
+    text-decoration: 0.5px underline rgba(0, 0, 0, 0.3);
+  }
+`;
+
+const StyledAdultChildren = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #dddddd;
+
+  > div:nth-of-type(1) {
+    font-weight: 600;
+    font-size: 17px;
+  }
+`;
+
+const StyledAddSub = styled.span`
+  font-size: 10px;
+  padding: 0px 12px;
+  cursor: pointer;
+`;
+
+export default function CustomerHeader({
+  setGuest,
+  selectedDates,
+  setSelectedDates,
+  chosenProvince,
+  setChosenProvince,
+  chosenDistrict,
+  setChosenDistrict,
+  chosenWard,
+  setChosenWard,
+}) {
   const [locationDropDown, setLocationDropDown] = useState(false);
   const locationButtonRef = useRef();
   const locationDropDownRef = useRef();
@@ -299,6 +382,74 @@ export default function CustomerHeader() {
   const [isRegisterPopUp, setIsRegisterPopUp] = useState("");
   const navigate = useNavigate();
   const user = UserRequest();
+  const managedCity = ManagedCityRequest();
+
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+
+  const [adult, setAdult] = useState(1);
+  const [children, setChildren] = useState(0);
+
+  const calculateDaysBetween = (start_day, end_day) => {
+    const startDate = new Date(start_day);
+    const endDate = new Date(end_day);
+
+    const timeDifference = endDate - startDate;
+
+    const daysDifference = timeDifference / (1000 * 3600 * 24);
+
+    return Math.floor(daysDifference);
+  };
+
+  useEffect(() => {
+    if (managedCity.isSuccess) {
+      var provincesData = dchc.data.filter((province) =>
+        managedCity.data.data
+          .filter((city) => city.managed == true)
+          .find((city) => city.cityName == province.name)
+      );
+      setProvinces((_) =>
+        provincesData.map((item) => {
+          return {
+            label: item.name,
+            value: item.level1_id,
+          };
+        })
+      );
+    }
+  }, [managedCity.isSuccess]);
+
+  useEffect(() => {
+    if (chosenProvince != null) {
+      const districtsData = dchc.data.find((city) => city.level1_id == chosenProvince.value);
+
+      setDistricts(() =>
+        districtsData.level2s.map((district) => {
+          return { value: district.level2_id, label: district.name };
+        })
+      );
+      setChosenDistrict(null);
+      setChosenWard(null);
+    }
+  }, [chosenProvince]);
+
+  useEffect(() => {
+    if (chosenDistrict != null) {
+      const districtsData = dchc.data.find((city) => city.level1_id == chosenProvince.value);
+      const wardsData = districtsData.level2s.find(
+        (district) => district.level2_id == chosenDistrict.value
+      );
+
+      setWards(() =>
+        wardsData.level3s.map((ward) => {
+          return { value: ward.level3_id, label: ward.name };
+        })
+      );
+
+      setChosenWard(null);
+    }
+  }, [chosenDistrict]);
 
   useEffect(() => {
     const event = function () {
@@ -387,6 +538,10 @@ export default function CustomerHeader() {
     };
   }, []);
 
+  useEffect(() => {
+    setGuest(adult + children);
+  }, [adult, children]);
+
   return (
     <>
       <Container ref={containerRef}>
@@ -405,32 +560,174 @@ export default function CustomerHeader() {
                 <div>
                   <button ref={locationButtonRef} onClick={() => setLocationDropDown(true)}>
                     <h5>Location</h5>
-                    <p>Where are you going?</p>
+                    {!chosenProvince ? <p>Where are you going ?</p> : <b>{chosenProvince.label}</b>}
                   </button>
                   {locationDropDown && (
-                    <LocationDropDown ref={locationDropDownRef}></LocationDropDown>
+                    <LocationDropDown ref={locationDropDownRef}>
+                      <div>
+                        <p>Province</p>
+                        <SelectInput
+                          state={chosenProvince}
+                          setState={setChosenProvince}
+                          options={provinces}
+                          placeholder={"I'm flexible"}
+                        />
+                      </div>
+                      <div>
+                        <p>District</p>
+                        <SelectInput
+                          state={chosenDistrict}
+                          setState={setChosenDistrict}
+                          options={districts}
+                          placeholder={"I'm flexible"}
+                        />
+                      </div>
+                      <div>
+                        <p>Ward</p>
+                        <SelectInput
+                          placeholder={"I'm flexible"}
+                          options={wards}
+                          state={chosenWard}
+                          setState={setChosenWard}
+                        />
+                      </div>
+                    </LocationDropDown>
                   )}
                 </div>
                 <div>
                   <button ref={dateCheckInButtonRef} onClick={() => setDateDropDown(true)}>
                     <h5>Check in</h5>
-                    <p>Add dates</p>
+                    {!selectedDates[0] ? (
+                      <p>Add dates</p>
+                    ) : (
+                      <b>{formatDate(selectedDates[0], false)}</b>
+                    )}
                   </button>
-                  {dateDropDown && <DateDropDown ref={dateDropDownRef}></DateDropDown>}
+                  {dateDropDown && (
+                    <DateDropDown ref={dateDropDownRef}>
+                      <div>
+                        {selectedDates[0] != null && selectedDates[1] != null && (
+                          <div>
+                            <h2>
+                              {calculateDaysBetween(selectedDates[0], selectedDates[1])} nights
+                            </h2>
+                            <StyledReadCalendar>
+                              <div>
+                                <div>{formatDate(selectedDates[0])} </div>
+                              </div>
+                              <p> - </p>
+                              <div>
+                                <div> {formatDate(selectedDates[1])}</div>
+                              </div>
+                            </StyledReadCalendar>
+                          </div>
+                        )}
+                        <CalendarHeader
+                          selectedDates={selectedDates}
+                          setSelectedDates={setSelectedDates}
+                        />
+                        <StyledContainerClearClose>
+                          <div
+                            onClick={() => {
+                              setSelectedDates([]);
+                            }}
+                          >
+                            Clear dates
+                          </div>
+                        </StyledContainerClearClose>
+                      </div>
+                    </DateDropDown>
+                  )}
                 </div>
                 <div>
                   <button ref={dateCheckOutButtonRef} onClick={() => setDateDropDown(true)}>
                     <h5>Check out</h5>
-                    <p>Add dates</p>
+                    {!selectedDates[1] ? (
+                      <p>Add dates</p>
+                    ) : (
+                      <b>{formatDate(selectedDates[1], false)}</b>
+                    )}
                   </button>
                 </div>
                 <div>
                   <button ref={guessButtonRef} onClick={() => setGuestDropDown(true)}>
                     <h5>Guests</h5>
-                    <p>Add guests</p>
+
+                    {Number(adult + children) <= Number(1) ? (
+                      <p>Add guests </p>
+                    ) : (
+                      <b>{Number(adult + children)} guests</b>
+                    )}
                   </button>
 
-                  {guessDropDown && <GuestDropDown ref={guessDropDownRef}></GuestDropDown>}
+                  {guessDropDown && (
+                    <GuestDropDown ref={guessDropDownRef}>
+                      <StyledAdultChildren>
+                        <div>Adults</div>
+                        <div>
+                          <StyledAddSub
+                            onClick={() => {
+                              if (adult != 1) {
+                                setAdult(adult - 1);
+                              }
+                            }}
+                            style={{
+                              cursor: adult != 1 ? "pointer" : "not-allowed",
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faSubtract} />
+                          </StyledAddSub>
+                          {adult}
+                          <StyledAddSub
+                            onClick={() => {
+                              if (adult < 20 && children + adult < 20) {
+                                setAdult(adult + 1);
+                              }
+                            }}
+                            style={{
+                              cursor:
+                                adult < 20 && children + adult < 20 ? "pointer" : "not-allowed",
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faPlus} />
+                          </StyledAddSub>
+                        </div>
+                      </StyledAdultChildren>
+                      <StyledAdultChildren>
+                        <div>Children</div>
+                        <div>
+                          <StyledAddSub
+                            onClick={() => {
+                              if (children != 0) {
+                                setChildren(children - 1);
+                              }
+                            }}
+                            style={{
+                              cursor: children != 0 ? "pointer" : "not-allowed",
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faSubtract} />
+                          </StyledAddSub>
+                          {children}
+                          <StyledAddSub
+                            onClick={() => {
+                              if (20 - adult > 0 && children < 20 - 1 && children + adult < 20) {
+                                setChildren(children + 1);
+                              }
+                            }}
+                            style={{
+                              cursor:
+                                20 - adult > 0 && children < 20 - 1 && children + adult < 20
+                                  ? "pointer"
+                                  : "not-allowed",
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faPlus} />
+                          </StyledAddSub>
+                        </div>
+                      </StyledAdultChildren>
+                    </GuestDropDown>
+                  )}
                 </div>
               </>
             )}
@@ -465,7 +762,7 @@ export default function CustomerHeader() {
               <Avatar src={default_avatar} round size="30" />
             )}
             {user.isSuccess && user.data.status == 200 && (
-              <Avatar src={user.data.data.Avatar} name={user.data.data.firstName} round size="30" />
+              <Avatar src={user.data.data.avatar} name={user.data.data.firstName} round size="30" />
             )}
           </DropDownButton>
           {isClickDropDown && (

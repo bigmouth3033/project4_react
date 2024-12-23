@@ -63,16 +63,25 @@ const StyleCategoryItem = styled.div`
 `;
 
 const StyleButtonLeft = styled.button`
-  background: none;
-  border: 0.5px gray solid;
+  background-color: white;
+  border: 0.5px solid gray;
   border-radius: 50%;
   padding: 8px;
   cursor: pointer;
   color: #333;
-  display: ${(props) => (props.hidden ? "none" : "block")};
-
+  display: ${(props) => (props.hidden ? "none" : "flex")};
+  align-items: center;
+  justify-content: center;
+  min-width: 35px !important; /* Đặt kích thước cụ thể */
+  min-height: 35px !important;
+  box-sizing: border-box;
+  z-index: 10;
   &:hover {
     box-shadow: 0px 10px 20px #dadada;
+  }
+
+  svg {
+    font-size: 15px !important; /* Kích thước icon */
   }
 `;
 
@@ -92,11 +101,22 @@ const StyleFilterButton = styled.button`
   border-radius: 10px;
   cursor: pointer;
   margin-left: 10px;
-
+  min-width: max-content;
   &:hover {
     background-color: #f8f8f8;
     border: 1px solid #6f6e6e;
   }
+`;
+
+const StyledContainer = styled.div`
+  /* position: fixed;
+  z-index: 1;
+  top: 100;
+  background-color: white; */
+`;
+
+const StyledFather = styled.div`
+  /* position: relative; */
 `;
 
 export const FilterBar = ({
@@ -174,66 +194,70 @@ export const FilterBar = ({
   }, []);
 
   return (
-    <>
-      <StyleScrollContainer>
-        <StyleButtonLeft onClick={scrollLeft} hidden={!showLeftButton}>
-          <MdArrowBackIosNew />
-        </StyleButtonLeft>
+    <StyledFather>
+      <StyledContainer>
+        <StyleScrollContainer>
+          <StyleButtonLeft onClick={scrollLeft} hidden={!showLeftButton}>
+            <MdArrowBackIosNew />
+          </StyleButtonLeft>
 
-        <StyleCategoryBar ref={scrollRef}>
-          {categoriesRequest.isSuccess ? (
-            categoriesRequest.data.data.map((category) => (
-              <StyleCategoryItem
-                key={category.id}
-                selected={categoryId === category.id}
-                onClick={() => setCategoryId(category.id)}
-              >
-                <div>
-                  <img src={category.categoryImage} alt={category.categoryName} />
-                </div>
-                <div>{category.categoryName}</div>
-              </StyleCategoryItem>
-            ))
-          ) : (
-            <Skeleton count={6} />
-          )}
-        </StyleCategoryBar>
+          <StyleCategoryBar ref={scrollRef}>
+            {categoriesRequest.isSuccess ? (
+              categoriesRequest.data.data
+                .filter((item) => item.status == true)
+                .map((category) => (
+                  <StyleCategoryItem
+                    key={category.id}
+                    selected={categoryId === category.id}
+                    onClick={() => setCategoryId(category.id)}
+                  >
+                    <div>
+                      <img src={category.categoryImage} alt={category.categoryName} />
+                    </div>
+                    <div>{category.categoryName}</div>
+                  </StyleCategoryItem>
+                ))
+            ) : (
+              <Skeleton count={6} />
+            )}
+          </StyleCategoryBar>
 
-        <StyleButtonRight onClick={scrollRight} hidden={!showRightButton}>
-          <MdArrowForwardIos />
-        </StyleButtonRight>
-        <StyleFilterButton onClick={() => setIsPopUp(true)}>
-          <FaFilter />
-          <div>Filter</div>
-        </StyleFilterButton>
-      </StyleScrollContainer>
+          <StyleButtonRight onClick={scrollRight} hidden={!showRightButton}>
+            <MdArrowForwardIos />
+          </StyleButtonRight>
+          <StyleFilterButton onClick={() => setIsPopUp(true)}>
+            <FaFilter />
+            <div>Filter</div>
+          </StyleFilterButton>
+        </StyleScrollContainer>
 
-      {isPopUp && (
-        <FilterPopUp
-          {...{
-            properties,
-            selectedAmenity,
-            setSelectedAmenity,
-            selectedPropertyType,
-            setSelectedPropertyType,
-            isInstant,
-            setIsInstant,
-            isPetAllow,
-            setIsPetAllow,
-            isSelfCheckin,
-            setIsSelfCheckin,
-            selectedPrice,
-            setSelectedPrice,
-            selectedRoom,
-            setSelectedRoom,
-            selectedBed,
-            setSelectedBed,
-            selectedBathRoom,
-            setSelectedBathRoom,
-            action: () => setIsPopUp(false),
-          }}
-        />
-      )}
-    </>
+        {isPopUp && (
+          <FilterPopUp
+            {...{
+              properties,
+              selectedAmenity,
+              setSelectedAmenity,
+              selectedPropertyType,
+              setSelectedPropertyType,
+              isInstant,
+              setIsInstant,
+              isPetAllow,
+              setIsPetAllow,
+              isSelfCheckin,
+              setIsSelfCheckin,
+              selectedPrice,
+              setSelectedPrice,
+              selectedRoom,
+              setSelectedRoom,
+              selectedBed,
+              setSelectedBed,
+              selectedBathRoom,
+              setSelectedBathRoom,
+              action: () => setIsPopUp(false),
+            }}
+          />
+        )}
+      </StyledContainer>
+    </StyledFather>
   );
 };

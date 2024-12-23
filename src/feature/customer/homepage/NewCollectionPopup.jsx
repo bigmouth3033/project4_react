@@ -2,18 +2,13 @@ import React, { useState } from "react";
 import PopUp from "@/shared/components/PopUp/PopUp";
 import styled from "styled-components";
 import { useSearchParams } from "react-router-dom";
-import {
-  CreateFavouriteMutation,
-  FavouriteRequest,
-} from "./api/collectionFavApi";
+import { CreateFavouriteMutation, FavouriteRequest } from "./api/collectionFavApi";
 
 const StylePopUp = styled(PopUp)`
   width: 30rem;
   height: 55vh;
   overflow-y: auto;
   padding: 0;
-  display: flex;
-  flex-direction: column;
 `;
 
 const StyleTitle = styled.div`
@@ -22,7 +17,6 @@ const StyleTitle = styled.div`
   font-weight: 600;
   text-align: center;
   padding: 1.5rem 0;
-  margin-bottom: 1rem;
   border-bottom: 1px solid lightgray;
   position: sticky;
   top: 0;
@@ -31,20 +25,25 @@ const StyleTitle = styled.div`
 `;
 
 const StyleBody = styled.div`
-  padding: 0 2rem;
+  width: 100%;
+  padding: 0;
   flex-grow: 1;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyleWrapper = styled.div`
+  width: 100%;
   position: relative;
-  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyleLabel = styled.label`
   position: absolute;
-  left: 10px;
+  left: 14%;
   top: 50%;
   transform: translateY(-50%);
   transition: 0.2s ease all;
@@ -54,8 +53,8 @@ const StyleLabel = styled.label`
 `;
 
 const StyleInput = styled.input`
-  width: 100%;
-  padding: 1rem 0.5rem;
+  width: 80%;
+  padding: 1.3rem 0.5rem;
   border: 1px solid lightgray;
   border-radius: 5px;
   font-size: 1rem;
@@ -75,8 +74,6 @@ const StyleInput = styled.input`
 const StyleSubmit = styled.div`
   position: sticky;
   bottom: 0;
-  min-height: 2rem;
-  margin-top: 1rem;
   font-size: 1.1rem;
   font-weight: 600;
   text-align: center;
@@ -95,11 +92,7 @@ const StyleCreateButton = styled.div`
   opacity: ${(props) => (props.disabled ? 0.5 : 1)};
 `;
 
-export const NewCollectionPopup = ({
-  properties,
-  favouriteRequest,
-  action,
-}) => {
+export const NewCollectionPopup = ({ properties, favouriteRequest, action }) => {
   const createFavouriteMutation = CreateFavouriteMutation();
   const [collectionName, setCollectionName] = useState("");
   const [searchParams] = useSearchParams();
@@ -161,9 +154,7 @@ export const NewCollectionPopup = ({
         {createFavouriteMutation.isError && (
           <p style={{ color: "red" }}>Adding collection failed!</p>
         )}
-        {createFavouriteMutation.isSuccess && (
-          <p style={{ color: "green" }}>Collection added!</p>
-        )}
+        {createFavouriteMutation.isSuccess && <p style={{ color: "green" }}>Collection added!</p>}
       </StyleSubmit>
     </StylePopUp>
   );

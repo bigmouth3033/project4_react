@@ -8,8 +8,8 @@ import { IoMdStar } from "react-icons/io";
 import { IoMdHeart } from "react-icons/io";
 import { GrFormNext } from "react-icons/gr";
 import { GrFormPrevious } from "react-icons/gr";
-import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { CategoriesRequest } from "../../../shared/api/categoryClientApi";
 import dchc from "@/shared/data/dchc";
 import { CollectionPopUp } from "./CollectionPopUp";
@@ -17,6 +17,7 @@ import getWords from "@/shared/utils/getWords";
 import { UserRequest } from "@/shared/api/userApi";
 import RegisterPopUp from "../custome_header/components/RegisterPopUp";
 import { DeleteFavouriteMutation } from "./api/collectionFavApi";
+import { useInView } from "react-intersection-observer";
 
 //npm install react-multi-carousel --save
 
@@ -50,14 +51,14 @@ const StyleBody = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   padding: 10px 5rem;
-  gap: 1rem;
+  gap: 1.5rem;
 `;
 
 const StyleBodyItem = styled.div`
   aspect-ratio: 1/1.25;
   display: grid; //important
 
-  border-radius: 10px;
+  border-radius: 15px;
 
   & .box {
     width: 100%;
@@ -82,13 +83,13 @@ const StyleBodyItem = styled.div`
 `;
 
 const CarouselStyled = styled(Carousel)`
-  border-radius: 10px;
+  border-radius: 15px;
   aspect-ratio: 1 / 1;
 `;
 const StyleContent = styled.div`
   display: grid;
   grid-template-columns: 6fr 1fr;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   overflow: hidden; /* Ẩn phần thừa */
   white-space: nowrap; /* Không cho dòng xuống */
   text-overflow: ellipsis; /* Thêm dấu "..." */
@@ -102,6 +103,7 @@ const StyleContent = styled.div`
     & div:nth-child(2) {
       color: gray;
     }
+    font-size: 17px;
   }
   //CSS rating
   & > div:nth-child(2) {
@@ -170,9 +172,7 @@ export default function HomePage() {
   //Call User API
   const user = UserRequest();
   const deleteFavouriteMutation = DeleteFavouriteMutation();
-  const [categoryId, setCategoryId] = useState(
-    categoriesRequest.isSuccess == true ? categoriesRequest.data.data[0].id : null
-  );
+  const [categoryId, setCategoryId] = useState(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [propertyId, setPropertyId] = useState(null);
@@ -187,6 +187,12 @@ export default function HomePage() {
   const [selectedRoom, setSelectedRoom] = useState(1);
   const [selectedBed, setSelectedBed] = useState(1);
   const [selectedBathRoom, setSelectedBathRoom] = useState(1);
+  const [guest, setGuest] = useState(4);
+  const [selectedDates, setSelectedDates] = useState([]);
+  const [chosenProvince, setChosenProvince] = useState(null);
+  const [chosenDistrict, setChosenDistrict] = useState(null);
+  const [chosenWard, setChosenWard] = useState(null);
+  const navigate = useNavigate();
 
   //Call main API
   const properties = PropertiesRequest(
@@ -194,12 +200,13 @@ export default function HomePage() {
     selectedPropertyType,
     selectedAmenity,
     isInstant,
-    isPetAllow,
     isSelfCheckin,
+    isPetAllow,
     selectedPrice,
     selectedRoom,
     selectedBed,
-    selectedBathRoom
+    selectedBathRoom,
+    guest
   );
 
   const HandleLove = (propertyID) => {
@@ -228,10 +235,36 @@ export default function HomePage() {
     }
   };
 
+  const { ref, inView, entry } = useInView({
+    threshold: 0,
+  });
+
+  useEffect(() => {
+    if (inView) {
+      if (properties.hasNextPage) {
+        properties.fetchNextPage();
+      }
+    }
+  }, [entry]);
+
   return (
     <StyleContainer>
       <StyleHeaderContainer>
-        <CustomerHeader {...{ properties }} />
+        <CustomerHeader
+          {...{
+            properties,
+            setGuest,
+            selectedDates,
+            setSelectedDates,
+            chosenProvince,
+            setChosenProvince,
+            chosenDistrict,
+            setChosenDistrict,
+            chosenWard,
+            setChosenWard,
+          }}
+        />
+
         <div>
           <FilterBar
             properties={properties}
@@ -260,410 +293,71 @@ export default function HomePage() {
       </StyleHeaderContainer>
       <StyleBody>
         {properties.isSuccess &&
-          properties.data.data.map((item) => {
-            return (
-              <StyleBodyItem key={item.id}>
-                <CarouselStyled
-                  showDots
-                  deviceType={"mobile"}
-                  itemClass="image-item"
-                  responsive={responsive}
-                  customLeftArrow={<CustomLeftArrow />}
-                  customRightArrow={<CustomRightArrow />}
-                >
-                  {item.propertyImages.slice(0, 5).map((image) => {
-                    return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
-                        <img src={image.imageName} />
-                        <IoMdHeart
-                          style={{
-                            position: "absolute",
-                            zIndex: "2",
-                            right: "10px",
-                            top: "10px",
-                            color:
-                              user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
-                                ? "red"
-                                : "gray",
-                            cursor: "pointer",
-                            filter:
-                              "drop-shadow(0.1rem 0 white) drop-shadow(-1px 0 white) drop-shadow(0 1px white) drop-shadow(0 -1px white)",
-                          }}
-                          onClick={() => HandleLove(item.id)}
-                        />
+          properties.data.pages.map((page) => {
+            return page.data.map((item) => {
+              return (
+                <StyleBodyItem key={item.id}>
+                  <CarouselStyled
+                    showDots
+                    deviceType={"mobile"}
+                    itemClass="image-item"
+                    responsive={responsive}
+                    customLeftArrow={<CustomLeftArrow />}
+                    customRightArrow={<CustomRightArrow />}
+                  >
+                    {item.propertyImages.slice(0, 5).map((image) => {
+                      return (
+                        <div className="box" key={image.id} style={{ position: "relative" }}>
+                          <img
+                            onClick={() => navigate(`/property_detail/${item.id}`)}
+                            src={image.imageName}
+                          />
+                          <IoMdHeart
+                            style={{
+                              position: "absolute",
+                              zIndex: "2",
+                              right: "10px",
+                              top: "10px",
+                              fontSize: "22px",
+                              color:
+                                user?.data?.data?.id &&
+                                item.favourites.find((fav) => fav.id.userId == user.data.data.id)
+                                  ? "red"
+                                  : "gray",
+                              cursor: "pointer",
+                              filter:
+                                "drop-shadow(0.1rem 0 white) drop-shadow(-1px 0 white) drop-shadow(0 1px white) drop-shadow(0 -1px white)",
+                            }}
+                            onClick={() => HandleLove(item.id)}
+                          />
+                        </div>
+                      );
+                    })}
+                  </CarouselStyled>
+                  <StyleContent>
+                    <div>
+                      <div>
+                        <b>{getWords(item.propertyTitle, 7)}</b>
                       </div>
-                    );
-                  })}
-                </CarouselStyled>
-                <StyleContent>
-                  <div>
-                    <div>
-                      <b>{getWords(item.propertyTitle, 7)}</b>
-                    </div>
-                    <div>{convertAddressCode(item.addressCode)}</div>
-                    <div>
-                      $ <b>{item.basePrice}</b> /night
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <IoMdStar />
-                      <p>4.6</p>
-                    </div>
-                  </div>
-                </StyleContent>
-              </StyleBodyItem>
-            );
-          })}
-
-        {properties.isSuccess &&
-          properties.data.data.map((item) => {
-            return (
-              <StyleBodyItem key={item.id}>
-                <CarouselStyled
-                  showDots
-                  deviceType={"mobile"}
-                  itemClass="image-item"
-                  responsive={responsive}
-                  customLeftArrow={<CustomLeftArrow />}
-                  customRightArrow={<CustomRightArrow />}
-                >
-                  {item.propertyImages.slice(0, 5).map((image) => {
-                    return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
-                        <img src={image.imageName} />
-                        <IoMdHeart
-                          style={{
-                            position: "absolute",
-                            zIndex: "2",
-                            right: "10px",
-                            top: "10px",
-                            color:
-                              user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
-                                ? "red"
-                                : "gray",
-                            cursor: "pointer",
-                            filter:
-                              "drop-shadow(0.1rem 0 white) drop-shadow(-1px 0 white) drop-shadow(0 1px white) drop-shadow(0 -1px white)",
-                          }}
-                          onClick={() => HandleLove(item.id)}
-                        />
+                      <div>{convertAddressCode(item.addressCode)}</div>
+                      <div>
+                        $ <b>{item.basePrice}</b> /night
                       </div>
-                    );
-                  })}
-                </CarouselStyled>
-                <StyleContent>
-                  <div>
-                    <div>
-                      <b>{getWords(item.propertyTitle, 7)}</b>
                     </div>
-                    <div>{convertAddressCode(item.addressCode)}</div>
                     <div>
-                      $ <b>{item.basePrice}</b> /night
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <IoMdStar />
-                      <p>4.6</p>
-                    </div>
-                  </div>
-                </StyleContent>
-              </StyleBodyItem>
-            );
-          })}
-
-        {properties.isSuccess &&
-          properties.data.data.map((item) => {
-            return (
-              <StyleBodyItem key={item.id}>
-                <CarouselStyled
-                  showDots
-                  deviceType={"mobile"}
-                  itemClass="image-item"
-                  responsive={responsive}
-                  customLeftArrow={<CustomLeftArrow />}
-                  customRightArrow={<CustomRightArrow />}
-                >
-                  {item.propertyImages.slice(0, 5).map((image) => {
-                    return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
-                        <img src={image.imageName} />
-                        <IoMdHeart
-                          style={{
-                            position: "absolute",
-                            zIndex: "2",
-                            right: "10px",
-                            top: "10px",
-                            color:
-                              user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
-                                ? "red"
-                                : "gray",
-                            cursor: "pointer",
-                            filter:
-                              "drop-shadow(0.1rem 0 white) drop-shadow(-1px 0 white) drop-shadow(0 1px white) drop-shadow(0 -1px white)",
-                          }}
-                          onClick={() => HandleLove(item.id)}
-                        />
+                      <div>
+                        <IoMdStar />
+                        <p>4.6</p>
                       </div>
-                    );
-                  })}
-                </CarouselStyled>
-                <StyleContent>
-                  <div>
-                    <div>
-                      <b>{getWords(item.propertyTitle, 7)}</b>
                     </div>
-                    <div>{convertAddressCode(item.addressCode)}</div>
-                    <div>
-                      $ <b>{item.basePrice}</b> /night
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <IoMdStar />
-                      <p>4.6</p>
-                    </div>
-                  </div>
-                </StyleContent>
-              </StyleBodyItem>
-            );
+                  </StyleContent>
+                </StyleBodyItem>
+              );
+            });
           })}
-
-        {properties.isSuccess &&
-          properties.data.data.map((item) => {
-            return (
-              <StyleBodyItem key={item.id}>
-                <CarouselStyled
-                  showDots
-                  deviceType={"mobile"}
-                  itemClass="image-item"
-                  responsive={responsive}
-                  customLeftArrow={<CustomLeftArrow />}
-                  customRightArrow={<CustomRightArrow />}
-                >
-                  {item.propertyImages.slice(0, 5).map((image) => {
-                    return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
-                        <img src={image.imageName} />
-                        <IoMdHeart
-                          style={{
-                            position: "absolute",
-                            zIndex: "2",
-                            right: "10px",
-                            top: "10px",
-                            color:
-                              user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
-                                ? "red"
-                                : "gray",
-                            cursor: "pointer",
-                            filter:
-                              "drop-shadow(0.1rem 0 white) drop-shadow(-1px 0 white) drop-shadow(0 1px white) drop-shadow(0 -1px white)",
-                          }}
-                          onClick={() => HandleLove(item.id)}
-                        />
-                      </div>
-                    );
-                  })}
-                </CarouselStyled>
-                <StyleContent>
-                  <div>
-                    <div>
-                      <b>{getWords(item.propertyTitle, 7)}</b>
-                    </div>
-                    <div>{convertAddressCode(item.addressCode)}</div>
-                    <div>
-                      $ <b>{item.basePrice}</b> /night
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <IoMdStar />
-                      <p>4.6</p>
-                    </div>
-                  </div>
-                </StyleContent>
-              </StyleBodyItem>
-            );
-          })}
-
-        {properties.isSuccess &&
-          properties.data.data.map((item) => {
-            return (
-              <StyleBodyItem key={item.id}>
-                <CarouselStyled
-                  showDots
-                  deviceType={"mobile"}
-                  itemClass="image-item"
-                  responsive={responsive}
-                  customLeftArrow={<CustomLeftArrow />}
-                  customRightArrow={<CustomRightArrow />}
-                >
-                  {item.propertyImages.slice(0, 5).map((image) => {
-                    return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
-                        <img src={image.imageName} />
-                        <IoMdHeart
-                          style={{
-                            position: "absolute",
-                            zIndex: "2",
-                            right: "10px",
-                            top: "10px",
-                            color:
-                              user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
-                                ? "red"
-                                : "gray",
-                            cursor: "pointer",
-                            filter:
-                              "drop-shadow(0.1rem 0 white) drop-shadow(-1px 0 white) drop-shadow(0 1px white) drop-shadow(0 -1px white)",
-                          }}
-                          onClick={() => HandleLove(item.id)}
-                        />
-                      </div>
-                    );
-                  })}
-                </CarouselStyled>
-                <StyleContent>
-                  <div>
-                    <div>
-                      <b>{getWords(item.propertyTitle, 7)}</b>
-                    </div>
-                    <div>{convertAddressCode(item.addressCode)}</div>
-                    <div>
-                      $ <b>{item.basePrice}</b> /night
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <IoMdStar />
-                      <p>4.6</p>
-                    </div>
-                  </div>
-                </StyleContent>
-              </StyleBodyItem>
-            );
-          })}
-
-        {properties.isSuccess &&
-          properties.data.data.map((item) => {
-            return (
-              <StyleBodyItem key={item.id}>
-                <CarouselStyled
-                  showDots
-                  deviceType={"mobile"}
-                  itemClass="image-item"
-                  responsive={responsive}
-                  customLeftArrow={<CustomLeftArrow />}
-                  customRightArrow={<CustomRightArrow />}
-                >
-                  {item.propertyImages.slice(0, 5).map((image) => {
-                    return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
-                        <img src={image.imageName} />
-                        <IoMdHeart
-                          style={{
-                            position: "absolute",
-                            zIndex: "2",
-                            right: "10px",
-                            top: "10px",
-                            color:
-                              user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
-                                ? "red"
-                                : "gray",
-                            cursor: "pointer",
-                            filter:
-                              "drop-shadow(0.1rem 0 white) drop-shadow(-1px 0 white) drop-shadow(0 1px white) drop-shadow(0 -1px white)",
-                          }}
-                          onClick={() => HandleLove(item.id)}
-                        />
-                      </div>
-                    );
-                  })}
-                </CarouselStyled>
-                <StyleContent>
-                  <div>
-                    <div>
-                      <b>{getWords(item.propertyTitle, 7)}</b>
-                    </div>
-                    <div>{convertAddressCode(item.addressCode)}</div>
-                    <div>
-                      $ <b>{item.basePrice}</b> /night
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <IoMdStar />
-                      <p>4.6</p>
-                    </div>
-                  </div>
-                </StyleContent>
-              </StyleBodyItem>
-            );
-          })}
-
-        {properties.isSuccess &&
-          properties.data.data.map((item) => {
-            return (
-              <StyleBodyItem key={item.id}>
-                <CarouselStyled
-                  showDots
-                  deviceType={"mobile"}
-                  itemClass="image-item"
-                  responsive={responsive}
-                  customLeftArrow={<CustomLeftArrow />}
-                  customRightArrow={<CustomRightArrow />}
-                >
-                  {item.propertyImages.slice(0, 5).map((image) => {
-                    return (
-                      <div className="box" key={image.id} style={{ position: "relative" }}>
-                        <img src={image.imageName} />
-                        <IoMdHeart
-                          style={{
-                            position: "absolute",
-                            zIndex: "2",
-                            right: "10px",
-                            top: "10px",
-                            color:
-                              user?.data?.data?.id &&
-                              item.favourites.find((fav) => fav.id.userId == user.data.data.id)
-                                ? "red"
-                                : "gray",
-                            cursor: "pointer",
-                            filter:
-                              "drop-shadow(0.1rem 0 white) drop-shadow(-1px 0 white) drop-shadow(0 1px white) drop-shadow(0 -1px white)",
-                          }}
-                          onClick={() => HandleLove(item.id)}
-                        />
-                      </div>
-                    );
-                  })}
-                </CarouselStyled>
-                <StyleContent>
-                  <div>
-                    <div>
-                      <b>{getWords(item.propertyTitle, 7)}</b>
-                    </div>
-                    <div>{convertAddressCode(item.addressCode)}</div>
-                    <div>
-                      $ <b>{item.basePrice}</b> /night
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <IoMdStar />
-                      <p>4.6</p>
-                    </div>
-                  </div>
-                </StyleContent>
-              </StyleBodyItem>
-            );
-          })}
+        <div ref={ref} style={{ color: "white" }}>
+          _____
+        </div>
       </StyleBody>
       {isPopUp && (
         <CollectionPopUp {...{ properties, propertyId, action: () => setIsPopUp(false) }} />

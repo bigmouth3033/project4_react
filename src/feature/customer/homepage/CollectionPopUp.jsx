@@ -32,7 +32,7 @@ const StyleBody = styled.div`
   flex-grow: 1; //Allow body to take up remaining space
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 2rem;
 `;
 const StyleNotFound = styled.div`
   position: absolute;
@@ -45,9 +45,7 @@ const StyleNotFound = styled.div`
 `;
 const StyleCard = styled.div`
   cursor: pointer;
-  /* width: 80%; */
-  margin: 0 auto;
-  aspect-ratio: 1/1.25;
+  width: 100%;
   font-size: 0.85rem;
   > img {
     aspect-ratio: 1/1;
