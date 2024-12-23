@@ -290,7 +290,9 @@ export default function HomePage() {
                         style={{ position: "relative" }}
                       >
                         <img
-                          onClick={() => navigate(`/product-detail/${item.id}`)}
+                          onClick={() =>
+                            navigate(`/property_detail/${item.id}`)
+                          }
                           src={image.imageName}
                         />
                         <IoMdHeart
@@ -317,7 +319,7 @@ export default function HomePage() {
                   })}
                 </CarouselStyled>
                 <StyleContent
-                  onClick={() => navigate(`/product-detail/${item.id}`)}
+                  onClick={() => navigate(`/property_detail/${item.id}`)}
                 >
                   <div>
                     <div>
